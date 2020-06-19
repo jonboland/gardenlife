@@ -1,6 +1,5 @@
 class Organism:
-    def __init__(self, kind, impact="neutral", prevalence="medium", trend="stable"):
-        self.kind = kind
+    def __init__(self, impact, prevalence, trend, organism_kind):  # organism_kind,
         self.impact_levels = (
             "very negative",
             "negative",
@@ -19,6 +18,7 @@ class Organism:
         self.impact = impact
         self.prevalence = prevalence
         self.trend = trend
+        self.organism_kind = organism_kind
 
     @property
     def impact(self):
@@ -62,3 +62,5 @@ class Organism:
                 setattr(self, measure, setting[setting.index(item) - 1])
         else:
             print(f"{measure.title()} already set to {item}")
+
+test_org = Organism("neutral", "medium", "stable", "creature")
