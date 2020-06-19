@@ -11,8 +11,8 @@ class Creature(Organism):
         trend="stable",
     ):
         super().__init__(impact, prevalence, trend, organism_kind="creature")
-        self.creature_type = creature_type  # Mammal, Rodent, Insect, Bird
-        self.creature_name = creature_name  # Badger, Mouse, Bee, Pigeon
+        self.creature_type = creature_type  # Eg Mammal, Rodent, Insect, Bird
+        self.creature_name = creature_name  # Eg Badger, Mouse, Bee, Pigeon
 
     def __repr__(self):
         return (
