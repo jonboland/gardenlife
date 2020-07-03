@@ -6,18 +6,25 @@ class Creature(Organism):
         self,
         creature_type,
         creature_name,
+        age="unknown",
+        appeared="unknown",
         impact="neutral",
         prevalence="medium",
         trend="stable",
     ):
-        super().__init__(impact, prevalence, trend, organism_kind="creature")
-        self.creature_type = creature_type  # Eg Mammal, Rodent, Insect, Bird
-        self.creature_name = creature_name  # Eg Badger, Mouse, Bee, Pigeon
+        super().__init__(
+            age, appeared, impact, prevalence, trend, organism_kind="creature"
+        )
+        self.creature_type = creature_type  # Eg Tree, Vegetable, Flower, Weed
+        self.creature_name = creature_name  # Eg Ash, Bean, Poppy, Thistle
 
     def __repr__(self):
+        if self.creature_name[0] in "aeiou":
+            name = f"This creature is an {self.creature_name}"
+        else:
+            name = f"This creature is a {self.creature_name}"
         return (
-            f"This creature is a {self.creature_name}. "
-            f"{self.creature_name.title()}s are {self.creature_type}s."
+            f"{name}, which is a {self.creature_type}."
         )
 
     def __eq__(self, other):
