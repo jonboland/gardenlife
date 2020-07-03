@@ -32,15 +32,3 @@ class Plant(Organism):
             self.plant_type == other.plant_type
             and self.plant_name == other.plant_name
         )
-
-    # def planting(self):
-    #     pass
-
-# marrow = Plant("vegetable", "marrow")
-
-# ash = Plant("tree", "ash")
-
-# print(marrow)
-# print()
-# print(ash)
-# print()
