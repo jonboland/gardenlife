@@ -1,20 +1,26 @@
+LEVELS = {
+    "impact_levels": (
+        "very negative",
+        "negative",
+        "neutral",
+        "positive",
+        "very positive",
+    ),
+    "prevalence_levels": ("very low", "low", "medium", "high", "very high"),
+    "trend_levels": (
+        "rapidly decreasing",
+        "decreasing",
+        "stable",
+        "increasing",
+        "rapidly increasing",
+    ),
+}
+
+
 class Organism:
-    def __init__(self, impact, prevalence, trend, organism_kind):
-        self.impact_levels = (
-            "very negative",
-            "negative",
-            "neutral",
-            "positive",
-            "very positive",
-        )
-        self.prevalence_levels = ("very low", "low", "medium", "high", "very high")
-        self.trend_levels = (
-            "rapidly decreasing",
-            "decreasing",
-            "stable",
-            "increasing",
-            "rapidly increasing",
-        )
+    def __init__(self, age, appeared, impact, prevalence, trend, organism_kind):
+        self.age = age
+        self.appeared = appeared
         self.impact = impact
         self.prevalence = prevalence
         self.trend = trend
@@ -26,7 +32,7 @@ class Organism:
 
     @impact.setter
     def impact(self, impact):
-        if impact not in self.impact_levels:
+        if impact not in LEVELS["impact_levels"]:
             raise ValueError(f"{impact} is not a valid impact level")
         self._impact = impact
 
@@ -36,7 +42,7 @@ class Organism:
 
     @prevalence.setter
     def prevalence(self, prevalence):
-        if prevalence not in self.prevalence_levels:
+        if prevalence not in LEVELS["prevalence_levels"]:
             raise ValueError(f"{prevalence} is not a valid prevalence level")
         self._prevalence = prevalence
 
@@ -46,7 +52,7 @@ class Organism:
 
     @trend.setter
     def trend(self, trend):
-        if trend not in self.trend_levels:
+        if trend not in LEVELS["trend_levels"]:
             raise ValueError(f"{trend} is not a valid trend level")
         self._trend = trend
 
@@ -55,11 +61,11 @@ class Organism:
 
     def change_level(self, measure, direction):
         item = getattr(self, measure)
-        setting = getattr(self, f"{measure}_levels")
+        setting = LEVELS[f"{measure}_levels"]
         if direction == "increase" and item != setting[-1]:
-                setattr(self, measure, setting[setting.index(item) + 1])
+            setattr(self, measure, setting[setting.index(item) + 1])
         elif direction == "decrease" and item != setting[0]:
-                setattr(self, measure, setting[setting.index(item) - 1])
+            setattr(self, measure, setting[setting.index(item) - 1])
         else:
             print(f"{measure.title()} already set to {item}")
 

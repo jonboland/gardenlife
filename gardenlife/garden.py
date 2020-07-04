@@ -13,7 +13,6 @@ class Garden:
         self.since = since
         self.creatures = []
         self.plants = []
-        self.fungi = []
         self.tasks = []
 
     def __repr__(self):
