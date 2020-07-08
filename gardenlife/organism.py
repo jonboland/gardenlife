@@ -60,6 +60,8 @@ class Organism:
         return f"{self.__class__.__name__} of type {self.kind}."
 
     def change_level(self, measure, direction):
+        if direction not in ("increase", "decrease"):
+            raise ValueError(f"{direction} is not a valid direction")
         item = getattr(self, measure)
         setting = LEVELS[f"{measure}_levels"]
         if direction == "increase" and item != setting[-1]:
@@ -67,5 +69,5 @@ class Organism:
         elif direction == "decrease" and item != setting[0]:
             setattr(self, measure, setting[setting.index(item) - 1])
         else:
-            print(f"{measure.title()} already set to {item}")
+            print(f"{measure} already set to {item}")
 
