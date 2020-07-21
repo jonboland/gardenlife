@@ -37,6 +37,7 @@ class Garden:
         now = datetime.strptime(str(date.today()), "%Y-%m-%d")
         ago = datetime.strptime(self.since, "%d/%m/%Y")
         dif = now - ago
+        # years, days = divmod(dif.days, 365)
         return f"{self.name} has been in the same hands for {dif.days} days."
 
     @classmethod
@@ -55,6 +56,6 @@ class Garden:
             "Autumn": ["September", "October", "November"],
             "Winter": ["December", "January", "February"],
         }
-        for s, m in seasons.items():
-            if current_month in m:
-                return s
+        for season, months in seasons.items():
+            if current_month in months:
+                return season
