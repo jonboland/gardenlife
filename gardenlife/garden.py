@@ -32,13 +32,21 @@ class Garden:
             f"and {self.owners[-1]}."
         )
 
-    def ownership_length(self):
+    def ownership_length(self, today=str(date.today())):
         """Return current garden ownership length in days."""
-        now = datetime.strptime(str(date.today()), "%Y-%m-%d")
+        now = datetime.strptime(today, "%Y-%m-%d")
         ago = datetime.strptime(self.since, "%d/%m/%Y")
         dif = now - ago
-        # years, days = divmod(dif.days, 365)
-        return f"{self.name} has been in the same hands for {dif.days} days."
+        years, days = divmod(dif.days, 365)
+        print(years, days)
+        if days > 270:
+            years += 1
+        elif days > 90:
+            years += 0.5
+        return (
+            f"{self.name} has been in the same hands for {dif.days:,d} days.\n"
+            f"That's about {years} years."
+        )
 
     @classmethod
     def from_string(cls, garden_details):
@@ -47,9 +55,8 @@ class Garden:
         return cls(name, location, size, since, *owners)
 
     @staticmethod
-    def season():
+    def season(current_month=strftime("%B")):
         """Return the current season."""
-        current_month = strftime("%B")
         seasons = {
             "Spring": ["March", "April", "May"],
             "Summer": ["June", "July", "August"],
