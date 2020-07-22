@@ -6,15 +6,7 @@ from creature import Creature
 
 @pytest.fixture
 def test_creature():
-    return Creature(
-        "mammal",
-        "badger",
-        3,
-        "03/07/20",
-        impact="positive",
-        prevalence="low",
-        trend="stable",
-    )
+    return Creature("mammal", "badger", "03/07/2020", 3, "positive", "low", "stable")
 
 
 def test_trend_increasing(test_creature):
@@ -49,8 +41,12 @@ def test_invalid_impact_level(test_creature):
 
 def test_invalid_direction(test_creature):
     with pytest.raises(ValueError) as excinfo:
-        test_creature.change_level("prevalence", "up")
-    assert "up is not a valid direction" in str(excinfo.value)
+        test_creature.change_level("prevalence", "blank")
+    assert "blank is not a valid direction" in str(excinfo.value)
+
+
+def test_date_appeared(test_creature):
+    assert test_creature.appeared == "03/07/2020"
 
 
 if __name__ == "__main__":

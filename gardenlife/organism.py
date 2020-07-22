@@ -18,9 +18,8 @@ LEVELS = {
 
 
 class Organism:
-    def __init__(self, age, appeared, impact, prevalence, trend, organism_kind):
+    def __init__(self, age, impact, prevalence, trend, organism_kind):
         self.age = age
-        self.appeared = appeared
         self.impact = impact
         self.prevalence = prevalence
         self.trend = trend
@@ -70,4 +69,3 @@ class Organism:
             setattr(self, measure, setting[setting.index(item) - 1])
         else:
             print(f"{measure} already set to {item}")
-
