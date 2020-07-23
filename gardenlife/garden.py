@@ -33,20 +33,18 @@ class Garden:
         )
 
     def ownership_length(self, today=str(date.today())):
-        """Return current garden ownership length in days."""
+        """Return garden ownership length."""
         now = datetime.strptime(today, "%Y-%m-%d")
         ago = datetime.strptime(self.since, "%d/%m/%Y")
         dif = now - ago
         years, days = divmod(dif.days, 365)
-        print(years, days)
-        if days > 270:
+        if days > 240:
             years += 1
-        elif days > 90:
+        elif days > 120:
             years += 0.5
-        return (
-            f"{self.name} has been in the same hands for {dif.days:,d} days.\n"
-            f"That's about {years} years."
-        )
+        exact_days = f"{self.name} has been in the same hands for {dif.days:,d} days."
+        approx_years = f"\nThat's around {years} years."
+        return  exact_days + approx_years if years > 2 else exact_days
 
     @classmethod
     def from_string(cls, garden_details):
