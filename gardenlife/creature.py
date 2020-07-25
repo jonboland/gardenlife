@@ -12,9 +12,7 @@ class Creature(Organism):
         prevalence="medium",
         trend="stable",
     ):
-        super().__init__(
-            age, impact, prevalence, trend, organism_kind="creature"
-        )
+        super().__init__(age, impact, prevalence, trend, organism_kind="creature")
         self.creature_type = creature_type  # Eg Mammal, Rodent, Insect, Bird
         self.creature_name = creature_name  # Eg Badger, Mouse, Bee, Pigeon
         self.appeared = appeared
@@ -24,9 +22,7 @@ class Creature(Organism):
             name = f"This creature is an {self.creature_name}"
         else:
             name = f"This creature is a {self.creature_name}"
-        return (
-            f"{name}, which is a {self.creature_type}."
-        )
+        return f"{name}, which is a {self.creature_type}."
 
     def __eq__(self, other):
         return (

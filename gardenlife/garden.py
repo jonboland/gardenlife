@@ -44,7 +44,7 @@ class Garden:
             years += 0.5
         exact_days = f"{self.name} has been in the same hands for {dif.days:,d} days."
         approx_years = f"\nThat's around {years} years."
-        return  exact_days + approx_years if years > 2 else exact_days
+        return exact_days + approx_years if years > 2 else exact_days
 
     @classmethod
     def from_string(cls, garden_details):
