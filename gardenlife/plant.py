@@ -23,12 +23,9 @@ class Plant(Organism):
             name = f"This plant is an {self.plant_name}"
         else:
             name = f"This plant is a {self.plant_name}"
-        return (
-            f"{name}, which is a {self.plant_type}."
-        )
+        return f"{name}, which is a {self.plant_type}."
 
     def __eq__(self, other):
         return (
-            self.plant_type == other.plant_type
-            and self.plant_name == other.plant_name
+            self.plant_type == other.plant_type and self.plant_name == other.plant_name
         )
