@@ -6,17 +6,18 @@ class Plant(Organism):
         self,
         plant_type,
         plant_name,
+        planted="unknown",
         age="unknown",
-        appeared="unknown",
         impact="neutral",
         prevalence="medium",
         trend="stable",
     ):
         super().__init__(
-            age, appeared, impact, prevalence, trend, organism_kind="plant"
+            age, impact, prevalence, trend, organism_kind="plant"
         )
         self.plant_type = plant_type  # Eg Tree, Vegetable, Flower, Weed
         self.plant_name = plant_name  # Eg Ash, Bean, Poppy, Thistle
+        self.planted = planted
 
     def __repr__(self):
         if self.plant_name[0] in "aeiou":
