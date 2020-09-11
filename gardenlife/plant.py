@@ -1,4 +1,5 @@
 from organism import Organism
+from status import Status
 
 
 class Plant(Organism):
@@ -19,12 +20,12 @@ class Plant(Organism):
             impact,
             prevalence,
             trend,
-            status="current",
             organism_kind="plant",
         )
         self.plant_type = plant_type  # Eg Tree, Vegetable, Flower, Weed
         self.plant_name = plant_name  # Eg Ash, Bean, Poppy, Thistle
         self.planted = planted
+        self.status = Status()
 
     def __repr__(self):
         if self.plant_name[0] in "aeiou":

@@ -5,11 +5,11 @@ from time import strftime
 TODAY = str(date.today())
 MONTH = strftime("%B")
 SEASONS = {
-            "Spring": ["March", "April", "May"],
-            "Summer": ["June", "July", "August"],
-            "Autumn": ["September", "October", "November"],
-            "Winter": ["December", "January", "February"],
-        }
+    "Spring": ["March", "April", "May"],
+    "Summer": ["June", "July", "August"],
+    "Autumn": ["September", "October", "November"],
+    "Winter": ["December", "January", "February"],
+}
 
 
 class Garden:
@@ -65,6 +65,6 @@ class Garden:
     @staticmethod
     def season(current_month=MONTH):
         """Return the current season."""
-        for season, months in seasons.items():
+        for season, months in SEASONS.items():
             if current_month in months:
                 return season

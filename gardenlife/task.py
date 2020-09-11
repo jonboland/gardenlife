@@ -1,4 +1,4 @@
-from garden import DATE, SEASONS
+from status import Status
 
 
 class Task:
@@ -11,7 +11,6 @@ class Task:
         length=None,
         frequency=None,
         due_date=None,
-        status="current",
     ):
         self.task_name = task_name
         self.description = description
@@ -22,8 +21,7 @@ class Task:
         self.due_date = due_date
         self.creatures = []
         self.plants = []
-        self.status = status
+        self.status = Status()
 
     def __repr__(self):
-        f"Task named: {self.task_name}"
-
+        return f"Task: {self.task_name}"
