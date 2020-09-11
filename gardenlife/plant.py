@@ -14,7 +14,13 @@ class Plant(Organism):
         trend="stable",
     ):
         super().__init__(
-            notes, age, impact, prevalence, trend, organism_kind="plant"
+            notes,
+            age,
+            impact,
+            prevalence,
+            trend,
+            status="current",
+            organism_kind="plant",
         )
         self.plant_type = plant_type  # Eg Tree, Vegetable, Flower, Weed
         self.plant_name = plant_name  # Eg Ash, Bean, Poppy, Thistle

@@ -60,6 +60,11 @@ def test_date_appeared(badger):
 def test_notes(badger):
     assert badger.notes == "Digs holes in various parts of the garden."
 
+def test_unarchived(badger):
+    badger.change_status()
+    badger.change_status()
+    assert badger.status == "current"
+
 
 if __name__ == "__main__":
     pytest.main()

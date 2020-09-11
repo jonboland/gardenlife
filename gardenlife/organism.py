@@ -18,12 +18,13 @@ LEVELS = {
 
 
 class Organism:
-    def __init__(self, notes, age, impact, prevalence, trend, organism_kind):
+    def __init__(self, notes, age, impact, prevalence, trend, status, organism_kind):
         self.notes = notes
         self.age = age
         self.impact = impact
         self.prevalence = prevalence
         self.trend = trend
+        self.status = status
         self.organism_kind = organism_kind
 
     @property
@@ -56,6 +57,16 @@ class Organism:
             raise ValueError(f"{trend} is not a valid trend level")
         self._trend = trend
 
+    @property
+    def status(self):
+        return self._status
+
+    @status.setter
+    def status(self, status):
+        if status not in ("current", "archived"):
+            raise ValueError(f"{status} is not a valid status")
+        self._status = status
+
     def __repr__(self):
         return f"{self.__class__.__name__} of type {self.kind}."
 
@@ -70,3 +81,11 @@ class Organism:
             setattr(self, measure, setting[setting.index(item) - 1])
         else:
             print(f"{measure} already set to {item}")
+
+    def change_status(self):
+        if self.status == "current":
+            self.status = "archived"
+        elif self.status == "archived":
+            self.status = "current"
+
+
