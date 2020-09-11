@@ -6,14 +6,15 @@ class Plant(Organism):
         self,
         plant_type,
         plant_name,
-        planted="unknown",
-        age="unknown",
+        planted=None,
+        notes=None,
+        age=None,
         impact="neutral",
         prevalence="medium",
         trend="stable",
     ):
         super().__init__(
-            age, impact, prevalence, trend, organism_kind="plant"
+            notes, age, impact, prevalence, trend, organism_kind="plant"
         )
         self.plant_type = plant_type  # Eg Tree, Vegetable, Flower, Weed
         self.plant_name = plant_name  # Eg Ash, Bean, Poppy, Thistle
