@@ -18,7 +18,8 @@ LEVELS = {
 
 
 class Organism:
-    def __init__(self, age, impact, prevalence, trend, organism_kind):
+    def __init__(self, notes, age, impact, prevalence, trend, organism_kind):
+        self.notes = notes
         self.age = age
         self.impact = impact
         self.prevalence = prevalence

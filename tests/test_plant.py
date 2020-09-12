@@ -47,6 +47,18 @@ def test_invalid_direction(sunflower):
 def test_date_appeared(sunflower):
     assert sunflower.planted == "01/05/2020"
 
+def test_current(sunflower):
+    assert sunflower.status.status == "current"
+
+def test_archived(sunflower):
+    sunflower.status.change_status()
+    assert sunflower.status.status == "archived"
+
+def test_invalid_status(sunflower):
+    with pytest.raises(ValueError) as excinfo:
+        sunflower.status.status = "fishing"
+    assert "fishing is not a valid status" in str(excinfo.value)
+
 
 if __name__ == "__main__":
     pytest.main()

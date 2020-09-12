@@ -1,4 +1,5 @@
 from organism import Organism
+from status import Status
 
 
 class Plant(Organism):
@@ -6,18 +7,25 @@ class Plant(Organism):
         self,
         plant_type,
         plant_name,
-        planted="unknown",
-        age="unknown",
+        planted=None,
+        notes=None,
+        age=None,
         impact="neutral",
         prevalence="medium",
         trend="stable",
     ):
         super().__init__(
-            age, impact, prevalence, trend, organism_kind="plant"
+            notes,
+            age,
+            impact,
+            prevalence,
+            trend,
+            organism_kind="plant",
         )
         self.plant_type = plant_type  # Eg Tree, Vegetable, Flower, Weed
         self.plant_name = plant_name  # Eg Ash, Bean, Poppy, Thistle
         self.planted = planted
+        self.status = Status()
 
     def __repr__(self):
         if self.plant_name[0] in "aeiou":

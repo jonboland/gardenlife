@@ -6,7 +6,16 @@ from creature import Creature
 
 @pytest.fixture
 def badger():
-    return Creature("mammal", "badger", "03/07/2020", 3, "positive", "low", "stable")
+    return Creature(
+        "mammal",
+        "badger",
+        "03/07/2020",
+        "Digs holes in various parts of the garden.",
+        3,
+        "positive",
+        "low",
+        "stable",
+    )
 
 
 def test_trend_increasing(badger):
@@ -47,6 +56,14 @@ def test_invalid_direction(badger):
 
 def test_date_appeared(badger):
     assert badger.appeared == "03/07/2020"
+
+def test_notes(badger):
+    assert badger.notes == "Digs holes in various parts of the garden."
+
+def test_unarchived(badger):
+    badger.status.change_status()
+    badger.status.change_status()
+    assert badger.status.status == "current"
 
 
 if __name__ == "__main__":
