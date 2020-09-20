@@ -12,8 +12,14 @@ class Status:
             raise ValueError(f"{status} is not a valid status")
         self._status = status
 
-    def change_status(self):
-        if self.status == "current":
-            self.status = "archived"
-        elif self.status == "archived":
-            self.status = "current"
+    def __repr__(self):
+        return f"{self.__class__.__name__}('{self.status}')"
+
+    def archive(self):
+        self.status = "archived"
+
+    def unarchive(self):
+        self.status = "current"
+
+    def get(self):
+        return self.status
