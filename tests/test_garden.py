@@ -30,28 +30,28 @@ def test_three_owners_from_string():
 
 def test_ownership_lenght_less_than_2_years(shade):
     assert (
-        shade.ownership_length("1989-01-25")
+        shade.ownership_length("25/01/1989")
         == "Shade has been in the same hands for 721 days."
     )
 
 
 def test_ownership_lenght_over_17_years(shade):
     assert (
-        shade.ownership_length("2004-03-22")
+        shade.ownership_length("22/03/2004")
         == "Shade has been in the same hands for 6,256 days.\nThat's around 17 years."
     )
 
 
 def test_ownership_lenght_around_33_and_a_half_year(shade):
     assert (
-        shade.ownership_length("2020-07-22")
+        shade.ownership_length("22/07/2020")
         == "Shade has been in the same hands for 12,222 days.\nThat's around 33.5 years."
     )
 
 
 def test_ownership_lenght_nearly_40_years(shade):
     assert (
-        shade.ownership_length("2027-01-01")
+        shade.ownership_length("01/01/2027")
         == "Shade has been in the same hands for 14,576 days.\nThat's around 40 years."
     )
 

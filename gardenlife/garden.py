@@ -2,8 +2,6 @@ from datetime import datetime, date
 from time import strftime
 
 
-TODAY = str(date.today())
-MONTH = strftime("%B")
 SEASONS = {
     "Spring": ["March", "April", "May"],
     "Summer": ["June", "July", "August"],
@@ -42,9 +40,12 @@ class Garden:
             f"and {self.owners[-1]}."
         )
 
-    def ownership_length(self, today=TODAY):
+    def ownership_length(self, today=None):
         """Return garden ownership length."""
-        now = datetime.strptime(today, "%Y-%m-%d")
+        if not today:
+            now = date.today()
+        else:
+            now = datetime.strptime(today, "%d/%m/%Y")
         ago = datetime.strptime(self.since, "%d/%m/%Y")
         dif = now - ago
         years, days = divmod(dif.days, 365)
@@ -63,8 +64,10 @@ class Garden:
         return cls(name, location, size, since, *owners)
 
     @staticmethod
-    def season(current_month=MONTH):
+    def season(current_month=None):
         """Return the current season."""
+        if not current_month:
+           current_month = strftime("%B")
         for season, months in SEASONS.items():
             if current_month in months:
                 return season

@@ -61,8 +61,8 @@ def test_notes(badger):
     assert badger.notes == "Digs holes in various parts of the garden."
 
 def test_unarchived(badger):
-    badger.status.change_status()
-    badger.status.change_status()
+    badger.status.archive()
+    badger.status.unarchive()
     assert badger.status.status == "current"
 
 

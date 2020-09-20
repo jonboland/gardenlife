@@ -51,7 +51,7 @@ def test_current(sunflower):
     assert sunflower.status.status == "current"
 
 def test_archived(sunflower):
-    sunflower.status.change_status()
+    sunflower.status.archive()
     assert sunflower.status.status == "archived"
 
 def test_invalid_status(sunflower):
