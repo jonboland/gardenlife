@@ -32,7 +32,13 @@ class Task:
 
     @progress.setter
     def progress(self, progress):
-        if progress not in (None, "outstanding", "in progress", "complete"):
+        if progress not in (
+            None,
+            "outstanding",
+            "in progress",
+            "completed",
+            "completed early",
+        ):
             raise ValueError(f"{progress} is not a valid progress level")
         self._progress = progress
 
@@ -55,30 +61,50 @@ class Task:
     def view_schedule(self):
         return [datetime.strftime(due_date, "%d/%m/%Y") for due_date in self.schedule]
 
-    def add_progress(self, progress, completed_date=None):
+    def add_progress(self, progress, completed_date=None, add_date=True):
         self.progress = progress
-        if self.progress == "complete":
-            if not completed_date:
-                completed_date = datetime.today()
-            else:
-                completed_date = datetime.strptime(completed_date, "%d/%m/%Y")
-            self.completed_dates.append(completed_date)
-            *_, last_scheduled_date = self.schedule
-            if completed_date > last_scheduled_date:
+        if self.progress in ("completed", "completed early"):
+            if add_date:
+                completed_date = self._format_date(completed_date)
+                self.completed_dates.append(completed_date)
+            self._archive_if_finished(completed_date)
+
+    def _archive_if_finished(self, completed_date):
+        if len(self.schedule) == 1:
+            self.status.archive()
+        elif len(self.schedule) == 2:
+            first_date, last_date = self.schedule
+            if (
+                completed_date > last_date
+                or completed_date > first_date
+                and self.progress == "completed early"
+            ):
+                self.status.archive()
+        else:
+            *_, penultimate_date, last_date = self.schedule
+            if (
+                completed_date > last_date
+                or completed_date > penultimate_date
+                and self.progress == "completed early"
+            ):
                 self.status.archive()
 
-    def refresh_progress(self, day=None):
-        if not day:
-            day = datetime.today()
-        if self.progress != "outstanding":
+    def _format_date(self, date):
+        if not date:
+           return datetime.today()
+        return datetime.strptime(date, "%d/%m/%Y")
+
+    def refresh_progress(self, date=None):
+        if self.status.get() != "archived" and self.progress != "outstanding":
+            date = self._format_date(date)
             for idx, due_date in enumerate(self.schedule):
-                if due_date > today:
+                if due_date > date:
                     break
                 if self.completed_dates and self.completed_dates[-1] >= due_date:
-                    break
-                if self.progress == "in progress":
+                    continue
+                if self.progress in ("in progress", "completed early"):
                     try:
-                        if self.schedule[idx + 1] > today:
+                        if self.schedule[idx + 1] > date:
                             break
                         self.progress = "outstanding"
                     except IndexError:
@@ -91,8 +117,8 @@ class Task:
             return status
         return self.progress
 
-    def link_creatures(self):
-        pass
+    def link_creature(self, creature):
+        self.creatures.append(creature)
 
-    def link_plants(self):
-        pass
+    def link_plant(self, plant):
+        self.plants.append(plant)
