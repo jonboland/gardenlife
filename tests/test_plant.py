@@ -1,7 +1,7 @@
 import pytest
 
 import context
-from plant import Plant
+from organisms import Plant
 
 
 @pytest.fixture

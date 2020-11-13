@@ -2,8 +2,7 @@ import datetime
 import pytest
 
 import context
-from creature import Creature
-from plant import Plant
+from organisms import Creature, Plant
 from task import Task, MONTHLY
 
 
