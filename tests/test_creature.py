@@ -1,7 +1,7 @@
 import pytest
 
 import context
-from creature import Creature
+from organisms import Creature
 
 
 @pytest.fixture
