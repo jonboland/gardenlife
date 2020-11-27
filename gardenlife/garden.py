@@ -1,4 +1,4 @@
-from datetime import datetime, date
+from datetime import datetime
 from time import strftime
 
 
@@ -19,9 +19,9 @@ class Garden:
         self.size = size
         self.owners = owners
         self.since = since
-        self.creatures = []
-        self.plants = []
-        self.tasks = []
+        self.creatures = dict()
+        self.plants = dict()
+        self.tasks = dict()
 
     def __repr__(self):
         return (
@@ -43,7 +43,7 @@ class Garden:
     def ownership_length(self, today=None):
         """Return garden ownership length."""
         if not today:
-            now = date.today()
+            now = datetime.today()
         else:
             now = datetime.strptime(today, "%d/%m/%Y")
         ago = datetime.strptime(self.since, "%d/%m/%Y")
@@ -54,6 +54,8 @@ class Garden:
         elif days > 120:
             years += 0.5
         exact_days = f"{self.name} has been in the same hands for {dif.days:,d} days."
+        if dif.days == 1:
+            exact_days = exact_days.replace("days.", "day.")
         approx_years = f"\nThat's around {years} years."
         return exact_days + approx_years if years > 2 else exact_days
 
