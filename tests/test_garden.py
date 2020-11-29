@@ -1,12 +1,12 @@
 import pytest
 
 import context
-from garden import Garden
+import garden
 
 
 @pytest.fixture
 def shade():
-    return Garden("Shade", "Hull", 1, "04/02/1987", "Dave Davidson")
+    return garden.Garden("Shade", "Hull", 1, "04/02/1987", "Dave Davidson")
 
 
 def test_one_owner(shade):
@@ -14,12 +14,14 @@ def test_one_owner(shade):
 
 
 def test_two_owners():
-    light = Garden("Light", "London", 0.2, "13/11/2017", "Paul Daniels", "Ruby Wilson")
+    light = garden.Garden(
+        "Light", "London", 0.2, "13/11/2017", "Paul Daniels", "Ruby Wilson"
+    )
     assert light.ownership() == "The owners of Light are Paul Daniels and Ruby Wilson."
 
 
 def test_three_owners_from_string():
-    string_garden = Garden.from_string(
+    string_garden = garden.Garden.from_string(
         "Bell-Cranleigh-0.1-24/04/2009-Mary Jones-Greg Jones-Spot"
     )
     assert (
@@ -28,7 +30,7 @@ def test_three_owners_from_string():
     )
 
 
-def test_ownership_lenght_less_than_2_years(shade):
+def test_ownership_lenght_less_than_two_years(shade):
     assert (
         shade.ownership_length("25/01/1989")
         == "Shade has been in the same hands for 721 days."
@@ -53,6 +55,23 @@ def test_ownership_lenght_nearly_40_years(shade):
     assert (
         shade.ownership_length("01/01/2027")
         == "Shade has been in the same hands for 14,576 days.\nThat's around 40 years."
+    )
+
+
+def test_ownership_lenght_one_day(shade):
+    assert (
+        shade.ownership_length("05/02/1987")
+        == "Shade has been in the same hands for 1 day."
+    )
+
+
+def test_ownership_lenght_zero_days():
+    new_shade = garden.Garden(
+        "New Shade", "Bath", 0.7, garden.strftime("%d/%m/%Y"), "Paul Daniels"
+    )
+    assert (
+        new_shade.ownership_length()
+        == "New Shade has been in the same hands for 0 days."
     )
 
 
