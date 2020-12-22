@@ -28,6 +28,9 @@ class Creature(Organism):
         self.status = Status()
 
     def __repr__(self):
+        return f"{self.__class__.__name__}({self.creature_type}, {self.creature_name})"
+
+    def __str__(self):
         if self.creature_name[0] in "aeiou":
             name = f"This creature is an {self.creature_name}"
         else:
