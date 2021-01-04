@@ -73,3 +73,12 @@ class Garden:
         for season, months in SEASONS.items():
             if current_month in months:
                 return season
+
+    def add_creature(self, creature):
+        """Add a creature to the garden."""
+        self.creatures[creature.creature_name] = creature
+
+    def add_task(self, task):
+        """Add a garden task."""
+        self.tasks[task.task_name] = task
+
