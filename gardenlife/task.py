@@ -22,8 +22,8 @@ class Task:
         self.progress = progress
         self.completed_dates = sorted([])
         self.added_date = datetime.today()
-        self.creatures = []
-        self.plants = []
+        self.linked_creatures = dict()
+        self.linked_plants = dict()
         self.status = Status()
 
     @property
@@ -118,7 +118,7 @@ class Task:
         return self.progress
 
     def link_creature(self, creature):
-        self.creatures.append(creature)
+        self.linked_creatures[creature.creature_name] = creature
 
-    def link_plant(self, plant):
-        self.plants.append(plant)
+    def unlink_creature(self, creature_name):
+        del self.linked_creatures["badger"]
