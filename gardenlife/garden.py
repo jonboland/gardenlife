@@ -74,11 +74,10 @@ class Garden:
             if current_month in months:
                 return season
 
-    def add_creature(self, creature):
-        """Add a creature to the garden."""
-        self.creatures[creature.creature_name] = creature
-
-    def add_task(self, task):
-        """Add a garden task."""
-        self.tasks[task.task_name] = task
-
+    def add_item(self, category, item):
+        """Add a creature, plant or task to the garden."""
+        if category not in {"creatures", "plants", "tasks"}:
+            raise ValueError(f"{category} is not a valid category")
+        item_type = getattr(self, category)
+        item_name = getattr(item, f"{category[:-1]}_name")
+        item_type[item_name] = item
