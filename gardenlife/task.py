@@ -32,13 +32,13 @@ class Task:
 
     @progress.setter
     def progress(self, progress):
-        if progress not in (
+        if progress not in {
             None,
             "outstanding",
             "in progress",
             "completed",
             "completed early",
-        ):
+        }:
             raise ValueError(f"{progress} is not a valid progress level")
         self._progress = progress
 
@@ -63,7 +63,7 @@ class Task:
 
     def add_progress(self, progress, completed_date=None, add_date=True):
         self.progress = progress
-        if self.progress in ("completed", "completed early"):
+        if self.progress in {"completed", "completed early"}:
             if add_date:
                 completed_date = self._format_date(completed_date)
                 self.completed_dates.append(completed_date)
@@ -102,7 +102,7 @@ class Task:
                     break
                 if self.completed_dates and self.completed_dates[-1] >= due_date:
                     continue
-                if self.progress in ("in progress", "completed early"):
+                if self.progress in {"in progress", "completed early"}:
                     try:
                         if self.schedule[idx + 1] > date:
                             break
@@ -121,4 +121,10 @@ class Task:
         self.linked_creatures[creature.creature_name] = creature
 
     def unlink_creature(self, creature_name):
-        del self.linked_creatures["badger"]
+        del self.linked_creatures[creature_name]
+
+    def link_plant(self, plant):
+        self.linked_plants[plant.plant_name] = plant
+
+    def unlink_plant(self, plant_name):
+        del self.linked_plants[plant_name]
