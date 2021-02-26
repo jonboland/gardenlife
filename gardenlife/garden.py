@@ -25,15 +25,22 @@ class Garden:
 
     def __repr__(self):
         return (
+            f"{self.__class__.__name__}({self.name}, {self.location}, "
+            f"{self.size}, {self.owners}, {self.since})"
+        )
+
+    def __str__(self):
+        acres = "acre" if self.size in {1, "1"} else "acres"
+        return (
             f"{self.__class__.__name__} in {self.location} called {self.name}, "
-            f"which is approximately {self.size} acres in size."
+            f"which is approximately {self.size} {acres} in size."
         )
 
     def ownership(self):
         """Return who currently owns the garden."""
         if len(self.owners) == 1:
             return f"The owner of {self.name} is {self.owners[0]}."
-        elif len(self.owners) == 2:
+        if len(self.owners) == 2:
             return f"The owners of {self.name} are {' and '.join(self.owners)}."
         return (
             f"The owners of {self.name} are {', '.join(self.owners[:-1])} "
@@ -69,7 +76,7 @@ class Garden:
     def season(current_month=None):
         """Return the current season."""
         if not current_month:
-           current_month = strftime("%B")
+            current_month = strftime("%B")
         for season, months in SEASONS.items():
             if current_month in months:
                 return season
@@ -81,3 +88,14 @@ class Garden:
         item_type = getattr(self, category)
         item_name = getattr(item, f"{category[:-1]}_name")
         item_type[item_name] = item
+
+    def remove_item(self, category, item):
+        """Remove a creature, plant or task from the garden."""
+        if category not in {"creatures", "plants", "tasks"}:
+            raise ValueError(f"{category} is not a valid category")
+        item_type = getattr(self, category)
+        if item not in item_type:
+            raise ValueError(
+                f'the {category[:-1]} "{item}" was not found in this garden'
+            )
+        del item_type[item]
