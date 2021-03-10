@@ -49,7 +49,7 @@ class Task:
         return repr(self) == other
 
     def set_schedule(self, start_date=None, frequency=YEARLY, number=50, **kwargs):
-        if start_date == None:
+        if start_date is None:
             start_date = self.schedule[0]
         else:
             start_date = datetime.strptime(start_date, "%d/%m/%Y")
@@ -91,7 +91,7 @@ class Task:
 
     def _format_date(self, date):
         if not date:
-           return datetime.today()
+            return datetime.today()
         return datetime.strptime(date, "%d/%m/%Y")
 
     def refresh_progress(self, date=None):

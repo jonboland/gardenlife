@@ -39,12 +39,11 @@ class Garden:
     def ownership(self):
         """Return who currently owns the garden."""
         if len(self.owners) == 1:
-            return f"The owner of {self.name} is {self.owners[0]}."
+            return f"{self.owners[0]}"
         if len(self.owners) == 2:
-            return f"The owners of {self.name} are {' and '.join(self.owners)}."
+            return f"{' and '.join(self.owners)}"
         return (
-            f"The owners of {self.name} are {', '.join(self.owners[:-1])} "
-            f"and {self.owners[-1]}."
+            f"{', '.join(self.owners[:-1])} and {self.owners[-1]}"
         )
 
     def ownership_length(self, today=None):
@@ -60,10 +59,10 @@ class Garden:
             years += 1
         elif days > 120:
             years += 0.5
-        exact_days = f"{self.name} has been in the same hands for {dif.days:,d} days."
+        exact_days = f"{dif.days:,d} days"
         if dif.days == 1:
-            exact_days = exact_days.replace("days.", "day.")
-        approx_years = f"\nThat's around {years} years."
+            exact_days = exact_days.replace("days", "day")
+        approx_years = f" (around {years} years)"
         return exact_days + approx_years if years > 2 else exact_days
 
     @classmethod
