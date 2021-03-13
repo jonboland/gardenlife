@@ -30,10 +30,9 @@ class Garden:
         )
 
     def __str__(self):
-        acres = "acre" if self.size in {1, "1"} else "acres"
         return (
             f"{self.__class__.__name__} in {self.location} called {self.name}, "
-            f"which is approximately {self.size} {acres} in size."
+            f"which is approximately {self.garden_size()} in size."
         )
 
     def ownership(self):
@@ -65,6 +64,10 @@ class Garden:
         approx_years = f" (around {years} years)"
         return exact_days + approx_years if years > 2 else exact_days
 
+    def garden_size(self):
+        acres = "acre" if self.size in {1, "1"} else "acres"
+        return f"{self.size} {acres}"
+
     @classmethod
     def from_string(cls, garden_details):
         """Construct a garden from a hyphen separated string."""
@@ -95,6 +98,6 @@ class Garden:
         item_type = getattr(self, category)
         if item not in item_type:
             raise ValueError(
-                f'the {category[:-1]} "{item}" was not found in this garden'
+                f'The {category[:-1]} "{item}" was not found in this garden.'
             )
         del item_type[item]
