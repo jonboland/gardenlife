@@ -5,14 +5,14 @@ from status import Status
 class Creature(Organism):
     def __init__(
         self,
-        creature_type,
         creature_name,
+        creature_type,
         appeared=None,
         notes=None,
         age=None,
-        impact="neutral",
-        prevalence="medium",
-        trend="stable",
+        impact=3,
+        prevalence=3,
+        trend=3,
     ):
         super().__init__(
             notes,
@@ -22,13 +22,13 @@ class Creature(Organism):
             trend,
             organism_kind="creature",
         )
-        self.creature_type = creature_type  # Eg Mammal, Rodent, Insect, Bird
         self.creature_name = creature_name  # Eg Badger, Mouse, Bee, Pigeon
+        self.creature_type = creature_type  # Eg Mammal, Rodent, Insect, Bird
         self.appeared = appeared
         self.status = Status()
 
     def __repr__(self):
-        return f"{self.__class__.__name__}({self.creature_type}, {self.creature_name})"
+        return f"{self.__class__.__name__}({self.creature_name}, {self.creature_type})"
 
     def __str__(self):
         if self.creature_name[0] in "aeiou":
@@ -47,14 +47,14 @@ class Creature(Organism):
 class Plant(Organism):
     def __init__(
         self,
-        plant_type,
         plant_name,
+        plant_type,
         planted=None,
         notes=None,
         age=None,
-        impact="neutral",
-        prevalence="medium",
-        trend="stable",
+        impact=3,
+        prevalence=3,
+        trend=3,
     ):
         super().__init__(
             notes,
@@ -64,13 +64,13 @@ class Plant(Organism):
             trend,
             organism_kind="plant",
         )
-        self.plant_type = plant_type  # Eg Tree, Vegetable, Flower, Weed
         self.plant_name = plant_name  # Eg Ash, Bean, Poppy, Thistle
+        self.plant_type = plant_type  # Eg Tree, Vegetable, Flower, Weed
         self.planted = planted
         self.status = Status()
 
     def __repr__(self):
-        return f"{self.__class__.__name__}({self.plant_type}, {self.plant_name})"
+        return f"{self.__class__.__name__}({self.plant_name}, {self.plant_type})"
 
     def __str__(self):
         if self.plant_name[0] in "aeiou":

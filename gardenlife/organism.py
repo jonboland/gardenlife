@@ -1,19 +1,25 @@
 LEVELS = {
-    "impact_levels": (
-        "very negative",
-        "negative",
-        "neutral",
-        "positive",
-        "very positive",
-    ),
-    "prevalence_levels": ("very low", "low", "medium", "high", "very high"),
-    "trend_levels": (
-        "rapidly decreasing",
-        "decreasing",
-        "stable",
-        "increasing",
-        "rapidly increasing",
-    ),
+    "impact_levels": {
+        1: "very negative",
+        2: "negative",
+        3: "neutral",
+        4: "positive",
+        5: "very positive",
+    },
+    "prevalence_levels": {
+        1: "very low", 
+        2: "low", 
+        3: "medium", 
+        4: "high", 
+        5: "very high"
+    },
+    "trend_levels": {
+        1: "rapidly decreasing",
+        2: "decreasing",
+        3: "stable",
+        4: "increasing",
+        5: "rapidly increasing",
+    },
 }
 
 
@@ -32,7 +38,7 @@ class Organism:
 
     @impact.setter
     def impact(self, impact):
-        if impact not in LEVELS["impact_levels"]:
+        if impact not in range(1, 6):
             raise ValueError(f"{impact} is not a valid impact level")
         self._impact = impact
 
@@ -42,7 +48,7 @@ class Organism:
 
     @prevalence.setter
     def prevalence(self, prevalence):
-        if prevalence not in LEVELS["prevalence_levels"]:
+        if prevalence not in range(1, 6):
             raise ValueError(f"{prevalence} is not a valid prevalence level")
         self._prevalence = prevalence
 
@@ -52,21 +58,12 @@ class Organism:
 
     @trend.setter
     def trend(self, trend):
-        if trend not in LEVELS["trend_levels"]:
+        if trend not in range(1, 6):
             raise ValueError(f"{trend} is not a valid trend level")
         self._trend = trend
 
     def __repr__(self):
         return f"{self.__class__.__name__} of type {self.kind}."
 
-    def change_level(self, measure, direction):
-        if direction not in {"increase", "decrease"}:
-            raise ValueError(f"{direction} is not a valid direction")
-        item = getattr(self, measure)
-        setting = LEVELS[f"{measure}_levels"]
-        if direction == "increase" and item != setting[-1]:
-            setattr(self, measure, setting[setting.index(item) + 1])
-        elif direction == "decrease" and item != setting[0]:
-            setattr(self, measure, setting[setting.index(item) - 1])
-        else:
-            print(f"{measure} already set to {item}")
+    def get_level(self, measure):
+        return LEVELS[f"{measure}_levels"][getattr(self, measure)]
