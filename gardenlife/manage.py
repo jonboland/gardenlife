@@ -246,7 +246,126 @@ creatures_tab = [
 # -------------------------------- Manage Plants Tab ------------------------------- #
 
 
-plants_tab = [[sg.Text("This is inside tab 4")], [sg.Input(key="in3")]]
+PLANT_BUTTON_TEXT = ("CREATE/UPDATE", "REMOVE")
+PLANT_FIELD_SIZE = (25, 1)
+
+
+def plant_label(label):
+    return sg.Text(label, size=(13, 1), pad=(0, 10))
+
+
+def plant_slider_label(label):
+    return sg.Text(label, size=(12, 1), pad=((0, 8), (20, 0)))
+
+
+def plant_slider(key=None, tooltip=None):
+    return sg.Slider(
+        range=(1, 5),
+        key=key,
+        orientation="horizontal",
+        default_value=3,
+        size=(19.7, 19),
+        tooltip=tooltip,
+    )
+
+
+plant_name = [
+    plant_label("Plant name:"),
+    sg.Combo(
+        sorted([""] + [plant for plant in garden.plants]),
+        size=PLANT_FIELD_SIZE,
+        key="-PLANT NAME-",
+        enable_events=True,
+    ),
+]
+
+plant_type = [
+    plant_label("Plant type:"),
+    sg.Combo(
+        sorted([""] + [plant.plant_type for plant in garden.plants.values()]),
+        size=PLANT_FIELD_SIZE,
+        key="-PLANT TYPE-",
+    ),
+]
+
+plant_age = [
+    plant_label("Plant age:"),
+    sg.Input(size=PLANT_FIELD_SIZE, key="-PLANT AGE-"),
+]
+
+plant_appeared = [
+    sg.Text("Planted date:", size=(13, 1), pad=(0, (6, 30))),
+    sg.Input(size=PLANT_FIELD_SIZE, key="-PLANT PLANTED DATE-", pad=(5, (6, 30))),
+    sg.CalendarButton("PICK", format="%d/%m/%Y", pad=(0, (6, 30)), key="-PLANT PICK-"),
+]
+
+plant_impact = [
+    plant_slider_label("Impact level:"),
+    plant_slider(
+        key="-PLANT IMPACT SLIDER-",
+        tooltip="Impact levels — 1: very negative, 2: negative, "
+                "3: neutral, 4: positive, 5: very positive",
+    ),
+]
+
+plant_prevalence = [
+    plant_slider_label("Prevalence level:"),
+    plant_slider(
+        key="-PLANT PREVALENCE SLIDER-",
+        tooltip="Prevalence levels — 1: very low, 2: low, "
+                "3: medium, 4: high, 5: very high",
+    ),
+]
+
+plant_trend = [
+    plant_slider_label("Trend level:"),
+    plant_slider(
+        key="-PLANT TREND SLIDER-",
+        tooltip="Trend levels — 1: rapidly decreasing, 2: decreasing, "
+                "3: stable, 4: increasing, 5: rapidly increasing",
+    ),
+]
+
+plant_status = [
+    sg.Text("Status:", size=(8, 1), pad=(0, 10)),
+    sg.Combo(["current", "archived"], size=PLANT_FIELD_SIZE, key="-PLANT STATUS-"),
+]
+
+plant_notes_label = [sg.Text("Notes:", size=(8, 1), pad=(0, 10))]
+
+plant_notes_field = [
+    sg.Multiline(size=(35, 10), pad=(0, 10), key="-PLANT NOTES-", do_not_clear=False)
+]
+
+plant_buttons = [
+    sg.Button(name, size=(15, 2), pad=((0, 7), (35, 0)), key=f"PLANT {name}")
+    for name in PLANT_BUTTON_TEXT
+]
+
+
+plants_left_column = [
+    plant_name,
+    plant_type,
+    plant_age,
+    plant_appeared,
+    plant_impact,
+    plant_prevalence,
+    plant_trend,
+]
+
+plants_right_column = [
+    plant_status,
+    plant_notes_label,
+    plant_notes_field,
+    plant_buttons,
+]
+
+plants_tab = [
+    [
+        sg.Column(plants_left_column, pad=((30, 40), 40)),
+        sg.Column(plants_right_column, pad=((0, 40), 40), vertical_alignment="top"),
+    ]
+]
 
 
 # -------------------------------- Manage Tasks Tab -------------------------------- #
@@ -386,11 +505,77 @@ while True:
 
     except ValueError as error_description:
         sg.popup(error_description, keep_on_top=True)
-    # fmt: on
 
     ######################### Manage Plant Events ##########################
 
+    def clear_plant_values():
+        for value in ("NAME", "TYPE", "AGE", "PLANTED DATE", "STATUS", "NOTES"):
+            window[f"-PLANT {value}-"].update("")
+        for value in ("IMPACT", "PREVALENCE", "TREND"):
+            window[f"-PLANT {value} SLIDER-"].update(3)
+
+
+    def plant_instance():
+        return garden.plants[values["-PLANT NAME-"]]
+
+
+    def update_plant_dropdowns():
+        plant_names = sorted([""] + [plant for plant in garden.plants])
+        plant_types = sorted(
+            [""] + [plant.plant_type for plant in garden.plants.values()]
+        )
+        return (
+            window["-PLANT NAME-"].update(values=plant_names),
+            window["-PLANT TYPE-"].update(values=plant_types),
+        )
+
+    # fmt: off
+    try:
+        if event == "PLANT CREATE/UPDATE":
+            plant = Plant(
+                plant_name=values["-PLANT NAME-"],
+                plant_type=values["-PLANT TYPE-"],
+                age=values["-PLANT AGE-"],
+                planted=values["-PLANT PLANTED DATE-"],
+                notes=values["-PLANT NOTES-"],
+                impact=values["-PLANT IMPACT SLIDER-"],
+                prevalence=values["-PLANT PREVALENCE SLIDER-"],
+                trend=values["-PLANT TREND SLIDER-"],
+            )
+            if values["-PLANT STATUS-"] == "archived":
+                plant.status.archive()
+            garden.add_item("plants", plant)
+            update_plant_dropdowns()
+            clear_plant_values()
+            window["-SUMMARY TOTAL PLANTS-"].update(len(garden.plants))
+
+        elif event == "PLANT REMOVE":
+            garden.remove_item("plants", values["-PLANT NAME-"])
+            update_plant_dropdowns()
+            clear_plant_values()
+            window["-SUMMARY TOTAL PLANTS-"].update(len(garden.plants))
+
+        elif values["-PLANT NAME-"] == "":
+            clear_plant_values()
+
+        # If a plant is selected populate the relevant fields with its values
+        elif values["-PLANT NAME-"]:  # Something is highlighted in the dropdown
+            window["-PLANT TYPE-"].update(plant_instance().plant_type)
+            window["-PLANT AGE-"].update(plant_instance().age)
+            window["-PLANT PLANTED DATE-"].update(plant_instance().planted)
+            window["-PLANT STATUS-"].update(plant_instance().status.get())
+            window["-PLANT NOTES-"].update(plant_instance().notes)
+            window["-PLANT IMPACT SLIDER-"].update(plant_instance().impact)
+            window["-PLANT PREVALENCE SLIDER-"].update(plant_instance().prevalence)
+            window["-PLANT TREND SLIDER-"].update(plant_instance().trend)
+
+    except ValueError as error_description:
+        sg.popup(error_description, keep_on_top=True)
+    # fmt: on
+
     ########################## Manage Task Events ##########################
+
+    ########################################################################
 
 # Finish up by removing from the screen
 window.close()
