@@ -1,6 +1,6 @@
 from calendar import Calendar
 import pickle
-from tkinter.constants import SUNKEN
+from tkinter.constants import SUNKEN, RAISED, RIDGE, GROOVE
 import traceback
 
 import PySimpleGUI as sg
@@ -147,7 +147,7 @@ def creature_slider(key=None, tooltip=None):
 creature_name = [
     creature_label("Creature name:"),
     sg.Combo(
-        sorted([""] + [creature for creature in garden.creatures]),
+        sorted([""] + list(garden.creatures)),
         size=CREATURE_FIELD_SIZE,
         key="-CREATURE NAME-",
         enable_events=True,
@@ -205,15 +205,13 @@ creature_status = [
     sg.Text("Status:", size=(8, 1), pad=(0, 10)),
     sg.Combo(["current", "archived"], size=CREATURE_FIELD_SIZE, key="-CREATURE STATUS-"),
 ]
-# fmt: on
+
 creature_notes_label = [sg.Text("Notes:", size=(8, 1), pad=(0, 10))]
 
-creature_notes_field = [
-    sg.Multiline(size=(35, 10), pad=(0, 10), key="-CREATURE NOTES-", do_not_clear=False)
-]
-
+creature_notes_field = [sg.Multiline(size=(35, 10), pad=(0, 10), key="-CREATURE NOTES-")]
+# fmt: on
 creature_buttons = [
-    sg.Button(name, size=(15, 2), pad=((0, 7), (35, 0)), key=f"CREATURE {name}")
+    sg.Button(name, size=(15, 2), pad=((0, 7), (32, 0)), key=f"CREATURE {name}")
     for name in CREATURE_BUTTON_TEXT
 ]
 
@@ -237,7 +235,7 @@ creatures_right_column = [
 
 creatures_tab = [
     [
-        sg.Column(creatures_left_column, pad=((30, 40), 40)),
+        sg.Column(creatures_left_column, pad=((30, 40), 40), vertical_alignment="top"),
         sg.Column(creatures_right_column, pad=((0, 40), 40), vertical_alignment="top"),
     ]
 ]
@@ -272,7 +270,7 @@ def plant_slider(key=None, tooltip=None):
 plant_name = [
     plant_label("Plant name:"),
     sg.Combo(
-        sorted([""] + [plant for plant in garden.plants]),
+        sorted([""] + list(garden.plants)),
         size=PLANT_FIELD_SIZE,
         key="-PLANT NAME-",
         enable_events=True,
@@ -333,12 +331,10 @@ plant_status = [
 
 plant_notes_label = [sg.Text("Notes:", size=(8, 1), pad=(0, 10))]
 
-plant_notes_field = [
-    sg.Multiline(size=(35, 10), pad=(0, 10), key="-PLANT NOTES-", do_not_clear=False)
-]
+plant_notes_field = [sg.Multiline(size=(35, 10), pad=(0, 10), key="-PLANT NOTES-")]
 
 plant_buttons = [
-    sg.Button(name, size=(15, 2), pad=((0, 7), (35, 0)), key=f"PLANT {name}")
+    sg.Button(name, size=(15, 2), pad=((0, 7), (32, 0)), key=f"PLANT {name}")
     for name in PLANT_BUTTON_TEXT
 ]
 
@@ -362,7 +358,7 @@ plants_right_column = [
 
 plants_tab = [
     [
-        sg.Column(plants_left_column, pad=((30, 40), 40)),
+        sg.Column(plants_left_column, pad=((30, 40), 40), vertical_alignment="top"),
         sg.Column(plants_right_column, pad=((0, 40), 40), vertical_alignment="top"),
     ]
 ]
@@ -371,14 +367,159 @@ plants_tab = [
 # -------------------------------- Manage Tasks Tab -------------------------------- #
 
 
-tasks_tab = [[sg.Text("This is inside tab 5")], [sg.Input(key="in4")]]
+TASK_BUTTON_TEXT = ("CREATE/UPDATE", "REMOVE")
+TASK_FIELD_SIZE = (25, 1)
 
-# task_elements += [
-#     [
-#         sg.Listbox(values=('Listbox Item 1', 'Listbox Item 2', 'Listbox Item 3'),
-#         select_mode=sg.LISTBOX_SELECT_MODE_EXTENDED, size=(30, 5), key="-LINKED CREATURES-"),
-#     ]
-# ]
+
+def task_label(label):
+    return sg.Text(label, size=(13, 1), pad=(0, 10))
+
+
+task_name = [
+    task_label("Task name:"),
+    sg.Combo(
+        sorted([""] + list(garden.tasks)),
+        size=TASK_FIELD_SIZE,
+        key="-TASK NAME-",
+        enable_events=True,
+    ),
+]
+
+task_progress = [
+    task_label("Progress:"),
+    sg.Combo(
+        ["outstanding", "in progress", "completed", "completed early"],
+        size=TASK_FIELD_SIZE,
+        key="-TASK PROGRESS-",
+        enable_events=True,
+    ),
+]
+
+task_last_completed = [
+    sg.Text("Last completed:", size=(13, 1), pad=(0, (6, 0))),
+    sg.Input(size=TASK_FIELD_SIZE, key="-TASK LAST COMPLETED DATE-", pad=(5, (6, 0))),
+    sg.CalendarButton("PICK", format="%d/%m/%Y", pad=(0, (6, 0)), key="-TASK PICK COMPLETED-"),
+]
+
+task_next_due = [
+    sg.Text("Next due:", size=(13, 1), pad=(0, (10, 0))),
+    sg.Text("", size=(22, 1), relief=SUNKEN, pad=(5, (16, 2)), key="-TASK NEXT DUE-"),
+]
+
+task_first_horizontal_line = [sg.Text("_" * 41, pad=(0, 0))]
+
+task_first_due = [
+    sg.Text("First due:", size=(13, 1), pad=(0, (16, 10))),
+    sg.Input(size=TASK_FIELD_SIZE, key="-TASK FIRST DUE DATE-", pad=(5, (6, 0))),
+    sg.CalendarButton("PICK", format="%d/%m/%Y", pad=(0, (6, 0)), key="-TASK PICK FIRST DUE-"),
+]
+
+task_assignee = [
+    task_label("Assignee:"),
+    sg.Input(size=TASK_FIELD_SIZE, key="-TASK ASSIGNEE-"),
+]
+
+task_length = [
+    sg.Text("Length:", size=(13, 1), pad=(0, (10, 0))),
+    sg.Input(size=TASK_FIELD_SIZE, key="-TASK LENGTH-", pad=(4, (10, 0))),
+]
+
+task_second_horizontal_line = [sg.Text("_" * 41, pad=(0, 0))]
+
+task_link_labels = [
+    sg.Text("Linked creatures:", size=(12, 1), pad=((0, 68), 10)),
+    sg.Text("Linked plants:", size=(12, 1), pad=(0, 10)),
+]
+
+task_link_organisms = [
+    sg.Listbox(
+        values=('Listbox Item 1', 'Listbox Item 2', 'Listbox Item 3'),
+        select_mode=sg.LISTBOX_SELECT_MODE_EXTENDED, size=(17, 5), pad=((1, 26), 0), key="-LINKED CREATURES-"),
+    sg.Listbox(
+        values=('Listbox Item 1', 'Listbox Item 2', 'Listbox Item 3'),
+        select_mode=sg.LISTBOX_SELECT_MODE_EXTENDED, size=(17, 5), key="-LINKED PLANTS-"),
+]
+
+task_status = [
+    sg.Text("Status:", size=(8, 1), pad=((2, 0), 10)),
+    sg.Combo(["current", "archived"], size=TASK_FIELD_SIZE, key="-TASK STATUS-"),
+]
+
+task_notes_label = [sg.Text("Description:", size=(10, 1), pad=(2, 10))]
+
+task_description_field = [sg.Multiline(size=(37, 5), pad=(5, (10, 15)), key="-TASK NOTES-")]
+
+task_repeat_start = [
+    sg.Text("Start date:", size=(8, 1), pad=(3, (13, 0))),
+    sg.Input(size=(18, 1), key="-TASK REPEAT START DATE-", pad=(5, (13, 0))),
+    sg.CalendarButton("PICK", format="%d/%m/%Y", pad=((0, 7), (13, 0)), key="-TASK PICK REPEAT START-"),
+]
+
+task_repeat_frequency = [
+    sg.Text("Frequency:", size=(8, 1), pad=(3, (6, 0))),
+    sg.Combo(["daily", "weekly", "monthly", "yearly"], size=(18, 1), pad=(5, (6, 0)), key="-TASK REPEAT FREQUENCY-"),
+]
+
+task_repeat_interval = [
+    sg.Text("Interval:", size=(8, 1), pad=(3, (8, 0))),
+    sg.Input(size=(18, 1), key="-TASK REPEAT INTERVAL-", pad=(5, (8, 0))),
+]
+
+task_repeat_count = [
+    sg.Text("Count:", size=(8, 1), pad=(3, (8, 20))),
+    sg.Input(size=(18, 1), key="-TASK REPEAT COUNT-", pad=(5, (8, 20))),
+]
+
+repeat_contents = [
+    task_repeat_start, 
+    task_repeat_frequency, 
+    task_repeat_interval, 
+    task_repeat_count
+]
+
+task_repeat_frame = [
+    sg.Frame(
+        "Repeat schedule", 
+        repeat_contents, 
+        relief=GROOVE, # SUNKEN, RAISED, RIDGE, GROOVE
+        border_width=2,
+        size=(25, 5),
+    )
+]
+
+task_buttons = [
+    sg.Button(name, size=(15, 2), pad=((4, 4), (36, 0)), key=f"TASK {name}")
+    for name in TASK_BUTTON_TEXT
+]
+
+plants_left_column = [
+    task_name,
+    task_progress,
+    task_last_completed,
+    task_next_due,
+    task_first_horizontal_line,
+    task_first_due,
+    task_assignee,
+    task_length,
+    task_second_horizontal_line,
+    task_link_labels,
+    task_link_organisms,
+]
+
+plants_right_column = [
+    task_status,
+    task_notes_label,
+    task_description_field,
+    task_repeat_frame,
+    task_buttons,
+]
+
+tasks_tab = [
+    [
+        sg.Column(plants_left_column, pad=((30, 40), 40), vertical_alignment="top"),
+        sg.Column(plants_right_column, pad=((0, 40), 40), vertical_alignment="top"),
+    ]
+]
 
 
 # ----------------------------------- Main Layout ---------------------------------- #
