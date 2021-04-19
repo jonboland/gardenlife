@@ -10,7 +10,8 @@ from garden import Garden
 from organisms import Creature, Plant
 from task import Task, DAILY, WEEKLY, MONTHLY, YEARLY
 
-FREQUENCIES = {"daily": DAILY, "weekly": WEEKLY, "monthly": MONTHLY, "yearly": YEARLY}
+
+# FREQUENCIES = {"daily": DAILY, "weekly": WEEKLY, "monthly": MONTHLY, "yearly": YEARLY}
 
 
 sg.theme(new_theme="LightGray1")
@@ -765,11 +766,11 @@ while True:
         )
 
         if values["-TASK STATUS-"] == "archived":
-            plant.status.archive()
+            task.status.archive()
 
         task.set_schedule(
             start_date=values["-TASK START-"],
-            freq=FREQUENCIES.get(values["-TASK FREQUENCY-"]),
+            freq=values["-TASK FREQUENCY-"],
             count=values["-TASK COUNT-"],
             bymonth=values["-TASK BY MONTH-"],
             interval=values["-TASK INTERVAL-"]
@@ -779,18 +780,24 @@ while True:
             task.completed_dates = task_instance().completed_dates       
         # Add the task to the garden, overwriting the old version if it already exists
         garden.add_item("tasks", task)
+        # Clear the task variable once the task has been added to the garden
+        task = None
+        update_task_dropdown()
+        clear_task_values()
+        clear_organism_links()
+        # Update the total tasks number shown on the summary tab
+        window["-SUMMARY TOTAL TASKS-"].update(len(garden.tasks))
+
+    elif event == "TASK REMOVE":
+        garden.remove_item("tasks", values["-TASK NAME-"])
+        task = None        
         update_task_dropdown()
         clear_task_values()
         clear_organism_links()
         window["-SUMMARY TOTAL TASKS-"].update(len(garden.tasks))
 
-    elif event == "TASK REMOVE":
-            garden.remove_item("tasks", values["-TASK NAME-"])
-            update_task_dropdown()
-            clear_task_values()
-            window["-SUMMARY TOTAL TASKS-"].update(len(garden.tasks))
-
     elif values["-TASK NAME-"] == "":
+            task = None
             clear_task_values()
             clear_organism_links()
     
@@ -827,8 +834,9 @@ while True:
                 window.Enable()
                 break
 
-    # If a task is selected populate the relevant fields with its values
+    
     elif values["-TASK NAME-"]:  # Something is highlighted in the dropdown
+        # When a task is selected populate the relevant fields with its values
         window["-TASK PROGRESS-"].update(task_instance().get_current_progress())
         window["-TASK NEXT DUE-"].update(task_instance().get_next_due_date())
         window["-TASK ASSIGNEE-"].update(task_instance().assignee)
@@ -842,6 +850,7 @@ while True:
         window["-TASK COUNT-"].update(task_instance().raw_schedule["count"])
         window["-TASK BY MONTH-"].update(task_instance().raw_schedule["bymonth"])
         window["-TASK INTERVAL-"].update(task_instance().raw_schedule["interval"])
+        task = task_instance()  # Assign instance to task variable so progress can be added
 
     ########################################################################
 
