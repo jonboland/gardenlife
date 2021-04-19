@@ -1,63 +1,60 @@
 import pytest
 
 import context
-from organisms import Plant
+import organisms
 
 
 @pytest.fixture
 def sunflower():
-    return Plant("flower", "sunflower", planted="01/05/2020")
+    return organisms.Plant(
+        plant_name="sunflower",
+        plant_type="flower",
+        planted="03/05/2021",
+        prevalence=2,
+        trend=3,
+    )
 
 
-def test_trend_decreasing(sunflower):
-    sunflower.change_level("trend", "decrease")
-    assert sunflower.trend == "decreasing"
+def test_impact_neutral(sunflower):
+    assert sunflower.get_level("impact") == "neutral"
 
 
-def test_trend_already_rapidly_decreasing(sunflower, capsys):
-    for x in range(3):
-        sunflower.change_level("trend", "decrease")
-    captured = capsys.readouterr()
-    assert captured.out == "trend already set to rapidly decreasing\n"
-
-def test_prevalence_high(sunflower):
-    sunflower.change_level("prevalence", "increase")
-    assert sunflower.prevalence == "high"
-
-
-def test_impact_already_very_positive(sunflower, capsys):
-    for x in range(3):
-        sunflower.change_level("impact", "increase")
-    captured = capsys.readouterr()
-    assert captured.out == "impact already set to very positive\n"
+def test_prevalence_low(sunflower):
+    sunflower.prevalence = 1
+    assert sunflower.get_level("prevalence") == "very low"
 
 
 def test_invalid_trend_level(sunflower):
     with pytest.raises(ValueError) as excinfo:
-        sunflower.trend = "neutral"
-    assert "neutral is not a valid trend level" in str(excinfo.value)
-
-
-def test_invalid_direction(sunflower):
-    with pytest.raises(ValueError) as excinfo:
-        sunflower.change_level("impact", "blank")
-    assert "blank is not a valid direction" in str(excinfo.value)
+        sunflower.trend = "very positive"
+    assert str(excinfo.value) == "very positive is not a valid trend level"
 
 
 def test_date_appeared(sunflower):
-    assert sunflower.planted == "01/05/2020"
+    assert sunflower.planted == "03/05/2021"
+
+
+def test_plant_repr(sunflower):
+    assert repr(sunflower) == "Plant(sunflower, flower)"
+
+
+def test_plant_str(sunflower):
+    assert str(sunflower) == "This plant is a sunflower, which is a flower."
+
 
 def test_current(sunflower):
     assert sunflower.status.status == "current"
+
 
 def test_archived(sunflower):
     sunflower.status.archive()
     assert sunflower.status.status == "archived"
 
+
 def test_invalid_status(sunflower):
     with pytest.raises(ValueError) as excinfo:
         sunflower.status.status = "fishing"
-    assert "fishing is not a valid status" in str(excinfo.value)
+    assert str(excinfo.value) == "fishing is not a valid status"
 
 
 if __name__ == "__main__":
