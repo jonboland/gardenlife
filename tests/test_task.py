@@ -1,35 +1,36 @@
-import datetime
+from datetime import datetime
 import pytest
+import time
 
 import context
-from organisms import Creature, Plant
 from task import Task, MONTHLY
 
 
 @pytest.fixture
 def cut_hedges():
     task = Task(
-        "cut hedges",
-        "01/05/2020",
-        "Cut all hedges in garden ready for Summer and Winter.",
-        "Bob",
-        8,
+        task_name="cut hedges", 
+        description="Cut all hedges in garden ready for Summer and Winter.",
+        assignee="Bob",
+        length="8",
     )
-    task.set_schedule(number=5, bymonth=(5, 10))
+    task.set_schedule(start_date="01/05/2020", count="5", bymonth="5 10")
     return task
 
 
 @pytest.fixture
 def cut_hedges_too():
-    return Task("cut hedges", "01/05/2020")
+    task = Task("cut hedges")
+    task.set_schedule(start_date="01/05/2020")
+    return task
 
 
 @pytest.fixture
 def prune_tree():
-    task = Task("prune tree", "01/07/2020", "Prune tree by front gate.", "Jill", 2)
-    task.set_schedule(number=3)
+    task = Task("prune tree", "Prune tree by front gate.", "Jill", "2")
     return task
 
+# Status
 
 def test_status_current(cut_hedges):
     assert cut_hedges.status.get() == "current"
@@ -45,6 +46,7 @@ def test_status_unarchived(cut_hedges):
     cut_hedges.status.unarchive()
     assert cut_hedges.status.get() == "current"
 
+# Equality
 
 def test_equality_comparison_false(cut_hedges, prune_tree):
     assert (cut_hedges == prune_tree) == False
@@ -53,278 +55,237 @@ def test_equality_comparison_false(cut_hedges, prune_tree):
 def test_equality_comparison_true(cut_hedges, cut_hedges_too):
     assert (cut_hedges == cut_hedges_too) == True
 
+# Set schedule
 
 def test_set_schedule_without_start_date(prune_tree):
-    prune_tree.set_schedule(number=2)
-    assert prune_tree.schedule == [
-        datetime.datetime(2020, 7, 1, 0, 0),
-        datetime.datetime(2021, 7, 1, 0, 0),
-    ]
+    prune_tree.set_schedule(count=1)
+    assert prune_tree.schedule[0].strftime("%d/%m/%Y")  == time.strftime("%d/%m/%Y")
 
 
 def test_set_schedule_with_start_date(prune_tree):
-    prune_tree.set_schedule("01/10/2020", MONTHLY, 4)
+    prune_tree.set_schedule(start_date="01/10/2020", freq=MONTHLY, count="4")
     assert prune_tree.schedule == [
-        datetime.datetime(2020, 10, 1, 0, 0),
-        datetime.datetime(2020, 11, 1, 0, 0),
-        datetime.datetime(2020, 12, 1, 0, 0),
-        datetime.datetime(2021, 1, 1, 0, 0),
+        datetime(2020, 10, 1, 0, 0),
+        datetime(2020, 11, 1, 0, 0),
+        datetime(2020, 12, 1, 0, 0),
+        datetime(2021, 1, 1, 0, 0),
     ]
 
+# Add completed dates
 
-def test_view_schedule(cut_hedges):
-    assert cut_hedges.view_schedule() == [
-        "01/05/2020",
-        "01/10/2020",
-        "01/05/2021",
-        "01/10/2021",
-        "01/05/2022",
+def test_add_one_completed_date(cut_hedges):
+    scheduled_dates = {
+        "01/05/2020": True,
+        "01/10/2020": False,
+        "01/05/2021": False,
+        "01/10/2021": False,
+        "01/05/2022": False,
+    }
+    cut_hedges.update_completed_dates(scheduled_dates)
+    assert cut_hedges.completed_dates == [datetime(2020, 5, 1, 0, 0)]
+
+def test_add_two_completed_date(cut_hedges):
+    scheduled_dates = {
+        "01/05/2020": True,
+        "01/10/2020": False,
+        "01/05/2021": True,
+        "01/10/2021": False,
+        "01/05/2022": False,
+    }
+    cut_hedges.update_completed_dates(scheduled_dates)
+    assert cut_hedges.completed_dates == [
+        datetime(2020, 5, 1, 0, 0), 
+        datetime(2021, 5, 1, 0, 0),
     ]
 
+def test_add_same_two_completed_date_twice(cut_hedges):
+    scheduled_dates = {
+        "01/05/2020": True,
+        "01/10/2020": False,
+        "01/05/2021": True,
+        "01/10/2021": False,
+        "01/05/2022": False,
+    }
+    cut_hedges.update_completed_dates(scheduled_dates)
+    cut_hedges.update_completed_dates(scheduled_dates)
+    assert cut_hedges.completed_dates == [
+        datetime(2020, 5, 1, 0, 0), 
+        datetime(2021, 5, 1, 0, 0),
+    ]
 
-def test_link_creature(cut_hedges):
-    badger = Creature("mammal", "badger")
-    cut_hedges.link_creature(badger)
-    assert cut_hedges.creatures[0] == badger
-
-
-def test_link_plant(prune_tree):
-    sunflower = Plant("flower", "sunflower", planted="01/05/2020")
-    prune_tree.link_plant(sunflower)
-    assert prune_tree.plants[0] == sunflower
-
-
-# Add Progress
-
-
-def test_add_progress_completed_one_off(cut_hedges_too):
-    cut_hedges_too.add_progress("completed", completed_date="03/05/2020")
-    assert cut_hedges_too.progress == "completed"
-    assert cut_hedges_too.completed_dates[-1] == datetime.datetime(2020, 5, 3, 0, 0)
-    assert cut_hedges_too.status.get() == "archived"
-
-
-def test_add_progress_completed_two_due_dates(prune_tree):
-    prune_tree.set_schedule(number=2)  # Due dates: 01/07/2020, 01/07/2021
-    prune_tree.add_progress("completed", completed_date="03/09/2020")
-    assert prune_tree.progress == "completed"
-    assert prune_tree.completed_dates[-1] == datetime.datetime(2020, 9, 3, 0, 0)
-    assert prune_tree.status.get() == "current"
-
-
-def test_add_progress_completed_two_due_dates_archived(prune_tree):
-    prune_tree.set_schedule(number=2)  # Due dates: 01/07/2020, 01/07/2021
-    prune_tree.add_progress("completed", completed_date="03/09/2021")
-    assert prune_tree.progress == "completed"
-    assert prune_tree.status.get() == "archived"
-
-
-def test_add_progress_completed_several_due_dates(cut_hedges):
-    cut_hedges.add_progress("completed", completed_date="03/05/2020")
-    assert cut_hedges.progress == "completed"
-    assert cut_hedges.status.get() == "current"
-
-
-def test_add_progress_completed_early(cut_hedges):
-    cut_hedges.add_progress("completed early", completed_date="03/04/2020")
-    assert cut_hedges.progress == "completed early"
-    assert cut_hedges.status.get() == "current"
-
-
-def test_add_progress_in_progress(cut_hedges):
-    cut_hedges.add_progress("in progress", completed_date="04/06/2021")
-    assert cut_hedges.progress == "in progress"
+def test_remove_one_completed_date(cut_hedges):
+    scheduled_dates = {
+        "01/05/2020": True,
+        "01/10/2020": False,
+        "01/05/2021": False,
+        "01/10/2021": False,
+        "01/05/2022": False,
+    }
+    cut_hedges.update_completed_dates(scheduled_dates)
+    assert cut_hedges.completed_dates == [datetime(2020, 5, 1, 0, 0)]
+    scheduled_dates = {
+        "01/05/2020": False,
+        "01/10/2020": False,
+        "01/05/2021": False,
+        "01/10/2021": False,
+        "01/05/2022": False,
+    }
+    cut_hedges.update_completed_dates(scheduled_dates)
     assert cut_hedges.completed_dates == []
-    assert cut_hedges.status.get() == "current"
+
+def test_remove_two_completed_dates(cut_hedges):
+    scheduled_dates = {
+        "01/05/2020": True,
+        "01/10/2020": False,
+        "01/05/2021": True,
+        "01/10/2021": False,
+        "01/05/2022": True,
+    }
+    cut_hedges.update_completed_dates(scheduled_dates)
+    assert cut_hedges.completed_dates == [
+        datetime(2020, 5, 1, 0, 0), 
+        datetime(2021, 5, 1, 0, 0),
+        datetime(2022, 5, 1, 0, 0),
+    ]
+    scheduled_dates = {
+        "01/05/2020": True,
+        "01/10/2020": False,
+        "01/05/2021": False,
+        "01/10/2021": False,
+        "01/05/2022": False,
+    }
+    cut_hedges.update_completed_dates(scheduled_dates)
+    assert cut_hedges.completed_dates == [datetime(2020, 5, 1, 0, 0)]
+
+# Get all progress
+
+def test_get_all_progress_no_completed_dates(cut_hedges):
+    assert cut_hedges.get_all_progress() == {
+        "01/05/2020": False,
+        "01/10/2020": False,
+        "01/05/2021": False,
+        "01/10/2021": False,
+        "01/05/2022": False,
+    }
 
 
-def test_add_progress_completed_archived(cut_hedges):
-    cut_hedges.add_progress(
-        "completed", completed_date="04/06/2022"
-    )  # Final date: 01/05/2022
-    assert cut_hedges.progress == "completed"
-    assert cut_hedges.completed_dates[-1] == datetime.datetime(2022, 6, 4, 0, 0)
-    assert cut_hedges.status.get() == "archived"
+def test_get_all_progress_with_completed_dates(cut_hedges):
+    scheduled_dates = {"01/05/2020": True, "01/10/2021": True}
+    cut_hedges.update_completed_dates(scheduled_dates)
+    assert cut_hedges.get_all_progress() == {
+        "01/05/2020": True,
+        "01/10/2020": False,
+        "01/05/2021": False,
+        "01/10/2021": True,
+        "01/05/2022": False,
+    }
+
+# Get current progress
+
+def test_current_progress_no_completed_dates_not_yet_due(cut_hedges):
+    current_progress = cut_hedges.get_current_progress(current_date="30/04/2020")
+    assert current_progress == "Not yet due"
 
 
-def test_add_progress_completed_today(prune_tree):
-    prune_tree.add_progress("completed")
-    assert prune_tree.completed_dates[-1] == datetime.datetime.today()
+def test_current_progress_no_completed_dates_due(cut_hedges):
+    current_progress = cut_hedges.get_current_progress(current_date="01/05/2020")
+    assert current_progress == "Due"
 
 
-# Refresh Progress
+def test_current_progress_no_completed_dates_overdue(cut_hedges):
+    current_progress = cut_hedges.get_current_progress(current_date="01/09/2020")
+    assert current_progress == "Overdue"
 
 
-def test_refresh_progress_one_off_task_not_due(cut_hedges_too):
-    cut_hedges_too.refresh_progress("01/04/2020")  # Due 01/05/2020
-    assert not cut_hedges_too.progress
-    assert cut_hedges_too.status.get() == "current"
+def test_current_progress_no_completed_dates_very_overdue(cut_hedges):
+    current_progress = cut_hedges.get_current_progress(current_date="01/11/2020")
+    assert current_progress == "Very overdue"
 
 
-def test_refresh_progress_one_off_task_due(cut_hedges_too):
-    cut_hedges_too.refresh_progress("02/07/2020")  # Due 01/05/2020
-    assert cut_hedges_too.progress == "outstanding"
-    assert cut_hedges_too.status.get() == "current"
+def test_current_progress_with_completed_date_due(cut_hedges):
+    scheduled_dates = {"01/05/2020": True, "01/10/2020": False}
+    cut_hedges.update_completed_dates(scheduled_dates)
+    current_progress = cut_hedges.get_current_progress(current_date="01/10/2020")
+    assert current_progress == "Due"
 
 
-def test_refresh_progress_one_off_task_completed_before_due(cut_hedges_too):
-    cut_hedges_too.add_progress(
-        "completed early", completed_date="01/04/2020"
-    )  # Due 01/05/2020
-    cut_hedges_too.refresh_progress("01/06/2020")
-    assert cut_hedges_too.progress == "completed early"
-    assert cut_hedges_too.status.get() == "archived"
+def test_current_progress_with_completed_date_one_missed_date(cut_hedges):
+    scheduled_dates = {"01/05/2020": True}
+    cut_hedges.update_completed_dates(scheduled_dates)
+    current_progress = cut_hedges.get_current_progress(current_date="01/11/2020")
+    assert current_progress == "Overdue"
 
 
-def test_refresh_progress_one_off_task_completed_on_due(cut_hedges_too):
-    cut_hedges_too.add_progress(
-        "completed", completed_date="01/05/2020"
-    )  # Due 01/05/2020
-    cut_hedges_too.refresh_progress("01/07/2020")
-    assert cut_hedges_too.progress == "completed"
-    assert cut_hedges_too.status.get() == "archived"
+def test_current_progress_with_completed_dates_two_missed_dates(cut_hedges):
+    scheduled_dates = {"01/05/2020": True, "01/10/2020": True}
+    cut_hedges.update_completed_dates(scheduled_dates)
+    current_progress = cut_hedges.get_current_progress(current_date="01/11/2021")
+    assert current_progress == "Very overdue"
 
 
-def test_refresh_progress_one_off_task_completed_after_due(cut_hedges_too):
-    cut_hedges_too.add_progress(
-        "completed", completed_date="04/06/2020"
-    )  # Due 01/05/2020
-    cut_hedges_too.refresh_progress("01/08/2020")
-    assert cut_hedges_too.progress == "completed"
-    assert cut_hedges_too.status.get() == "archived"
+def test_current_progress_with_completed_dates_no_missed_dates(cut_hedges):
+    scheduled_dates = {"01/05/2020": True, "01/10/2020": True}
+    cut_hedges.update_completed_dates(scheduled_dates)
+    current_progress = cut_hedges.get_current_progress(current_date="01/04/2021")
+    assert current_progress == "Completed"
+
+# Get next date date
+
+def test_get_next_due_date_no_completed_dates(cut_hedges):
+    next_due = cut_hedges.get_next_due_date()
+    assert next_due == "01/05/2020"
 
 
-def test_refresh_progress_completed_once_due_again(prune_tree):
-    prune_tree.set_schedule(
-        "01/10/2020", MONTHLY, 4
-    )  # Due: 01/10/2020, 01/11/2020, 01/12/2020, 01/01/2021
-    prune_tree.add_progress("completed", "05/10/2020")
-    prune_tree.refresh_progress("05/11/2020")
-    assert prune_tree.progress == "outstanding"
-    assert prune_tree.status.get() == "current"
+def test_get_next_due_date_all_dates_completed(cut_hedges):
+    scheduled_dates = {
+        "01/05/2020": True,
+        "01/10/2020": True,
+        "01/05/2021": True,
+        "01/10/2021": True,
+        "01/05/2022": True,
+    }
+    cut_hedges.update_completed_dates(scheduled_dates)
+    next_due = cut_hedges.get_next_due_date()
+    assert next_due == "No further due dates"
 
 
-def test_refresh_progress_completed_twice_before_second_due(prune_tree):
-    prune_tree.set_schedule("01/10/2020", MONTHLY, 4)
-    prune_tree.add_progress("completed", "05/10/2020")
-    prune_tree.add_progress("completed early", "28/10/2020")
-    prune_tree.refresh_progress("05/11/2020")
-    assert prune_tree.progress == "completed early"
+def test_get_next_due_date_last_date_completed(cut_hedges):
+    scheduled_dates = {
+        "01/05/2020": False,
+        "01/10/2020": True,
+        "01/05/2021": False,
+        "01/10/2021": False,
+        "01/05/2022": True,
+    }
+    cut_hedges.update_completed_dates(scheduled_dates)
+    next_due = cut_hedges.get_next_due_date()
+    assert next_due == "No further due dates"
 
 
-def test_refresh_progress_completed_second_time_on_second_due(prune_tree):
-    prune_tree.set_schedule("01/10/2020", MONTHLY, 4)
-    prune_tree.add_progress("completed", "05/10/2020")
-    prune_tree.add_progress("completed", "01/11/2020")
-    prune_tree.refresh_progress("05/11/2020")
-    assert prune_tree.progress == "completed"
+def test_get_next_due_date_first_date_completed(cut_hedges):
+    scheduled_dates = {
+        "01/05/2020": True,
+        "01/10/2020": False,
+        "01/05/2021": False,
+        "01/10/2021": False,
+        "01/05/2022": False,
+    }
+    cut_hedges.update_completed_dates(scheduled_dates)
+    next_due = cut_hedges.get_next_due_date()
+    assert next_due == "01/10/2020"
 
 
-def test_refresh_progress_completed_second_time_after_second_due(prune_tree):
-    prune_tree.set_schedule("01/10/2020", MONTHLY, 4)
-    prune_tree.add_progress("completed", "05/10/2020")
-    prune_tree.add_progress("completed", "04/11/2020")
-    prune_tree.refresh_progress("05/11/2020")
-    assert prune_tree.progress == "completed"
-
-
-def test_refresh_progress_completed_twice_due_again(prune_tree):
-    prune_tree.set_schedule("01/10/2020", MONTHLY, 4)
-    prune_tree.add_progress("completed", "05/10/2020")
-    prune_tree.add_progress("completed early", "29/10/2020")
-    prune_tree.refresh_progress("10/12/2020")
-    assert prune_tree.progress == "outstanding"
-    assert prune_tree.status.get() == "current"
-
-
-def test_refresh_progress_completed_third_time_after_third_due(prune_tree):
-    prune_tree.set_schedule("01/10/2020", MONTHLY, 4)
-    prune_tree.add_progress("completed", "05/10/2020")
-    prune_tree.add_progress("completed early", "29/10/2020")
-    prune_tree.add_progress("completed", "02/12/2020")
-    prune_tree.refresh_progress("10/12/2020")
-    assert prune_tree.progress == "completed"
-
-
-def test_refresh_progress_completed_once_due_again_in_progress(prune_tree):
-    prune_tree.set_schedule(
-        "01/10/2020", MONTHLY, 4
-    )  # Due: 01/10/2020, 01/11/2020, 01/12/2020, 01/01/2021
-    prune_tree.add_progress("completed", "05/10/2020")
-    prune_tree.add_progress("in progress")
-    prune_tree.refresh_progress("05/11/2020")
-    assert prune_tree.progress == "in progress"
-
-
-def test_refresh_progress_completed_once_third_due_reached_in_progress(prune_tree):
-    prune_tree.set_schedule("01/10/2020", MONTHLY, 4)
-    prune_tree.add_progress("completed", "05/10/2020")
-    prune_tree.add_progress("in progress")
-    prune_tree.refresh_progress("05/12/2020")
-    assert prune_tree.progress == "outstanding"
-
-
-def test_refresh_progress_completed_twice_third_due_reached_completed_early(prune_tree):
-    prune_tree.set_schedule("01/10/2020", MONTHLY, 4)
-    prune_tree.add_progress("completed", "05/10/2020")
-    prune_tree.add_progress("completed early", "30/10/2020")
-    prune_tree.refresh_progress("05/12/2020")
-    assert prune_tree.progress == "outstanding"
-    assert prune_tree.status.get() == "current"
-
-
-def test_refresh_progress_completed_every_time(prune_tree):
-    prune_tree.set_schedule("01/10/2020", MONTHLY, 4)
-    prune_tree.add_progress("completed", "05/10/2020")
-    prune_tree.add_progress("completed early", "30/10/2020")
-    prune_tree.add_progress("completed", "06/12/2020")
-    prune_tree.add_progress("completed", "03/01/2021")
-    prune_tree.refresh_progress("08/01/2021")
-    assert prune_tree.progress == "completed"
-    assert prune_tree.status.get() == "archived"
-
-
-def test_refresh_progress_completed_three_times_last_due_reached(prune_tree):
-    prune_tree.set_schedule("01/10/2020", MONTHLY, 4)
-    prune_tree.add_progress("completed", "05/10/2020")
-    prune_tree.add_progress("completed early", "30/10/2020")
-    prune_tree.add_progress("completed", "06/12/2020")
-    prune_tree.refresh_progress("08/01/2021")
-    assert prune_tree.progress == "outstanding"
-    assert prune_tree.status.get() == "current"
-
-
-def test_refresh_progress_completed_every_time_completed_early(prune_tree):
-    prune_tree.set_schedule("01/10/2020", MONTHLY, 4)
-    prune_tree.add_progress("completed", "05/10/2020")
-    prune_tree.add_progress("completed early", "30/10/2020")
-    prune_tree.add_progress("completed", "06/12/2020")
-    prune_tree.add_progress("completed early", "31/12/2020")
-    prune_tree.refresh_progress("08/01/2021")
-    assert prune_tree.progress == "completed early"
-    assert prune_tree.status.get() == "archived"
-
-
-def test_refresh_progress_completed_twice_last_due_reached_in_progress(prune_tree):
-    prune_tree.set_schedule(
-        "01/10/2020", MONTHLY, 4
-    )  # Due: 01/10/2020, 01/11/2020, 01/12/2020, 01/01/2021
-    prune_tree.add_progress("completed", "05/10/2020")
-    prune_tree.add_progress("completed early", "30/10/2020")
-    prune_tree.add_progress("in progress")
-    prune_tree.refresh_progress("08/01/2021")
-    assert prune_tree.progress == "outstanding"
-
-
-def test_refresh_progress_completed_three_times_last_due_reached_in_progress(prune_tree):
-    prune_tree.set_schedule("01/10/2020", MONTHLY, 4)
-    prune_tree.add_progress("completed", "05/10/2020")
-    prune_tree.add_progress("completed early", "30/10/2020")
-    prune_tree.add_progress("completed", "13/12/2020")
-    prune_tree.add_progress("in progress")
-    prune_tree.refresh_progress("08/01/2021")
-    assert prune_tree.progress == "in progress"
-    assert prune_tree.status.get() == "current"
+def test_get_next_due_date_penultimate_date_completed(cut_hedges):
+    scheduled_dates = {
+        "01/05/2020": False,
+        "01/10/2020": False,
+        "01/05/2021": False,
+        "01/10/2021": True,
+        "01/05/2022": False,
+    }
+    cut_hedges.update_completed_dates(scheduled_dates)
+    next_due = cut_hedges.get_next_due_date()
+    assert next_due == "01/05/2022"
 
 
 if __name__ == "__main__":
