@@ -1,13 +1,16 @@
 from calendar import Calendar
 import pickle
-from tkinter.constants import SUNKEN, RAISED, RIDGE, GROOVE
+from tkinter.constants import SUNKEN, GROOVE
 import traceback
 
 import PySimpleGUI as sg
+from PySimpleGUI.PySimpleGUI import Column
 
 from garden import Garden
 from organisms import Creature, Plant
-from task import Task
+from task import Task, DAILY, WEEKLY, MONTHLY, YEARLY
+
+FREQUENCIES = {"daily": DAILY, "weekly": WEEKLY, "monthly": MONTHLY, "yearly": YEARLY}
 
 
 sg.theme(new_theme="LightGray1")
@@ -94,8 +97,8 @@ def garden_label_format(label):
 
 
 select_garden = [
-        garden_label_format("Select garden:"),
-        sg.Combo([], default_value=garden.name, size=(30, 1), key="-SELECT GARDEN-"),
+    garden_label_format("Select garden:"),
+    sg.Combo([], default_value=garden.name, size=(30, 10), key="-SELECT GARDEN-"),
 ]
 
 
@@ -148,7 +151,7 @@ creature_name = [
     creature_label("Creature name:"),
     sg.Combo(
         sorted([""] + list(garden.creatures)),
-        size=CREATURE_FIELD_SIZE,
+        size=(25, 10),
         key="-CREATURE NAME-",
         enable_events=True,
     ),
@@ -158,7 +161,7 @@ creature_type = [
     creature_label("Creature type:"),
     sg.Combo(
         sorted([""] + [creature.creature_type for creature in garden.creatures.values()]),
-        size=CREATURE_FIELD_SIZE,
+        size=(25, 10),
         key="-CREATURE TYPE-",
     ),
 ]
@@ -271,7 +274,7 @@ plant_name = [
     plant_label("Plant name:"),
     sg.Combo(
         sorted([""] + list(garden.plants)),
-        size=PLANT_FIELD_SIZE,
+        size=(25, 10),
         key="-PLANT NAME-",
         enable_events=True,
     ),
@@ -281,7 +284,7 @@ plant_type = [
     plant_label("Plant type:"),
     sg.Combo(
         sorted([""] + [plant.plant_type for plant in garden.plants.values()]),
-        size=PLANT_FIELD_SIZE,
+        size=(25, 10),
         key="-PLANT TYPE-",
     ),
 ]
@@ -302,7 +305,7 @@ plant_impact = [
     plant_slider(
         key="-PLANT IMPACT SLIDER-",
         tooltip="Impact levels — 1: very negative, 2: negative, "
-                "3: neutral, 4: positive, 5: very positive",
+        "3: neutral, 4: positive, 5: very positive",
     ),
 ]
 
@@ -311,7 +314,7 @@ plant_prevalence = [
     plant_slider(
         key="-PLANT PREVALENCE SLIDER-",
         tooltip="Prevalence levels — 1: very low, 2: low, "
-                "3: medium, 4: high, 5: very high",
+        "3: medium, 4: high, 5: very high",
     ),
 ]
 
@@ -320,7 +323,7 @@ plant_trend = [
     plant_slider(
         key="-PLANT TREND SLIDER-",
         tooltip="Trend levels — 1: rapidly decreasing, 2: decreasing, "
-                "3: stable, 4: increasing, 5: rapidly increasing",
+        "3: stable, 4: increasing, 5: rapidly increasing",
     ),
 ]
 
@@ -387,36 +390,22 @@ task_name = [
 
 task_progress = [
     task_label("Progress:"),
-    sg.Combo(
-        ["outstanding", "in progress", "completed", "completed early"],
-        size=TASK_FIELD_SIZE,
-        key="-TASK PROGRESS-",
-        enable_events=True,
-    ),
-]
-
-task_last_completed = [
-    sg.Text("Last completed:", size=(13, 1), pad=(0, (6, 0))),
-    sg.Input(size=TASK_FIELD_SIZE, key="-TASK LAST COMPLETED DATE-", pad=(5, (6, 0))),
-    sg.CalendarButton("PICK", format="%d/%m/%Y", pad=(0, (6, 0)), key="-TASK PICK COMPLETED-"),
+    sg.Text("", size=(22, 1), relief=SUNKEN, key="-TASK PROGRESS-"),
 ]
 
 task_next_due = [
-    sg.Text("Next due:", size=(13, 1), pad=(0, (10, 0))),
-    sg.Text("", size=(22, 1), relief=SUNKEN, pad=(5, (16, 2)), key="-TASK NEXT DUE-"),
+    task_label("Next due:"),
+    sg.Text("", size=(22, 1), relief=SUNKEN, key="-TASK NEXT DUE-"),
+]
+
+add_progress_button = [sg.Button("ADD PROGRESS", size=(21, 1), pad=((113.5, 0), (10, 4)))
 ]
 
 task_first_horizontal_line = [sg.Text("_" * 41, pad=(0, 0))]
 
-task_first_due = [
-    sg.Text("First due:", size=(13, 1), pad=(0, (16, 10))),
-    sg.Input(size=TASK_FIELD_SIZE, key="-TASK FIRST DUE DATE-", pad=(5, (6, 0))),
-    sg.CalendarButton("PICK", format="%d/%m/%Y", pad=(0, (6, 0)), key="-TASK PICK FIRST DUE-"),
-]
-
 task_assignee = [
-    task_label("Assignee:"),
-    sg.Input(size=TASK_FIELD_SIZE, key="-TASK ASSIGNEE-"),
+    sg.Text("Assignee:", size=(13, 1), pad=(0, (16, 10))),
+    sg.Input(size=TASK_FIELD_SIZE, key="-TASK ASSIGNEE-", pad=(4, (10, 0))),
 ]
 
 task_length = [
@@ -433,11 +422,20 @@ task_link_labels = [
 
 task_link_organisms = [
     sg.Listbox(
-        values=('Listbox Item 1', 'Listbox Item 2', 'Listbox Item 3'),
-        select_mode=sg.LISTBOX_SELECT_MODE_EXTENDED, size=(17, 5), pad=((1, 26), 0), key="-LINKED CREATURES-"),
+        values=(sorted(list(garden.creatures))),
+        select_mode=sg.LISTBOX_SELECT_MODE_EXTENDED,
+        size=(17, 5),
+        pad=((1, 26), 0),
+        highlight_background_color="#004225",
+        key="-TASK LINKED CREATURES-",
+    ),
     sg.Listbox(
-        values=('Listbox Item 1', 'Listbox Item 2', 'Listbox Item 3'),
-        select_mode=sg.LISTBOX_SELECT_MODE_EXTENDED, size=(17, 5), key="-LINKED PLANTS-"),
+        values=(sorted(list(garden.plants))),
+        select_mode=sg.LISTBOX_SELECT_MODE_EXTENDED,
+        size=(17, 5),
+        highlight_background_color="#004225",
+        key="-TASK LINKED PLANTS-",
+    ),
 ]
 
 task_status = [
@@ -447,58 +445,72 @@ task_status = [
 
 task_notes_label = [sg.Text("Description:", size=(10, 1), pad=(2, 10))]
 
-task_description_field = [sg.Multiline(size=(37, 5), pad=(5, (10, 15)), key="-TASK NOTES-")]
-
-task_repeat_start = [
-    sg.Text("Start date:", size=(8, 1), pad=(3, (13, 0))),
-    sg.Input(size=(18, 1), key="-TASK REPEAT START DATE-", pad=(5, (13, 0))),
-    sg.CalendarButton("PICK", format="%d/%m/%Y", pad=((0, 7), (13, 0)), key="-TASK PICK REPEAT START-"),
+task_description_field = [
+    sg.Multiline(size=(37, 5), pad=(5, (10, 15)), key="-TASK NOTES-")
 ]
 
-task_repeat_frequency = [
+task_start = [
+    sg.Text("First due:", size=(8, 1), pad=(3, (13, 0))),
+    sg.Input(size=(18, 1), key="-TASK START-", pad=(5, (13, 0))),
+    sg.CalendarButton(
+        "PICK", format="%d/%m/%Y", pad=((0, 7), (13, 0)), key="-TASK PICK START-"
+    ),
+]
+
+task_frequency = [
     sg.Text("Frequency:", size=(8, 1), pad=(3, (6, 0))),
-    sg.Combo(["daily", "weekly", "monthly", "yearly"], size=(18, 1), pad=(5, (6, 0)), key="-TASK REPEAT FREQUENCY-"),
+    sg.Combo(
+        ["daily", "weekly", "monthly", "yearly"],
+        size=(18, 1),
+        pad=(5, (6, 0)),
+        key="-TASK FREQUENCY-",
+    ),
 ]
 
-task_repeat_interval = [
-    sg.Text("Interval:", size=(8, 1), pad=(3, (8, 0))),
-    sg.Input(size=(18, 1), key="-TASK REPEAT INTERVAL-", pad=(5, (8, 0))),
+task_count = [
+    sg.Text("Count:", size=(8, 1), pad=(3, (8, 0))),
+    sg.Input(size=(18, 1), key="-TASK COUNT-", pad=(5, (8, 0))),
 ]
 
-task_repeat_count = [
-    sg.Text("Count:", size=(8, 1), pad=(3, (8, 20))),
-    sg.Input(size=(18, 1), key="-TASK REPEAT COUNT-", pad=(5, (8, 20))),
+task_by_month = [
+    sg.Text("By month:", size=(8, 1), pad=(3, (8, 0))),
+    sg.Input(size=(18, 1), key="-TASK BY MONTH-", pad=(5, (8, 0))),
 ]
 
-repeat_contents = [
-    task_repeat_start, 
-    task_repeat_frequency, 
-    task_repeat_interval, 
-    task_repeat_count
+task_interval = [
+    sg.Text("Interval:", size=(8, 1), pad=(3, (8, 20))),
+    sg.Input(size=(18, 1), key="-TASK INTERVAL-", pad=(5, (8, 20))),
 ]
 
-task_repeat_frame = [
+schedule_contents = [
+    task_start,
+    task_frequency,
+    task_count,
+    task_by_month,
+    task_interval,
+]
+
+task_schedule_frame = [
     sg.Frame(
-        "Repeat schedule", 
-        repeat_contents, 
-        relief=GROOVE, # SUNKEN, RAISED, RIDGE, GROOVE
+        "Schedule",
+        schedule_contents,
+        relief=GROOVE,  # SUNKEN, RAISED, RIDGE, GROOVE
         border_width=2,
         size=(25, 5),
     )
 ]
 
 task_buttons = [
-    sg.Button(name, size=(15, 2), pad=((4, 4), (36, 0)), key=f"TASK {name}")
+    sg.Button(name, size=(15, 2), pad=((4, 4), (22, 0)), key=f"TASK {name}")
     for name in TASK_BUTTON_TEXT
 ]
 
 plants_left_column = [
     task_name,
     task_progress,
-    task_last_completed,
     task_next_due,
+    add_progress_button,
     task_first_horizontal_line,
-    task_first_due,
     task_assignee,
     task_length,
     task_second_horizontal_line,
@@ -510,7 +522,7 @@ plants_right_column = [
     task_status,
     task_notes_label,
     task_description_field,
-    task_repeat_frame,
+    task_schedule_frame,
     task_buttons,
 ]
 
@@ -545,6 +557,19 @@ window = sg.Window("gardenlife", layout, keep_on_top=True)
 
 # ----------------------------------- Event Loop ----------------------------------- #
 
+# scheduled_dates = {
+#     "12/05/2021": False,
+#     "12/06/2021": False,
+#     "12/07/2021": False,
+#     "12/08/2021": False,
+#     "12/09/2021": False,
+#     "12/10/2021": False,
+#     "12/11/2021": False,
+#     "12/12/2021": False,
+# }
+
+# Set the active status of the set progress window
+progress_window_active = False
 
 # Display and interact with the window using an event loop
 while True:
@@ -589,22 +614,19 @@ while True:
         for value in ("IMPACT", "PREVALENCE", "TREND"):
             window[f"-CREATURE {value} SLIDER-"].update(3)
 
-
     def creature_instance():
         return garden.creatures[values["-CREATURE NAME-"]]
 
-
     def update_creature_dropdowns():
-        creature_names = sorted([""] + [creature for creature in garden.creatures])
+        creature_names = sorted([""] + list(garden.creatures))
         creature_types = sorted(
             [""] + [creature.creature_type for creature in garden.creatures.values()]
         )
         return (
-            window["-CREATURE NAME-"].update(values=creature_names),
-            window["-CREATURE TYPE-"].update(values=creature_types),
+            window["-CREATURE NAME-"].update(values=creature_names, size=(25, 10)),
+            window["-CREATURE TYPE-"].update(values=creature_types, size=(25, 10)),
         )
 
-    # fmt: off
     try:
         if event == "CREATURE CREATE/UPDATE":
             creature = Creature(
@@ -641,7 +663,9 @@ while True:
             window["-CREATURE STATUS-"].update(creature_instance().status.get())
             window["-CREATURE NOTES-"].update(creature_instance().notes)
             window["-CREATURE IMPACT SLIDER-"].update(creature_instance().impact)
-            window["-CREATURE PREVALENCE SLIDER-"].update(creature_instance().prevalence)
+            window["-CREATURE PREVALENCE SLIDER-"].update(
+                creature_instance().prevalence
+            )
             window["-CREATURE TREND SLIDER-"].update(creature_instance().trend)
 
     except ValueError as error_description:
@@ -655,22 +679,19 @@ while True:
         for value in ("IMPACT", "PREVALENCE", "TREND"):
             window[f"-PLANT {value} SLIDER-"].update(3)
 
-
     def plant_instance():
         return garden.plants[values["-PLANT NAME-"]]
 
-
     def update_plant_dropdowns():
-        plant_names = sorted([""] + [plant for plant in garden.plants])
+        plant_names = sorted([""] + list(garden.plants))
         plant_types = sorted(
             [""] + [plant.plant_type for plant in garden.plants.values()]
         )
         return (
-            window["-PLANT NAME-"].update(values=plant_names),
-            window["-PLANT TYPE-"].update(values=plant_types),
+            window["-PLANT NAME-"].update(values=plant_names, size=(25, 10)),
+            window["-PLANT TYPE-"].update(values=plant_types, size=(25, 10)),
         )
 
-    # fmt: off
     try:
         if event == "PLANT CREATE/UPDATE":
             plant = Plant(
@@ -712,9 +733,125 @@ while True:
 
     except ValueError as error_description:
         sg.popup(error_description, keep_on_top=True)
-    # fmt: on
 
     ########################## Manage Task Events ##########################
+
+    def clear_task_values():
+        for value in (
+            "NAME",
+            "PROGRESS",
+            "NEXT DUE",
+            "ASSIGNEE",
+            "LENGTH",
+            "STATUS",
+            "NOTES",
+            "START",
+            "FREQUENCY",
+            "COUNT",
+            "BY MONTH",
+            "INTERVAL",
+        ):
+            window[f"-TASK {value}-"].update("")
+
+    def task_instance():
+        return garden.tasks.get(values["-TASK NAME-"])
+
+    def update_task_dropdown():
+        task_names = sorted([""] + list(garden.tasks))
+        return window["-TASK NAME-"].update(values=task_names, size=(25, 10))
+
+    def clear_organism_links():
+        window["-TASK LINKED CREATURES-"].update(sorted(list(garden.creatures)))
+        window["-TASK LINKED PLANTS-"].update(sorted(list(garden.plants)))
+
+    if event == "TASK CREATE/UPDATE":
+        task = Task(
+            task_name=values["-TASK NAME-"],
+            assignee=values["-TASK ASSIGNEE-"],
+            length=values["-TASK LENGTH-"],
+            linked_creatures=values["-TASK LINKED CREATURES-"],
+            linked_plants=values["-TASK LINKED PLANTS-"],
+            description=values["-TASK NOTES-"],
+        )
+
+        if values["-TASK STATUS-"] == "archived":
+            plant.status.archive()
+
+        task.set_schedule(
+            start_date=values["-TASK START-"],
+            freq=FREQUENCIES.get(values["-TASK FREQUENCY-"]),
+            count=values["-TASK COUNT-"],
+            bymonth=values["-TASK BY MONTH-"],
+            interval=values["-TASK INTERVAL-"]
+        )
+        # If the task already exists add any pre-existing completed dates to it
+        if task_instance():
+            task.completed_dates = task_instance().completed_dates       
+        # Add the task to the garden, overwriting the old version if it already exists
+        garden.add_item("tasks", task)
+        update_task_dropdown()
+        clear_task_values()
+        clear_organism_links()
+        window["-SUMMARY TOTAL TASKS-"].update(len(garden.tasks))
+
+    elif event == "TASK REMOVE":
+            garden.remove_item("tasks", values["-TASK NAME-"])
+            update_task_dropdown()
+            clear_task_values()
+            window["-SUMMARY TOTAL TASKS-"].update(len(garden.tasks))
+
+    elif values["-TASK NAME-"] == "":
+            clear_task_values()
+            clear_organism_links()
+    
+    elif event == "ADD PROGRESS" and not progress_window_active:
+        progress_window_active = True
+        window.Disable()
+
+        progress_layout = [
+            [
+                sg.Column(
+                    [
+                        [sg.Checkbox(date, default=value, key=date)]
+                        for date, value in task.get_all_progress().items()
+                    ],
+                    size=(200, 200),
+                    scrollable=True,
+                ),
+            ],
+            [sg.Button("Add")],
+        ]
+
+        progress_window = sg.Window("Add Progress", progress_layout, keep_on_top=True)
+
+        while True:
+            progress_event, progress_values = progress_window.read()
+            print(progress_event, progress_values)
+
+            if progress_event == "Add":
+                task.update_completed_dates(progress_values)
+
+            if progress_event == sg.WIN_CLOSED or progress_event == "Add":
+                progress_window.close()
+                progress_window_active = False
+                window.Enable()
+                break
+
+    # If a task is selected populate the relevant fields with its values
+    elif values["-TASK NAME-"]:  # Something is highlighted in the dropdown
+        window["-TASK PROGRESS-"].update(task_instance().get_current_progress())
+        window["-TASK NEXT DUE-"].update(task_instance().get_next_due_date())
+        window["-TASK ASSIGNEE-"].update(task_instance().assignee)
+        window["-TASK LENGTH-"].update(task_instance().length)
+        window["-TASK LINKED CREATURES-"].set_value(task_instance().linked_creatures)
+        window["-TASK LINKED PLANTS-"].set_value(task_instance().linked_plants)
+        window["-TASK STATUS-"].update(task_instance().status.get())
+        window["-TASK NOTES-"].update(task_instance().description)
+        window["-TASK START-"].update(task_instance().raw_schedule["start date"])
+        window["-TASK FREQUENCY-"].update(task_instance().raw_schedule["freq"])
+        window["-TASK COUNT-"].update(task_instance().raw_schedule["count"])
+        window["-TASK BY MONTH-"].update(task_instance().raw_schedule["bymonth"])
+        window["-TASK INTERVAL-"].update(task_instance().raw_schedule["interval"])
 
     ########################################################################
 
