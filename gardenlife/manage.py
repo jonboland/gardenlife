@@ -557,16 +557,6 @@ window = sg.Window("gardenlife", layout, keep_on_top=True)
 
 # ----------------------------------- Event Loop ----------------------------------- #
 
-# scheduled_dates = {
-#     "12/05/2021": False,
-#     "12/06/2021": False,
-#     "12/07/2021": False,
-#     "12/08/2021": False,
-#     "12/09/2021": False,
-#     "12/10/2021": False,
-#     "12/11/2021": False,
-#     "12/12/2021": False,
-# }
 
 # Set the active status of the set progress window
 progress_window_active = False
