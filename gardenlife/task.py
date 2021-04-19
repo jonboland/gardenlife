@@ -1,5 +1,5 @@
 from datetime import datetime
-from dateutil.rrule import rrule, WEEKLY, MONTHLY, YEARLY
+from dateutil.rrule import rrule, DAILY, WEEKLY, MONTHLY, YEARLY
 
 from status import Status
 
@@ -8,39 +8,22 @@ class Task:
     def __init__(
         self,
         task_name,
-        schedule,
         description=None,
         assignee=None,
         length=None,
-        progress=None,
+        linked_creatures=None,
+        linked_plants=None,
     ):
         self.task_name = task_name
-        self.schedule = sorted([datetime.strptime(schedule, "%d/%m/%Y")])
+        self.schedule = [self._set_date()]
         self.description = description
         self.assignee = assignee
         self.length = length
-        self.progress = progress
-        self.completed_dates = sorted([])
-        self.added_date = datetime.today()
-        self.linked_creatures = dict()
-        self.linked_plants = dict()
+        self.completed_dates = []
+        self.linked_creatures = linked_creatures
+        self.linked_plants = linked_plants
+        self.raw_schedule = None
         self.status = Status()
-
-    @property
-    def progress(self):
-        return self._progress
-
-    @progress.setter
-    def progress(self, progress):
-        if progress not in {
-            None,
-            "outstanding",
-            "in progress",
-            "completed",
-            "completed early",
-        }:
-            raise ValueError(f"{progress} is not a valid progress level")
-        self._progress = progress
 
     def __repr__(self):
         return f"Task: {self.task_name}"
@@ -48,83 +31,116 @@ class Task:
     def __eq__(self, other):
         return repr(self) == other
 
-    def set_schedule(self, start_date=None, frequency=YEARLY, number=50, **kwargs):
-        if start_date is None:
-            start_date = self.schedule[0]
-        else:
-            start_date = datetime.strptime(start_date, "%d/%m/%Y")
+    # fmt: on
+    def set_schedule(self, start_date=None, freq=None, count=None, bymonth=None, interval=None):
+        """Sets the task's scheduled dates."""
+        # Store the raw schedule values to repopulate UI fields
+        self.raw_schedule = {
+            "start date": start_date,
+            "freq": freq,
+            "count": count,
+            "bymonth": bymonth,
+            "interval": interval,
+        }
+        # Convert string to datetime object. Set start date to today if no date supplied
+        start_date = self._set_date(start_date)
+        freq = freq if freq else MONTHLY
+        count = int(count) if count else 1
+        bymonth = [int(num) for num in bymonth.split(" ")] if bymonth else None
+        interval = int(interval) if interval else 1
         self.schedule = list(
-            rrule(dtstart=start_date, freq=frequency, count=number, **kwargs)
+            rrule(dtstart=start_date, freq=freq, count=count, bymonth=bymonth, interval=interval)
         )
-        self.status.unarchive()
 
-    def view_schedule(self):
-        return [datetime.strftime(due_date, "%d/%m/%Y") for due_date in self.schedule]
+    # format: on
+    def update_completed_dates(self, all_progress):
+        """
+        Takes a dict containing all scheduled dates as keys in string format.
+        Adds or removes dates from completed dates list based on their boolean values.
+        """
+        for date_string, boolean in all_progress.items():
+            date = self._string_to_date(date_string)
+            if boolean:
+                self._add_completed_date(date)
+            else:
+                self._remove_completed_date(date)
+        self.completed_dates.sort()
 
-    def add_progress(self, progress, completed_date=None, add_date=True):
-        self.progress = progress
-        if self.progress in {"completed", "completed early"}:
-            if add_date:
-                completed_date = self._format_date(completed_date)
-                self.completed_dates.append(completed_date)
-            self._archive_if_finished(completed_date)
+    def _add_completed_date(self, date):
+        # Adds date to completed date list if not already present
+        if date not in self.completed_dates:
+            self.completed_dates.append(date)
 
-    def _archive_if_finished(self, completed_date):
-        if len(self.schedule) == 1:
-            self.status.archive()
-        elif len(self.schedule) == 2:
-            first_date, last_date = self.schedule
-            if (
-                completed_date > last_date
-                or completed_date > first_date
-                and self.progress == "completed early"
-            ):
-                self.status.archive()
-        else:
-            *_, penultimate_date, last_date = self.schedule
-            if (
-                completed_date > last_date
-                or completed_date > penultimate_date
-                and self.progress == "completed early"
-            ):
-                self.status.archive()
+    def _remove_completed_date(self, date):
+        # Removes date from completed date list
+        try:
+            self.completed_dates.remove(date)
+        except ValueError:
+            pass
 
-    def _format_date(self, date):
-        if not date:
-            return datetime.today()
-        return datetime.strptime(date, "%d/%m/%Y")
+    def get_all_progress(self):
+        """
+        Returns a dict containing all scheduled dates in string format with bool
+        indicating whether they are in the completed dates list
+        """
+        return {
+            self._date_to_string(date): (date in self.completed_dates)
+            for date in self.schedule
+        }
 
-    def refresh_progress(self, date=None):
-        if self.status.get() != "archived" and self.progress != "outstanding":
-            date = self._format_date(date)
-            for idx, due_date in enumerate(self.schedule):
-                if due_date > date:
-                    break
-                if self.completed_dates and self.completed_dates[-1] >= due_date:
-                    continue
-                if self.progress in {"in progress", "completed early"}:
-                    try:
-                        if self.schedule[idx + 1] > date:
-                            break
-                        self.progress = "outstanding"
-                    except IndexError:
-                        break
-                self.progress = "outstanding"
+    def get_current_progress(self, current_date=None):
+        """Returns current task progress."""
+        # Convert string to datetime object. Set current date to today if no date supplied
+        current_date = self._set_date(current_date)
 
-    def view_progress(self):
-        status = self.status.get()
-        if status == "archived":
-            return status
-        return self.progress
+        if not self.completed_dates:
+            if current_date < self.schedule[0]:
+                return "Not yet due"
+            elif current_date == self.schedule[0]:
+                return "Due"
+            missed_dates_no_completed = sum(
+                date < current_date for date in self.schedule
+            )
+            if missed_dates_no_completed == 1:
+                return "Overdue"
+            # If number of missed dates isn't 1 it must be greater than 1
+            return "Very overdue"        
 
-    def link_creature(self, creature):
-        self.linked_creatures[creature.creature_name] = creature
+        if current_date in self.schedule and current_date > self.completed_dates[-1]:
+            return "Due"
+        # Scheduled dates since task last completed, before or on the current date
+        missed_dates_with_completed = sum(
+            date > self.completed_dates[-1] and date < current_date
+            for date in self.schedule
+        )
+        if missed_dates_with_completed == 1:
+            return "Overdue"
+        elif missed_dates_with_completed > 1:
+            return "Very overdue"
+        # If there are aren't any missed dates the task is up to date
+        return "Completed"
+        # ***Add "Due" state when task due today and completed dates exist*** 
 
-    def unlink_creature(self, creature_name):
-        del self.linked_creatures[creature_name]
+    def get_next_due_date(self):
+        if not self.completed_dates:
+            return self._date_to_string(self.schedule[0])
+        elif self.schedule[-1] <= self.completed_dates[-1]:
+            return "No further due dates"
+        next_due = min(
+            date for date in self.schedule if date > self.completed_dates[-1]
+        )
+        return self._date_to_string(next_due)
 
-    def link_plant(self, plant):
-        self.linked_plants[plant.plant_name] = plant
+    def _set_date(self, date=None):
+        # Return datetime object from string or today if not date.
+        if date:
+            return self._string_to_date(date)
+        return datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)
 
-    def unlink_plant(self, plant_name):
-        del self.linked_plants[plant_name]
+    def _string_to_date(self, date_string):
+        # Converts a string into a datetime object
+        return datetime.strptime(date_string, "%d/%m/%Y")
+
+    def _date_to_string(self, date_object):
+        # Converts a datetime object into a string
+        return datetime.strftime(date_object, "%d/%m/%Y")
