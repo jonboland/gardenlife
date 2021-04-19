@@ -8,7 +8,7 @@ from PySimpleGUI.PySimpleGUI import Column
 
 from garden import Garden
 from organisms import Creature, Plant
-from task import Task, DAILY, WEEKLY, MONTHLY, YEARLY
+from task import Task
 
 
 sg.theme(new_theme="LightGray1")
