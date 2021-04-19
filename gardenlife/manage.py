@@ -11,9 +11,6 @@ from organisms import Creature, Plant
 from task import Task, DAILY, WEEKLY, MONTHLY, YEARLY
 
 
-# FREQUENCIES = {"daily": DAILY, "weekly": WEEKLY, "monthly": MONTHLY, "yearly": YEARLY}
-
-
 sg.theme(new_theme="LightGray1")
 sg.theme_button_color(("white", "#004225"))
 sg.theme_input_background_color("light grey")
