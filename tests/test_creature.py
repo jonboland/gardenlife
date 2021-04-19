@@ -1,64 +1,45 @@
 import pytest
 
 import context
-from organisms import Creature
+import organisms
 
 
 @pytest.fixture
 def badger():
-    return Creature(
-        "mammal",
+    return organisms.Creature(
         "badger",
+        "mammal",
         "03/07/2020",
         "Digs holes in various parts of the garden.",
+        10,
         3,
-        "positive",
-        "low",
-        "stable",
+        2,
+        4,
     )
 
 
-def test_trend_increasing(badger):
-    badger.change_level("trend", "increase")
-    assert badger.trend == "increasing"
+def test_impact_neutral(badger):
+    assert badger.get_level("impact") == "neutral"
 
 
-def test_trend_already_rapidly_increasing(badger, capsys):
-    for x in range(3):
-        badger.change_level("trend", "increase")
-    captured = capsys.readouterr()
-    assert captured.out == "trend already set to rapidly increasing\n"
-
-
-def test_prevalence_very_low(badger):
-    badger.change_level("prevalence", "decrease")
-    assert badger.prevalence == "very low"
-
-
-def test_impact_already_very_negative(badger, capsys):
-    for x in range(4):
-        badger.change_level("impact", "decrease")
-    captured = capsys.readouterr()
-    assert captured.out == "impact already set to very negative\n"
+def test_prevalence_low(badger):
+    badger.prevalence = 1
+    assert badger.get_level("prevalence") == "very low"
 
 
 def test_invalid_impact_level(badger):
     with pytest.raises(ValueError) as excinfo:
         badger.impact = "high"
-    assert "high is not a valid impact level" in str(excinfo.value)
-
-
-def test_invalid_direction(badger):
-    with pytest.raises(ValueError) as excinfo:
-        badger.change_level("prevalence", "blank")
-    assert "blank is not a valid direction" in str(excinfo.value)
+    assert str(excinfo.value) == "high is not a valid impact level"
 
 
 def test_date_appeared(badger):
     assert badger.appeared == "03/07/2020"
 
+
 def test_notes(badger):
     assert badger.notes == "Digs holes in various parts of the garden."
+
 
 def test_unarchived(badger):
     badger.status.archive()
