@@ -586,7 +586,10 @@ while True:
             ]
 
             confirm_window = sg.Window(
-                "Confirm", confirm_layout, keep_on_top=True, element_justification="center"
+                "Confirm",
+                confirm_layout,
+                keep_on_top=True,
+                element_justification="center",
             )
 
             while True:
@@ -653,7 +656,6 @@ while True:
             window["-CREATURE TYPE-"].update(values=creature_types, size=(25, 10)),
         )
 
-
     if event == "CREATURE CREATE/UPDATE":
         creature = Creature(
             creature_name=values["-CREATURE NAME-"],
@@ -691,9 +693,7 @@ while True:
         window["-CREATURE STATUS-"].update(creature_instance().status.get())
         window["-CREATURE NOTES-"].update(creature_instance().notes)
         window["-CREATURE IMPACT SLIDER-"].update(creature_instance().impact)
-        window["-CREATURE PREVALENCE SLIDER-"].update(
-            creature_instance().prevalence
-        )
+        window["-CREATURE PREVALENCE SLIDER-"].update(creature_instance().prevalence)
         window["-CREATURE TREND SLIDER-"].update(creature_instance().trend)
 
     ######################### Manage Plant Events ##########################
@@ -716,7 +716,6 @@ while True:
             window["-PLANT NAME-"].update(values=plant_names, size=(25, 10)),
             window["-PLANT TYPE-"].update(values=plant_types, size=(25, 10)),
         )
-
 
     if event == "PLANT CREATE/UPDATE":
         plant = Plant(
@@ -759,7 +758,7 @@ while True:
         window["-PLANT TREND SLIDER-"].update(plant_instance().trend)
 
     ########################## Manage Task Events ##########################
-    
+
     def clear_task_values():
         for value in (
             "NAME",
@@ -835,7 +834,9 @@ while True:
         clear_organism_links()
 
     elif event == "ADD PROGRESS":
-        if "task" in globals():  # Prevents crashes if add progress clicked before task creation
+        if (
+            "task" in globals()
+        ):  # Prevents crashes if add progress clicked before task creation
             window.Disable()
 
             progress_layout = [
@@ -867,6 +868,8 @@ while True:
                     progress_window.close()
                     window.Enable()
                     break
+        else:
+            sg.popup("Task must be created before progress is added.", keep_on_top=True)
 
     elif values["-TASK NAME-"]:  # Something is highlighted in the dropdown
         # When a task is selected populate the relevant fields with its values
@@ -884,7 +887,7 @@ while True:
         window["-TASK BY MONTH-"].update(task_instance().raw_schedule["bymonth"])
         window["-TASK INTERVAL-"].update(task_instance().raw_schedule["interval"])
         # Assign instance to task variable so progress can be added
-        task = task_instance() 
+        task = task_instance()
 
     ########################################################################
 
