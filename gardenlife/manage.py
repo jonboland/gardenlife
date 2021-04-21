@@ -2,6 +2,7 @@ from calendar import Calendar
 import pickle
 from tkinter.constants import SUNKEN, GROOVE
 import traceback
+import sys
 
 import PySimpleGUI as sg
 from PySimpleGUI.PySimpleGUI import Column
@@ -21,7 +22,7 @@ sg.theme_slider_color("#004225")
 try:
     with open("garden.pickle", "rb") as file:
         garden = pickle.load(file)
-except (OSError, IOError) as e:
+except (OSError, IOError):
     garden = Garden("-", "-", 0, "01/01/2000", "-")
 
 
@@ -396,7 +397,8 @@ task_next_due = [
     sg.Text("", size=(22, 1), relief=SUNKEN, key="-TASK NEXT DUE-"),
 ]
 
-add_progress_button = [sg.Button("ADD PROGRESS", size=(21, 1), pad=((113.5, 0), (10, 4)))
+add_progress_button = [
+    sg.Button("ADD PROGRESS", size=(21, 1), pad=((113.5, 0), (10, 4)))
 ]
 
 task_first_horizontal_line = [sg.Text("_" * 41, pad=(0, 0))]
@@ -550,29 +552,64 @@ all_tabs = [[sg.Tab(label, tab, pad=(10, 10)) for label, tab in tab_details.item
 layout = [[sg.Menu(menu_definition)], [sg.TabGroup(all_tabs, tab_background_color="#004225")]]
 # fmt: on
 # Create the window
-window = sg.Window("gardenlife", layout, keep_on_top=True)
+window = sg.Window(
+    "gardenlife", layout, keep_on_top=True, enable_close_attempted_event=True
+)
 
 
 # ----------------------------------- Event Loop ----------------------------------- #
 
 
-# Set the active status of the set progress window
-progress_window_active = False
+# Keeps track of whether any changes have been made since the garden was saved
+garden_changed = False
 
 # Display and interact with the window using an event loop
 while True:
     event, values = window.read()
     print(event, values)
 
-    ############################## Menu Events ##############################
+    ########################### Menu & Window Closure Events ###########################
 
-    # See if user wants to quit or window was closed
-    if event == sg.WINDOW_CLOSED or event == "Exit":
-        break
+    # See if user wants to quit or attempted to close the window
+    if event in ("Exit", sg.WINDOW_CLOSE_ATTEMPTED_EVENT):
+
+        if garden_changed:
+            window.Disable()
+
+            confirm_layout = [
+                [sg.Text("Would you like to save your changes?", pad=(0, 15))],
+                [
+                    sg.Button("Save", size=(10, 1)),
+                    sg.Button("Don't Save", size=(10, 1)),
+                    sg.Button("Cancel", size=(10, 1)),
+                ],
+            ]
+
+            confirm_window = sg.Window(
+                "Confirm", confirm_layout, keep_on_top=True, element_justification="center"
+            )
+
+            while True:
+                confirm_event, confirm_values = confirm_window.read()
+                print(confirm_event, confirm_values)
+
+                if confirm_event == "Save":
+                    with open("garden.pickle", "wb") as file:
+                        pickle.dump(garden, file)
+                    sys.exit()
+                if confirm_event == "Don't Save":
+                    sys.exit()
+                if confirm_event in ("Cancel", sg.WIN_CLOSED):
+                    confirm_window.close()
+                    window.Enable()
+                    break
+        else:
+            break
 
     elif event == "Save":
         with open("garden.pickle", "wb") as file:
             pickle.dump(garden, file)
+        garden_changed = False
 
     ######################### Garden Summary Events ########################
 
@@ -593,6 +630,7 @@ while True:
         window["-SUMMARY SIZE-"].update(garden.garden_size())
         window["-SUMMARY OWNED BY-"].update(garden.ownership())
         window["-SUMMARY OWNED FOR-"].update(garden.ownership_length())
+        garden_changed = True
 
     ####################### Manage Creatures Events ########################
 
@@ -615,49 +653,48 @@ while True:
             window["-CREATURE TYPE-"].update(values=creature_types, size=(25, 10)),
         )
 
-    try:
-        if event == "CREATURE CREATE/UPDATE":
-            creature = Creature(
-                creature_name=values["-CREATURE NAME-"],
-                creature_type=values["-CREATURE TYPE-"],
-                age=values["-CREATURE AGE-"],
-                appeared=values["-CREATURE APPEARED DATE-"],
-                notes=values["-CREATURE NOTES-"],
-                impact=values["-CREATURE IMPACT SLIDER-"],
-                prevalence=values["-CREATURE PREVALENCE SLIDER-"],
-                trend=values["-CREATURE TREND SLIDER-"],
-            )
-            if values["-CREATURE STATUS-"] == "archived":
-                creature.status.archive()
-            garden.add_item("creatures", creature)
-            update_creature_dropdowns()
-            clear_creature_values()
-            window["-SUMMARY TOTAL CREATURES-"].update(len(garden.creatures))
 
-        elif event == "CREATURE REMOVE":
-            garden.remove_item("creatures", values["-CREATURE NAME-"])
-            update_creature_dropdowns()
-            clear_creature_values()
-            window["-SUMMARY TOTAL CREATURES-"].update(len(garden.creatures))
+    if event == "CREATURE CREATE/UPDATE":
+        creature = Creature(
+            creature_name=values["-CREATURE NAME-"],
+            creature_type=values["-CREATURE TYPE-"],
+            age=values["-CREATURE AGE-"],
+            appeared=values["-CREATURE APPEARED DATE-"],
+            notes=values["-CREATURE NOTES-"],
+            impact=values["-CREATURE IMPACT SLIDER-"],
+            prevalence=values["-CREATURE PREVALENCE SLIDER-"],
+            trend=values["-CREATURE TREND SLIDER-"],
+        )
+        if values["-CREATURE STATUS-"] == "archived":
+            creature.status.archive()
+        garden.add_item("creatures", creature)
+        update_creature_dropdowns()
+        clear_creature_values()
+        window["-SUMMARY TOTAL CREATURES-"].update(len(garden.creatures))
+        garden_changed = True
 
-        elif values["-CREATURE NAME-"] == "":
-            clear_creature_values()
+    elif event == "CREATURE REMOVE":
+        garden.remove_item("creatures", values["-CREATURE NAME-"])
+        update_creature_dropdowns()
+        clear_creature_values()
+        window["-SUMMARY TOTAL CREATURES-"].update(len(garden.creatures))
+        garden_changed = True
 
-        # If a creature is selected populate the relevant fields with its values
-        elif values["-CREATURE NAME-"]:  # Something is highlighted in the dropdown
-            window["-CREATURE TYPE-"].update(creature_instance().creature_type)
-            window["-CREATURE AGE-"].update(creature_instance().age)
-            window["-CREATURE APPEARED DATE-"].update(creature_instance().appeared)
-            window["-CREATURE STATUS-"].update(creature_instance().status.get())
-            window["-CREATURE NOTES-"].update(creature_instance().notes)
-            window["-CREATURE IMPACT SLIDER-"].update(creature_instance().impact)
-            window["-CREATURE PREVALENCE SLIDER-"].update(
-                creature_instance().prevalence
-            )
-            window["-CREATURE TREND SLIDER-"].update(creature_instance().trend)
+    elif values["-CREATURE NAME-"] == "":
+        clear_creature_values()
 
-    except ValueError as error_description:
-        sg.popup(error_description, keep_on_top=True)
+    # If a creature is selected populate the relevant fields with its values
+    elif values["-CREATURE NAME-"]:  # Something is highlighted in the dropdown
+        window["-CREATURE TYPE-"].update(creature_instance().creature_type)
+        window["-CREATURE AGE-"].update(creature_instance().age)
+        window["-CREATURE APPEARED DATE-"].update(creature_instance().appeared)
+        window["-CREATURE STATUS-"].update(creature_instance().status.get())
+        window["-CREATURE NOTES-"].update(creature_instance().notes)
+        window["-CREATURE IMPACT SLIDER-"].update(creature_instance().impact)
+        window["-CREATURE PREVALENCE SLIDER-"].update(
+            creature_instance().prevalence
+        )
+        window["-CREATURE TREND SLIDER-"].update(creature_instance().trend)
 
     ######################### Manage Plant Events ##########################
 
@@ -680,50 +717,49 @@ while True:
             window["-PLANT TYPE-"].update(values=plant_types, size=(25, 10)),
         )
 
-    try:
-        if event == "PLANT CREATE/UPDATE":
-            plant = Plant(
-                plant_name=values["-PLANT NAME-"],
-                plant_type=values["-PLANT TYPE-"],
-                age=values["-PLANT AGE-"],
-                planted=values["-PLANT PLANTED DATE-"],
-                notes=values["-PLANT NOTES-"],
-                impact=values["-PLANT IMPACT SLIDER-"],
-                prevalence=values["-PLANT PREVALENCE SLIDER-"],
-                trend=values["-PLANT TREND SLIDER-"],
-            )
-            if values["-PLANT STATUS-"] == "archived":
-                plant.status.archive()
-            garden.add_item("plants", plant)
-            update_plant_dropdowns()
-            clear_plant_values()
-            window["-SUMMARY TOTAL PLANTS-"].update(len(garden.plants))
 
-        elif event == "PLANT REMOVE":
-            garden.remove_item("plants", values["-PLANT NAME-"])
-            update_plant_dropdowns()
-            clear_plant_values()
-            window["-SUMMARY TOTAL PLANTS-"].update(len(garden.plants))
+    if event == "PLANT CREATE/UPDATE":
+        plant = Plant(
+            plant_name=values["-PLANT NAME-"],
+            plant_type=values["-PLANT TYPE-"],
+            age=values["-PLANT AGE-"],
+            planted=values["-PLANT PLANTED DATE-"],
+            notes=values["-PLANT NOTES-"],
+            impact=values["-PLANT IMPACT SLIDER-"],
+            prevalence=values["-PLANT PREVALENCE SLIDER-"],
+            trend=values["-PLANT TREND SLIDER-"],
+        )
+        if values["-PLANT STATUS-"] == "archived":
+            plant.status.archive()
+        garden.add_item("plants", plant)
+        update_plant_dropdowns()
+        clear_plant_values()
+        window["-SUMMARY TOTAL PLANTS-"].update(len(garden.plants))
+        garden_changed = True
 
-        elif values["-PLANT NAME-"] == "":
-            clear_plant_values()
+    elif event == "PLANT REMOVE":
+        garden.remove_item("plants", values["-PLANT NAME-"])
+        update_plant_dropdowns()
+        clear_plant_values()
+        window["-SUMMARY TOTAL PLANTS-"].update(len(garden.plants))
+        garden_changed = True
 
-        # If a plant is selected populate the relevant fields with its values
-        elif values["-PLANT NAME-"]:  # Something is highlighted in the dropdown
-            window["-PLANT TYPE-"].update(plant_instance().plant_type)
-            window["-PLANT AGE-"].update(plant_instance().age)
-            window["-PLANT PLANTED DATE-"].update(plant_instance().planted)
-            window["-PLANT STATUS-"].update(plant_instance().status.get())
-            window["-PLANT NOTES-"].update(plant_instance().notes)
-            window["-PLANT IMPACT SLIDER-"].update(plant_instance().impact)
-            window["-PLANT PREVALENCE SLIDER-"].update(plant_instance().prevalence)
-            window["-PLANT TREND SLIDER-"].update(plant_instance().trend)
+    elif values["-PLANT NAME-"] == "":
+        clear_plant_values()
 
-    except ValueError as error_description:
-        sg.popup(error_description, keep_on_top=True)
+    # If a plant is selected populate the relevant fields with its values
+    elif values["-PLANT NAME-"]:  # Something is highlighted in the dropdown
+        window["-PLANT TYPE-"].update(plant_instance().plant_type)
+        window["-PLANT AGE-"].update(plant_instance().age)
+        window["-PLANT PLANTED DATE-"].update(plant_instance().planted)
+        window["-PLANT STATUS-"].update(plant_instance().status.get())
+        window["-PLANT NOTES-"].update(plant_instance().notes)
+        window["-PLANT IMPACT SLIDER-"].update(plant_instance().impact)
+        window["-PLANT PREVALENCE SLIDER-"].update(plant_instance().prevalence)
+        window["-PLANT TREND SLIDER-"].update(plant_instance().trend)
 
     ########################## Manage Task Events ##########################
-
+    
     def clear_task_values():
         for value in (
             "NAME",
@@ -740,6 +776,7 @@ while True:
             "INTERVAL",
         ):
             window[f"-TASK {value}-"].update("")
+            task = None
 
     def task_instance():
         return garden.tasks.get(values["-TASK NAME-"])
@@ -770,68 +807,67 @@ while True:
             freq=values["-TASK FREQUENCY-"],
             count=values["-TASK COUNT-"],
             bymonth=values["-TASK BY MONTH-"],
-            interval=values["-TASK INTERVAL-"]
+            interval=values["-TASK INTERVAL-"],
         )
         # If the task already exists add any pre-existing completed dates to it
         if task_instance():
-            task.completed_dates = task_instance().completed_dates       
+            task.completed_dates = task_instance().completed_dates
         # Add the task to the garden, overwriting the old version if it already exists
         garden.add_item("tasks", task)
         # Clear the task variable once the task has been added to the garden
-        task = None
         update_task_dropdown()
         clear_task_values()
         clear_organism_links()
         # Update the total tasks number shown on the summary tab
         window["-SUMMARY TOTAL TASKS-"].update(len(garden.tasks))
+        garden_changed = True
 
     elif event == "TASK REMOVE":
         garden.remove_item("tasks", values["-TASK NAME-"])
-        task = None        
         update_task_dropdown()
         clear_task_values()
         clear_organism_links()
         window["-SUMMARY TOTAL TASKS-"].update(len(garden.tasks))
+        garden_changed = True
 
     elif values["-TASK NAME-"] == "":
-            task = None
-            clear_task_values()
-            clear_organism_links()
-    
-    elif event == "ADD PROGRESS" and not progress_window_active:
-        progress_window_active = True
-        window.Disable()
+        clear_task_values()
+        clear_organism_links()
 
-        progress_layout = [
-            [
-                sg.Column(
-                    [
-                        [sg.Checkbox(date, default=value, key=date)]
-                        for date, value in task.get_all_progress().items()
-                    ],
-                    size=(200, 200),
-                    scrollable=True,
-                ),
-            ],
-            [sg.Button("Add")],
-        ]
+    elif event == "ADD PROGRESS":
+        if "task" in globals():  # Prevents crashes if add progress clicked before task creation
+            window.Disable()
 
-        progress_window = sg.Window("Add Progress", progress_layout, keep_on_top=True)
+            progress_layout = [
+                [
+                    sg.Column(
+                        [
+                            [sg.Checkbox(date, default=value, key=date)]
+                            for date, value in task.get_all_progress().items()
+                        ],
+                        size=(200, 200),
+                        scrollable=True,
+                    ),
+                ],
+                [sg.Button("Add")],
+            ]
 
-        while True:
-            progress_event, progress_values = progress_window.read()
-            print(progress_event, progress_values)
+            progress_window = sg.Window(
+                "Add Progress", progress_layout, keep_on_top=True
+            )
 
-            if progress_event == "Add":
-                task.update_completed_dates(progress_values)
+            while True:
+                progress_event, progress_values = progress_window.read()
+                print(progress_event, progress_values)
 
-            if progress_event == sg.WIN_CLOSED or progress_event == "Add":
-                progress_window.close()
-                progress_window_active = False
-                window.Enable()
-                break
+                if progress_event == "Add":
+                    task.update_completed_dates(progress_values)
 
-    
+                if progress_event in (sg.WIN_CLOSED, "Add"):
+                    progress_window.close()
+                    window.Enable()
+                    break
+
     elif values["-TASK NAME-"]:  # Something is highlighted in the dropdown
         # When a task is selected populate the relevant fields with its values
         window["-TASK PROGRESS-"].update(task_instance().get_current_progress())
@@ -847,7 +883,8 @@ while True:
         window["-TASK COUNT-"].update(task_instance().raw_schedule["count"])
         window["-TASK BY MONTH-"].update(task_instance().raw_schedule["bymonth"])
         window["-TASK INTERVAL-"].update(task_instance().raw_schedule["interval"])
-        task = task_instance()  # Assign instance to task variable so progress can be added
+        # Assign instance to task variable so progress can be added
+        task = task_instance() 
 
     ########################################################################
 
