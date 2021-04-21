@@ -834,9 +834,7 @@ while True:
         clear_organism_links()
 
     elif event == "ADD PROGRESS":
-        if (
-            "task" in globals()
-        ):  # Prevents crashes if add progress clicked before task creation
+        if "task" in globals():
             window.Disable()
 
             progress_layout = [
