@@ -1,4 +1,5 @@
 from calendar import Calendar
+from operator import attrgetter
 import pickle
 from tkinter.constants import SUNKEN, GROOVE
 import traceback
@@ -616,7 +617,50 @@ while True:
 
     ######################### Garden Summary Events ########################
 
-    # Add report events here
+    creature_headings = (
+        "Name",
+        "Type",
+        "Appeared",
+        "Age",
+        "Impact",
+        "Prevalence",
+        "Trend",
+    )
+
+    def creature_values():
+        return (
+            creature.creature_name,
+            creature.creature_type,
+            creature.appeared,
+            creature.age,
+            creature.get_level("impact"),
+            creature.get_level("prevalence"),
+            creature.get_level("trend"),
+        )
+    
+
+    def line(character):
+        return (("|" + character * 15) * 7) + "|"
+
+
+    def create_creature_row(elements):
+        spaced_elements = (f"{elem:^15}" for elem in elements)
+        row = "|".join(spaced_elements)
+        return(f"|{row}|")
+        
+
+    if event == "VIEW ALL CREATURES":
+        sg.Print(
+            line(" "), 
+            font=("lucida sans typewriter", 9), 
+            size=(120, 30), 
+            keep_on_top=True
+        )
+        sg.Print(create_creature_row(creature_headings))
+        sg.Print(line("_"))
+        for creature in sorted(garden.creatures.values(), key=attrgetter("creature_name")):
+            sg.Print(create_creature_row(creature_values()))
+        sg.Print(line("_"))
 
     ######################### Manage Garden Events #########################
 
