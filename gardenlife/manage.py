@@ -569,7 +569,7 @@ while True:
     event, values = window.read()
     print(event, values)
 
-    ########################### Menu & Window Closure Events ###########################
+    ##################### Menu & Window Closure Events #####################
 
     # See if user wants to quit or attempted to close the window
     if event in ("Exit", sg.WINDOW_CLOSE_ATTEMPTED_EVENT):
@@ -615,9 +615,9 @@ while True:
             pickle.dump(garden, file)
         garden_changed = False
 
-    ######################## Creature Summary Events #######################   
+    ######################## Creature Summary Events #######################
     # fmt: off
-    creature_headings = ("Name", "Type", "Appeared", "Age", "Impact", "Prevalence", "Trend")
+    creature_headings = ("Name", "Type", "Appeared", "Age", "Impact", "Prevalence", "Trend", "Status")
     # fmt: on
     def creature_values(creature):
         values = (
@@ -628,18 +628,23 @@ while True:
             creature.get_level("impact"),
             creature.get_level("prevalence"),
             creature.get_level("trend"),
+            creature.status.get(),
         )
-        return [sg.Text(value, size=(10, 1), relief=SUNKEN) for value in values]
+        return [sg.Input(value, size=(11, 1)) for value in values]  # relief=SUNKEN
 
     def sorted_creatures(sort_key):
-        return sorted(garden.creatures.values(), key=attrgetter(sort_key))
+        """Sorts creature instances by archived status then by sort key."""
+        creatures = sorted(garden.creatures.values(), key=attrgetter(sort_key))
+        return sorted(
+            creatures, key=lambda creature: str(creature.status), reverse=True
+        )
 
     if event == "VIEW ALL CREATURES":
         window.Disable()
         # fmt: off
         header_row = [
             [
-                sg.Text(title, size=(10, 1), text_color="white", background_color="#004225") 
+                sg.Input(title, size=(11, 1), text_color="white", background_color="#004225") 
                 for title in creature_headings
             ]
         ]
@@ -648,7 +653,7 @@ while True:
 
         creature_table = header_row + creatures
 
-        creature_summary_column = [sg.Column(creature_table, size=(700, 500), scrollable=True)]
+        creature_summary_column = [sg.Column(creature_table, size=(750, 500), scrollable=True)]
 
         creature_summary_layout = [creature_summary_column, [sg.Button("Close")]]
 
@@ -657,7 +662,10 @@ while True:
         )
         # fmt: on
         while True:
-            creature_sum_event, creature_sum_values, = creature_summary_window.read()
+            (
+                creature_sum_event,
+                creature_sum_values,
+            ) = creature_summary_window.read()
             print(creature_sum_event, creature_sum_values)
 
             if creature_sum_event in (sg.WIN_CLOSED, "Close"):
@@ -667,7 +675,7 @@ while True:
 
     ########################## Plant Summary Events ########################
     # fmt: off
-    plant_headings = ("Name", "Type", "Planted", "Age", "Impact", "Prevalence", "Trend")
+    plant_headings = ("Name", "Type", "Planted", "Age", "Impact", "Prevalence", "Trend", "Status")
     # fmt: on
     def plant_values(plant):
         values = (
@@ -678,18 +686,21 @@ while True:
             plant.get_level("impact"),
             plant.get_level("prevalence"),
             plant.get_level("trend"),
+            plant.status.get(),
         )
-        return [sg.Text(value, size=(10, 1), relief=SUNKEN) for value in values]
+        return [sg.Input(value, size=(11, 1)) for value in values]  #  relief=SUNKEN
 
     def sorted_plants(sort_key):
-        return sorted(garden.plants.values(), key=attrgetter(sort_key))
+        """Sorts plant instances by archived status then by sort key."""
+        plants = sorted(garden.plants.values(), key=attrgetter(sort_key))
+        return sorted(plants, key=lambda plant: str(plant.status), reverse=True)
 
     if event == "VIEW ALL PLANTS":
         window.Disable()
         # fmt: off
         header_row = [
             [
-                sg.Text(title, size=(10, 1), text_color="white", background_color="#004225")
+                sg.Input(title, size=(11, 1), text_color="white", background_color="#004225")
                 for title in plant_headings
             ]
         ]
@@ -698,7 +709,7 @@ while True:
 
         plant_table = header_row + plants
 
-        plant_summary_column = [sg.Column(plant_table, size=(700, 500), scrollable=True)]
+        plant_summary_column = [sg.Column(plant_table, size=(750, 500), scrollable=True)]
 
         plant_summary_layout = [plant_summary_column, [sg.Button("Close")]]
 
@@ -707,14 +718,74 @@ while True:
         )
         # fmt: on
         while True:
-            plant_sum_event, plant_sum_values, = plant_summary_window.read()
+            (
+                plant_sum_event,
+                plant_sum_values,
+            ) = plant_summary_window.read()
             print(plant_sum_event, plant_sum_values)
 
             if plant_sum_event in (sg.WIN_CLOSED, "Close"):
                 plant_summary_window.close()
                 window.Enable()
                 break
- 
+
+    ########################## Task Summary Events #########################
+    # fmt: off
+    task_headings = (
+        "Name", "Progress", "Next Due", "Assignee", "Length", "Creatures", "Plants", "Status",
+    )
+    # fmt: on
+    def task_values(task):
+        other_values = (
+            task.get_current_progress(),
+            task.get_next_due_date(),
+            task.assignee,
+            task.length,
+            ", ".join(task.linked_creatures),
+            ", ".join(task.linked_plants),
+            task.status.get(),
+        )
+        task_name = [sg.Input(task.task_name, size=(18, 1))]
+        other_values = [sg.Input(value, size=(11, 1)) for value in other_values]
+        return task_name + other_values
+
+    def sorted_tasks(sort_key):
+        """Sorts tasks instances by archived status then by sort key."""
+        tasks = sorted(garden.tasks.values(), key=attrgetter(sort_key))
+        return sorted(tasks, key=lambda task: str(task.status), reverse=True)
+
+    if event == "VIEW ALL TASKS":
+        window.Disable()
+
+        name_head = [sg.Input(task_headings[0], size=(18, 1), text_color="white", background_color="#004225")]
+        other_head = [sg.Input(title, size=(11, 1), text_color="white", background_color="#004225") for title in task_headings[1:]]
+        
+        header_row = [name_head + other_head]
+        
+        tasks = [task_values(task) for task in sorted_tasks("task_name")]
+
+        task_table = header_row + tasks
+
+        task_summary_column = [sg.Column(task_table, size=(800, 500), scrollable=True)]
+
+        task_summary_layout = [task_summary_column, [sg.Button("Close")]]
+
+        task_summary_window = sg.Window(
+            "Task Summary", task_summary_layout, keep_on_top=True
+        )
+
+        while True:
+            (
+                task_sum_event,
+                task_sum_values,
+            ) = task_summary_window.read()
+            print(task_sum_event, task_sum_values)
+
+            if task_sum_event in (sg.WIN_CLOSED, "Close"):
+                task_summary_window.close()
+                window.Enable()
+                break
+
     ######################### Manage Garden Events #########################
 
     elif event == "UPDATE GARDEN":
