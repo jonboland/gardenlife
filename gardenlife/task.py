@@ -34,7 +34,7 @@ class Task:
     def __eq__(self, other):
         return repr(self) == other
 
-    # fmt: on
+    # fmt: off
     def set_schedule(self, start_date=None, freq=None, count=None, bymonth=None, interval=None):
         """Sets the task's scheduled dates."""
         # Store the raw schedule values to repopulate UI fields
@@ -54,8 +54,8 @@ class Task:
         self.schedule = list(
             rrule(dtstart=start_date, freq=freq, count=count, bymonth=bymonth, interval=interval)
         )
-
     # format: on
+    
     def update_completed_dates(self, all_progress):
         """
         Takes a dict containing all scheduled dates as keys in string format.
