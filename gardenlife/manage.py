@@ -1,4 +1,5 @@
 from calendar import Calendar
+from operator import attrgetter
 import pickle
 from tkinter.constants import SUNKEN, GROOVE
 import traceback
@@ -614,10 +615,106 @@ while True:
             pickle.dump(garden, file)
         garden_changed = False
 
-    ######################### Garden Summary Events ########################
+    ######################## Creature Summary Events #######################   
+    # fmt: off
+    creature_headings = ("Name", "Type", "Appeared", "Age", "Impact", "Prevalence", "Trend")
+    # fmt: on
+    def creature_values(creature):
+        values = (
+            creature.creature_name,
+            creature.creature_type,
+            creature.appeared,
+            creature.age,
+            creature.get_level("impact"),
+            creature.get_level("prevalence"),
+            creature.get_level("trend"),
+        )
+        return [sg.Text(value, size=(10, 1), relief=SUNKEN) for value in values]
 
-    # Add report events here
+    def sorted_creatures(sort_key):
+        return sorted(garden.creatures.values(), key=attrgetter(sort_key))
 
+    if event == "VIEW ALL CREATURES":
+        window.Disable()
+        # fmt: off
+        header_row = [
+            [
+                sg.Text(title, size=(10, 1), text_color="white", background_color="#004225") 
+                for title in creature_headings
+            ]
+        ]
+
+        creatures = [creature_values(creature) for creature in sorted_creatures("creature_name")]
+
+        creature_table = header_row + creatures
+
+        creature_summary_column = [sg.Column(creature_table, size=(700, 500), scrollable=True)]
+
+        creature_summary_layout = [creature_summary_column, [sg.Button("Close")]]
+
+        creature_summary_window = sg.Window(
+            "Creature Summary", creature_summary_layout, keep_on_top=True
+        )
+        # fmt: on
+        while True:
+            creature_sum_event, creature_sum_values, = creature_summary_window.read()
+            print(creature_sum_event, creature_sum_values)
+
+            if creature_sum_event in (sg.WIN_CLOSED, "Close"):
+                creature_summary_window.close()
+                window.Enable()
+                break
+
+    ########################## Plant Summary Events ########################
+    # fmt: off
+    plant_headings = ("Name", "Type", "Planted", "Age", "Impact", "Prevalence", "Trend")
+    # fmt: on
+    def plant_values(plant):
+        values = (
+            plant.plant_name,
+            plant.plant_type,
+            plant.planted,
+            plant.age,
+            plant.get_level("impact"),
+            plant.get_level("prevalence"),
+            plant.get_level("trend"),
+        )
+        return [sg.Text(value, size=(10, 1), relief=SUNKEN) for value in values]
+
+    def sorted_plants(sort_key):
+        return sorted(garden.plants.values(), key=attrgetter(sort_key))
+
+    if event == "VIEW ALL PLANTS":
+        window.Disable()
+        # fmt: off
+        header_row = [
+            [
+                sg.Text(title, size=(10, 1), text_color="white", background_color="#004225")
+                for title in plant_headings
+            ]
+        ]
+
+        plants = [plant_values(plant) for plant in sorted_plants("plant_name")]
+
+        plant_table = header_row + plants
+
+        plant_summary_column = [sg.Column(plant_table, size=(700, 500), scrollable=True)]
+
+        plant_summary_layout = [plant_summary_column, [sg.Button("Close")]]
+
+        plant_summary_window = sg.Window(
+            "Plant Summary", plant_summary_layout, keep_on_top=True
+        )
+        # fmt: on
+        while True:
+            plant_sum_event, plant_sum_values, = plant_summary_window.read()
+            print(plant_sum_event, plant_sum_values)
+
+            if plant_sum_event in (sg.WIN_CLOSED, "Close"):
+                plant_summary_window.close()
+                window.Enable()
+                break
+ 
     ######################### Manage Garden Events #########################
 
     elif event == "UPDATE GARDEN":
