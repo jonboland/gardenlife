@@ -616,19 +616,11 @@ while True:
         garden_changed = False
 
     ######################### Garden Summary Events ########################
-
-    creature_headings = (
-        "Name",
-        "Type",
-        "Appeared",
-        "Age",
-        "Impact",
-        "Prevalence",
-        "Trend",
-    )
-
-    def creature_values():
-        return (
+    # fmt: off
+    creature_headings = ("Name", "Type", "Appeared", "Age", "Impact", "Prevalence", "Trend")
+    # fmt: on
+    def creature_values(creature):
+        values = (
             creature.creature_name,
             creature.creature_type,
             creature.appeared,
@@ -637,30 +629,41 @@ while True:
             creature.get_level("prevalence"),
             creature.get_level("trend"),
         )
-    
+        return [sg.Text(value, size=(10, 1), relief=SUNKEN) for value in values]
 
-    def line(character):
-        return (("|" + character * 15) * 7) + "|"
-
-
-    def create_creature_row(elements):
-        spaced_elements = (f"{elem:^15}" for elem in elements)
-        row = "|".join(spaced_elements)
-        return(f"|{row}|")
-        
+    def sorted_creatures(sort_key):
+        return sorted(garden.creatures.values(), key=attrgetter(sort_key))
 
     if event == "VIEW ALL CREATURES":
-        sg.Print(
-            line(" "), 
-            font=("lucida sans typewriter", 9), 
-            size=(120, 30), 
-            keep_on_top=True
+        window.Disable()
+        # fmt: off
+        header_row = [
+            [
+                sg.Text(title, size=(10, 1), text_color="white", background_color="#004225") 
+                for title in creature_headings
+            ]
+        ]
+
+        creatures = [creature_values(creature) for creature in sorted_creatures("creature_name")]
+
+        creature_table = header_row + creatures
+
+        creature_summary_column = [sg.Column(creature_table, size=(700, 500), scrollable=True)]
+
+        creature_summary_layout = [creature_summary_column, [sg.Button("Close")]]
+
+        creature_summary_window = sg.Window(
+            "Creature Summary", creature_summary_layout, keep_on_top=True
         )
-        sg.Print(create_creature_row(creature_headings))
-        sg.Print(line("_"))
-        for creature in sorted(garden.creatures.values(), key=attrgetter("creature_name")):
-            sg.Print(create_creature_row(creature_values()))
-        sg.Print(line("_"))
+        # fmt: on
+        while True:
+            creature_sum_event, creature_sum_values, = creature_summary_window.read()
+            print(creature_sum_event, creature_sum_values)
+
+            if creature_sum_event in (sg.WIN_CLOSED, "Close"):
+                creature_summary_window.close()
+                window.Enable()
+                break
 
     ######################### Manage Garden Events #########################
 
