@@ -14,11 +14,11 @@ LEVELS = {
         5: "very high"
     },
     "trend_levels": {
-        1: "rapidly decreasing",
+        1: "rapid decrease",
         2: "decreasing",
         3: "stable",
         4: "increasing",
-        5: "rapidly increasing",
+        5: "rapid increase",
     },
 }
 
