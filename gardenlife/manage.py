@@ -49,7 +49,10 @@ summary_details = {
     "Total creatures:": len(garden.creatures),
     "Total plants:": len(garden.plants),
     "Total tasks:": len(garden.tasks),
-    "Outstanding tasks:": 0,
+    "Outstanding tasks:": sum(
+        task.get_current_progress() in {"Due", "Overdue", "Very overdue"}
+        for task in garden.tasks.values()
+    ),
 }
 
 # fmt: off
@@ -757,11 +760,23 @@ while True:
     if event == "VIEW ALL TASKS":
         window.Disable()
 
-        name_head = [sg.Input(task_headings[0], size=(18, 1), text_color="white", background_color="#004225")]
-        other_head = [sg.Input(title, size=(11, 1), text_color="white", background_color="#004225") for title in task_headings[1:]]
-        
+        name_head = [
+            sg.Input(
+                task_headings[0],
+                size=(18, 1),
+                text_color="white",
+                background_color="#004225",
+            )
+        ]
+        other_head = [
+            sg.Input(
+                title, size=(11, 1), text_color="white", background_color="#004225"
+            )
+            for title in task_headings[1:]
+        ]
+
         header_row = [name_head + other_head]
-        
+
         tasks = [task_values(task) for task in sorted_tasks("task_name")]
 
         task_table = header_row + tasks
@@ -987,6 +1002,12 @@ while True:
         clear_organism_links()
         # Update the total tasks number shown on the summary tab
         window["-SUMMARY TOTAL TASKS-"].update(len(garden.tasks))
+        window["-SUMMARY OUTSTANDING TASKS-"].update(
+            sum(
+                task.get_current_progress() in {"Due", "Overdue", "Very overdue"}
+                for task in garden.tasks.values()
+            )
+        )
         garden_changed = True
 
     elif event == "TASK REMOVE":
@@ -995,6 +1016,12 @@ while True:
         clear_task_values()
         clear_organism_links()
         window["-SUMMARY TOTAL TASKS-"].update(len(garden.tasks))
+        window["-SUMMARY OUTSTANDING TASKS-"].update(
+            sum(
+                task.get_current_progress() in {"Due", "Overdue", "Very overdue"}
+                for task in garden.tasks.values()
+            )
+        )
         garden_changed = True
 
     elif values["-TASK NAME-"] == "":
