@@ -49,7 +49,10 @@ summary_details = {
     "Total creatures:": len(garden.creatures),
     "Total plants:": len(garden.plants),
     "Total tasks:": len(garden.tasks),
-    "Outstanding tasks:": 0,
+    "Outstanding tasks:": sum(
+        task.get_current_progress() in {"Due", "Overdue", "Very overdue"}
+        for task in garden.tasks.values()
+    ),
 }
 
 # fmt: off
@@ -61,12 +64,10 @@ summary = [
     for label, value in summary_details.items()
 ]
 # fmt: on
-
 report_buttons = [
     [sg.Button(name, size=(20, 2), pad=(0, 10), border_width=2)]
     for name in REPORT_BUTTON_TEXT
 ]
-
 
 summary_tab = [
     [
@@ -100,7 +101,6 @@ select_garden = [
     garden_label_format("Select garden:"),
     sg.Combo([], default_value=garden.name, size=(30, 10), key="-SELECT GARDEN-"),
 ]
-
 
 garden_blank = [sg.Text("", size=(0, 1))]  # Blank row to add space below selector
 
@@ -156,11 +156,18 @@ creature_name = [
         enable_events=True,
     ),
 ]
-# fmt: off
+
 creature_type = [
     creature_label("Creature type:"),
     sg.Combo(
-        sorted([""] + [creature.creature_type for creature in garden.creatures.values()]),
+        sorted(
+            [""]
+            + [
+                creature.creature_type
+                for creature in garden.creatures.values()
+                if creature.creature_type
+            ]
+        ),
         size=(25, 10),
         key="-CREATURE TYPE-",
     ),
@@ -170,7 +177,7 @@ creature_age = [
     creature_label("Creature age:"),
     sg.Input(size=CREATURE_FIELD_SIZE, key="-CREATURE AGE-"),
 ]
-
+# fmt: off
 creature_appeared = [
     sg.Text("Appeared date:", size=(13, 1), pad=(0, (6, 30))),
     sg.Input(size=CREATURE_FIELD_SIZE, key="-CREATURE APPEARED DATE-", pad=(5, (6, 30))),
@@ -217,7 +224,6 @@ creature_buttons = [
     sg.Button(name, size=(15, 2), pad=((0, 7), (32, 0)), key=f"CREATURE {name}")
     for name in CREATURE_BUTTON_TEXT
 ]
-
 
 creatures_left_column = [
     creature_name,
@@ -279,16 +285,16 @@ plant_name = [
         enable_events=True,
     ),
 ]
-
+# fmt: off
 plant_type = [
     plant_label("Plant type:"),
     sg.Combo(
-        sorted([""] + [plant.plant_type for plant in garden.plants.values()]),
+        sorted([""] + [plant.plant_type for plant in garden.plants.values() if plant.plant_type]),
         size=(25, 10),
         key="-PLANT TYPE-",
     ),
 ]
-
+# fmt: on
 plant_age = [
     plant_label("Plant age:"),
     sg.Input(size=PLANT_FIELD_SIZE, key="-PLANT AGE-"),
@@ -340,7 +346,6 @@ plant_buttons = [
     sg.Button(name, size=(15, 2), pad=((0, 7), (32, 0)), key=f"PLANT {name}")
     for name in PLANT_BUTTON_TEXT
 ]
-
 
 plants_left_column = [
     plant_name,
@@ -558,6 +563,15 @@ window = sg.Window(
 )
 
 
+# ----------------------------- Shared Event Functions ----------------------------- #
+
+
+def sorted_organisms(organisms, sort_key):
+    """Sorts organism instances by archived status then by sort key."""
+    organisms = sorted(organisms, key=attrgetter(sort_key))
+    return sorted(organisms, key=lambda organism: str(organism.status), reverse=True)
+
+
 # ----------------------------------- Event Loop ----------------------------------- #
 
 
@@ -569,7 +583,7 @@ while True:
     event, values = window.read()
     print(event, values)
 
-    ########################### Menu & Window Closure Events ###########################
+    ##################### Menu & Window Closure Events #####################
 
     # See if user wants to quit or attempted to close the window
     if event in ("Exit", sg.WINDOW_CLOSE_ATTEMPTED_EVENT):
@@ -615,9 +629,10 @@ while True:
             pickle.dump(garden, file)
         garden_changed = False
 
-    ######################## Creature Summary Events #######################   
+    ######################## Creature Summary Events #######################
     # fmt: off
-    creature_headings = ("Name", "Type", "Appeared", "Age", "Impact", "Prevalence", "Trend")
+    creature_headings = ("Name", "Type", "Appeared", "Age", "Impact", "Prevalence", "Trend", "Status")
+
     # fmt: on
     def creature_values(creature):
         values = (
@@ -628,27 +643,28 @@ while True:
             creature.get_level("impact"),
             creature.get_level("prevalence"),
             creature.get_level("trend"),
+            creature.status.get(),
         )
-        return [sg.Text(value, size=(10, 1), relief=SUNKEN) for value in values]
-
-    def sorted_creatures(sort_key):
-        return sorted(garden.creatures.values(), key=attrgetter(sort_key))
+        return [sg.Input(value, size=(11, 1)) for value in values]
 
     if event == "VIEW ALL CREATURES":
         window.Disable()
         # fmt: off
         header_row = [
             [
-                sg.Text(title, size=(10, 1), text_color="white", background_color="#004225") 
+                sg.Input(title, size=(11, 1), text_color="white", background_color="#004225") 
                 for title in creature_headings
             ]
         ]
 
-        creatures = [creature_values(creature) for creature in sorted_creatures("creature_name")]
+        creatures = [
+            creature_values(creature)
+            for creature in sorted_organisms(garden.creatures.values(), sort_key="creature_name")
+        ]
 
         creature_table = header_row + creatures
 
-        creature_summary_column = [sg.Column(creature_table, size=(700, 500), scrollable=True)]
+        creature_summary_column = [sg.Column(creature_table, size=(750, 500), scrollable=True)]
 
         creature_summary_layout = [creature_summary_column, [sg.Button("Close")]]
 
@@ -657,7 +673,7 @@ while True:
         )
         # fmt: on
         while True:
-            creature_sum_event, creature_sum_values, = creature_summary_window.read()
+            creature_sum_event, creature_sum_values = creature_summary_window.read()
             print(creature_sum_event, creature_sum_values)
 
             if creature_sum_event in (sg.WIN_CLOSED, "Close"):
@@ -667,7 +683,8 @@ while True:
 
     ########################## Plant Summary Events ########################
     # fmt: off
-    plant_headings = ("Name", "Type", "Planted", "Age", "Impact", "Prevalence", "Trend")
+    plant_headings = ("Name", "Type", "Planted", "Age", "Impact", "Prevalence", "Trend", "Status")
+
     # fmt: on
     def plant_values(plant):
         values = (
@@ -678,27 +695,28 @@ while True:
             plant.get_level("impact"),
             plant.get_level("prevalence"),
             plant.get_level("trend"),
+            plant.status.get(),
         )
-        return [sg.Text(value, size=(10, 1), relief=SUNKEN) for value in values]
-
-    def sorted_plants(sort_key):
-        return sorted(garden.plants.values(), key=attrgetter(sort_key))
+        return [sg.Input(value, size=(11, 1)) for value in values]
 
     if event == "VIEW ALL PLANTS":
         window.Disable()
         # fmt: off
         header_row = [
             [
-                sg.Text(title, size=(10, 1), text_color="white", background_color="#004225")
+                sg.Input(title, size=(11, 1), text_color="white", background_color="#004225")
                 for title in plant_headings
             ]
         ]
-
-        plants = [plant_values(plant) for plant in sorted_plants("plant_name")]
+        
+        plants = [
+            plant_values(plant) 
+            for plant in sorted_organisms(garden.plants.values(), sort_key="plant_name")
+        ]
 
         plant_table = header_row + plants
 
-        plant_summary_column = [sg.Column(plant_table, size=(700, 500), scrollable=True)]
+        plant_summary_column = [sg.Column(plant_table, size=(750, 500), scrollable=True)]
 
         plant_summary_layout = [plant_summary_column, [sg.Button("Close")]]
 
@@ -707,14 +725,92 @@ while True:
         )
         # fmt: on
         while True:
-            plant_sum_event, plant_sum_values, = plant_summary_window.read()
+            plant_sum_event, plant_sum_values = plant_summary_window.read()
             print(plant_sum_event, plant_sum_values)
 
             if plant_sum_event in (sg.WIN_CLOSED, "Close"):
                 plant_summary_window.close()
                 window.Enable()
                 break
- 
+
+    ########################## Task Summary Events #########################
+    # fmt: off
+    task_headings = (
+        "Name", "Progress", "Next Due", "Assignee", "Length", "Creatures", "Plants", "Status",
+    )
+
+    # fmt: on
+    def task_values(task):
+        other_values = (
+            task.get_current_progress(),
+            task.get_next_due_date(),
+            task.assignee,
+            task.length,
+            ", ".join(task.linked_creatures),
+            ", ".join(task.linked_plants),
+            task.status.get(),
+        )
+        task_name = [sg.Input(task.task_name, size=(18, 1))]
+        other_values = [sg.Input(value, size=(11, 1)) for value in other_values]
+        return task_name + other_values
+
+    def sorted_tasks():
+        """Sorts tasks instances by status, progress, due date, assignee, and name."""
+        tasks = list(garden.tasks.values())
+        tasks.sort(key=attrgetter("assignee", "task_name"))
+        tasks.sort(key=lambda task: task.get_next_due_date())
+        tasks.sort(key=_progress_order, reverse=True)
+        tasks.sort(key=lambda task: str(task.status), reverse=True)
+        return tasks
+    
+    def _progress_order(task):
+        # Key for sorting tasks so those not yet due are placed before all others
+        # Note that the overall order is reversed once this key has been applied to every task
+        progress = task.get_current_progress()
+        return "A" if progress == "Not yet due" else progress
+
+    if event == "VIEW ALL TASKS":
+
+        window.Disable()
+
+        name_head = [
+            sg.Input(
+                task_headings[0],
+                size=(18, 1),
+                text_color="white",
+                background_color="#004225",
+            )
+        ]
+        other_head = [
+            sg.Input(
+                title, size=(11, 1), text_color="white", background_color="#004225"
+            )
+            for title in task_headings[1:]
+        ]
+
+        header_row = [name_head + other_head]
+
+        tasks = [task_values(task) for task in sorted_tasks()]
+
+        task_table = header_row + tasks
+
+        task_summary_column = [sg.Column(task_table, size=(800, 500), scrollable=True)]
+
+        task_summary_layout = [task_summary_column, [sg.Button("Close")]]
+
+        task_summary_window = sg.Window(
+            "Task Summary", task_summary_layout, keep_on_top=True
+        )
+
+        while True:
+            task_sum_event, task_sum_values = task_summary_window.read()
+            print(task_sum_event, task_sum_values)
+
+            if task_sum_event in (sg.WIN_CLOSED, "Close"):
+                task_summary_window.close()
+                window.Enable()
+                break
+
     ######################### Manage Garden Events #########################
 
     elif event == "UPDATE GARDEN":
@@ -746,7 +842,12 @@ while True:
     def update_creature_dropdowns():
         creature_names = sorted([""] + list(garden.creatures))
         creature_types = sorted(
-            [""] + [creature.creature_type for creature in garden.creatures.values()]
+            [""]
+            + [
+                creature.creature_type
+                for creature in garden.creatures.values()
+                if creature.creature_type
+            ]
         )
         return (
             window["-CREATURE NAME-"].update(values=creature_names, size=(25, 10)),
@@ -804,16 +905,18 @@ while True:
     def plant_instance():
         return garden.plants[values["-PLANT NAME-"]]
 
+    # fmt: off
     def update_plant_dropdowns():
         plant_names = sorted([""] + list(garden.plants))
         plant_types = sorted(
-            [""] + [plant.plant_type for plant in garden.plants.values()]
+            [""] + [plant.plant_type for plant in garden.plants.values() if plant.plant_type]
         )
         return (
             window["-PLANT NAME-"].update(values=plant_names, size=(25, 10)),
             window["-PLANT TYPE-"].update(values=plant_types, size=(25, 10)),
         )
 
+    # fmt: on
     if event == "PLANT CREATE/UPDATE":
         plant = Plant(
             plant_name=values["-PLANT NAME-"],
@@ -916,6 +1019,12 @@ while True:
         clear_organism_links()
         # Update the total tasks number shown on the summary tab
         window["-SUMMARY TOTAL TASKS-"].update(len(garden.tasks))
+        window["-SUMMARY OUTSTANDING TASKS-"].update(
+            sum(
+                task.get_current_progress() in {"Due", "Overdue", "Very overdue"}
+                for task in garden.tasks.values()
+            )
+        )
         garden_changed = True
 
     elif event == "TASK REMOVE":
@@ -924,6 +1033,12 @@ while True:
         clear_task_values()
         clear_organism_links()
         window["-SUMMARY TOTAL TASKS-"].update(len(garden.tasks))
+        window["-SUMMARY OUTSTANDING TASKS-"].update(
+            sum(
+                task.get_current_progress() in {"Due", "Overdue", "Very overdue"}
+                for task in garden.tasks.values()
+            )
+        )
         garden_changed = True
 
     elif values["-TASK NAME-"] == "":
