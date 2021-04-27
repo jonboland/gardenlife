@@ -725,10 +725,7 @@ while True:
         )
         # fmt: on
         while True:
-            (
-                plant_sum_event,
-                plant_sum_values,
-            ) = plant_summary_window.read()
+            plant_sum_event, plant_sum_values = plant_summary_window.read()
             print(plant_sum_event, plant_sum_values)
 
             if plant_sum_event in (sg.WIN_CLOSED, "Close"):
@@ -757,12 +754,23 @@ while True:
         other_values = [sg.Input(value, size=(11, 1)) for value in other_values]
         return task_name + other_values
 
-    def sorted_tasks(sort_key):
-        """Sorts tasks instances by archived status then by sort key."""
-        tasks = sorted(garden.tasks.values(), key=attrgetter(sort_key))
-        return sorted(tasks, key=lambda task: str(task.status), reverse=True)
+    def sorted_tasks():
+        """Sorts tasks instances by status, progress, due date, assignee, and name."""
+        tasks = list(garden.tasks.values())
+        tasks.sort(key=attrgetter("assignee", "task_name"))
+        tasks.sort(key=lambda task: task.get_next_due_date())
+        tasks.sort(key=_progress_order, reverse=True)
+        tasks.sort(key=lambda task: str(task.status), reverse=True)
+        return tasks
+    
+    def _progress_order(task):
+        # Key for sorting tasks so those not yet due are placed before all others
+        # Note that the overall order is reversed once this key has been applied to every task
+        progress = task.get_current_progress()
+        return "A" if progress == "Not yet due" else progress
 
     if event == "VIEW ALL TASKS":
+
         window.Disable()
 
         name_head = [
@@ -782,7 +790,7 @@ while True:
 
         header_row = [name_head + other_head]
 
-        tasks = [task_values(task) for task in sorted_tasks("task_name")]
+        tasks = [task_values(task) for task in sorted_tasks()]
 
         task_table = header_row + tasks
 
@@ -795,10 +803,7 @@ while True:
         )
 
         while True:
-            (
-                task_sum_event,
-                task_sum_values,
-            ) = task_summary_window.read()
+            task_sum_event, task_sum_values = task_summary_window.read()
             print(task_sum_event, task_sum_values)
 
             if task_sum_event in (sg.WIN_CLOSED, "Close"):
