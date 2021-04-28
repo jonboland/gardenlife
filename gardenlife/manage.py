@@ -158,28 +158,18 @@ creature_name = [
         enable_events=True,
     ),
 ]
-
+# fmt: off
 creature_type = [
     item_label("Creature type:"),
     sg.Combo(
-        sorted(
-            [""]
-            + [
-                creature.creature_type
-                for creature in garden.creatures.values()
-                if creature.creature_type
-            ]
-        ),
+        sorted([""] + list(set(c.creature_type for c in garden.creatures.values() if c.creature_type))),
         size=(25, 10),
         key="-CREATURE TYPE-",
     ),
 ]
 
-creature_age = [
-    item_label("Creature age:"),
-    sg.Input(size=FIELD_SIZE, key="-CREATURE AGE-"),
-]
-# fmt: off
+creature_age = [item_label("Creature age:"), sg.Input(size=FIELD_SIZE, key="-CREATURE AGE-")]
+
 creature_appeared = [
     sg.Text("Appeared date:", size=(13, 1), pad=(0, (6, 30))),
     sg.Input(size=FIELD_SIZE, key="-CREATURE APPEARED DATE-", pad=(5, (6, 30))),
@@ -268,16 +258,13 @@ plant_name = [
 plant_type = [
     item_label("Plant type:"),
     sg.Combo(
-        sorted([""] + [plant.plant_type for plant in garden.plants.values() if plant.plant_type]),
+        sorted([""] + list(set(p.plant_type for p in garden.plants.values() if p.plant_type))),
         size=(25, 10),
         key="-PLANT TYPE-",
     ),
 ]
 # fmt: on
-plant_age = [
-    item_label("Plant age:"),
-    sg.Input(size=FIELD_SIZE, key="-PLANT AGE-"),
-]
+plant_age = [item_label("Plant age:"), sg.Input(size=FIELD_SIZE, key="-PLANT AGE-")]
 
 plant_appeared = [
     sg.Text("Planted date:", size=(13, 1), pad=(0, (6, 30))),
@@ -800,14 +787,8 @@ while True:
 
     def update_creature_dropdowns():
         creature_names = sorted([""] + list(garden.creatures))
-        creature_types = sorted(
-            [""]
-            + [
-                creature.creature_type
-                for creature in garden.creatures.values()
-                if creature.creature_type
-            ]
-        )
+        types = {c.creature_type for c in garden.creatures.values() if c.creature_type}
+        creature_types = sorted([""] + list(types))
         return (
             window["-CREATURE NAME-"].update(values=creature_names, size=(25, 10)),
             window["-CREATURE TYPE-"].update(values=creature_types, size=(25, 10)),
@@ -867,9 +848,8 @@ while True:
     # fmt: off
     def update_plant_dropdowns():
         plant_names = sorted([""] + list(garden.plants))
-        plant_types = sorted(
-            [""] + [plant.plant_type for plant in garden.plants.values() if plant.plant_type]
-        )
+        types = {p.plant_type for p in garden.plants.values() if p.plant_type}
+        plant_types = sorted([""] + list(types))
         return (
             window["-PLANT NAME-"].update(values=plant_names, size=(25, 10)),
             window["-PLANT TYPE-"].update(values=plant_types, size=(25, 10)),
