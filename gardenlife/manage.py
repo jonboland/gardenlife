@@ -855,16 +855,6 @@ while True:
             window["-PLANT TYPE-"].update(values=plant_types, size=(25, 10)),
         )
 
-    # def update_plant_dropdowns():
-    #     plant_names = sorted([""] + list(garden.plants))
-    #     plant_types = sorted(
-    #         [""] + [plant.plant_type for plant in garden.plants.values() if plant.plant_type]
-    #     )
-    #     return (
-    #         window["-PLANT NAME-"].update(values=plant_names, size=(25, 10)),
-    #         window["-PLANT TYPE-"].update(values=plant_types, size=(25, 10)),
-    #     )
-
     # fmt: on
     if event == "PLANT CREATE/UPDATE":
         plant = Plant(
