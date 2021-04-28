@@ -71,7 +71,6 @@ report_buttons = [
 
 summary_tab = [
     [
-        # sg.Text("", size=(1, 20)),  # Blank row to set column sizes
         sg.Column(summary, pad=((30, 40), 40)),
         sg.Column(report_buttons, size=(200, 190), pad=((25, 40), 0)),
     ]
@@ -563,13 +562,91 @@ window = sg.Window(
 )
 
 
-# ----------------------------- Shared Event Functions ----------------------------- #
+# ----------------------- Summary Event Headings & Functions ----------------------- #
+
+# fmt: off
+creature_headings = ("Name", "Type", "Appeared", "Age", "Impact", "Prevalence", "Trend", "Status")
+plant_headings = ("Name", "Type", "Planted", "Age", "Impact", "Prevalence", "Trend", "Status")
+task_headings = ("Name", "Progress", "Next Due", "Assignee", "Length", "Creatures", "Plants", "Status")
+# fmt: on
+
+def summary_head_format(title):
+    return sg.Input(title, size=(11, 1), text_color="white", background_color="#004225")
+
+
+def summary_field_format(value):
+    return sg.Input(value, size=(11, 1))
+
+
+def organism_column_format(table):
+    return sg.Column(table, size=(750, 500), scrollable=True)
+
+
+def creature_fields(creature):
+    values = (
+        creature.creature_name,
+        creature.creature_type,
+        creature.appeared,
+        creature.age,
+        creature.get_level("impact"),
+        creature.get_level("prevalence"),
+        creature.get_level("trend"),
+        creature.status.get(),
+    )
+    return [summary_field_format(value) for value in values]
+
+
+def plant_fields(plant):
+    values = (
+        plant.plant_name,
+        plant.plant_type,
+        plant.planted,
+        plant.age,
+        plant.get_level("impact"),
+        plant.get_level("prevalence"),
+        plant.get_level("trend"),
+        plant.status.get(),
+    )
+    return [summary_field_format(value) for value in values]
+
+
+def task_fields(task):
+        """Converts task values into task summary fields."""
+        name_field = [sg.Input(task.task_name, size=(18, 1))]
+        other_values = (
+            task.get_current_progress(),
+            task.get_next_due_date(),
+            task.assignee,
+            task.length,
+            ", ".join(task.linked_creatures),
+            ", ".join(task.linked_plants),
+            task.status.get(),
+        )
+        other_fields = [summary_field_format(value) for value in other_values]
+        return name_field + other_fields
 
 
 def sorted_organisms(organisms, sort_key):
     """Sorts organism instances by archived status then by sort key."""
     organisms = sorted(organisms, key=attrgetter(sort_key))
     return sorted(organisms, key=lambda organism: str(organism.status), reverse=True)
+
+
+def sorted_tasks(tasks):
+    """Sorts tasks instances by status, progress, due date, assignee, and name."""
+    tasks = list(tasks)
+    tasks.sort(key=attrgetter("assignee", "task_name"))
+    tasks.sort(key=lambda task: task.get_next_due_date())
+    tasks.sort(key=_progress_order, reverse=True)
+    tasks.sort(key=lambda task: str(task.status), reverse=True)
+    return tasks
+
+
+def _progress_order(task):
+    # Key for sorting tasks so those not yet due are placed before all others
+    # Note that the overall order is reversed once this key has been applied to every task
+    progress = task.get_current_progress()
+    return "A" if progress == "Not yet due" else progress
 
 
 # ----------------------------------- Event Loop ----------------------------------- #
@@ -630,48 +707,27 @@ while True:
         garden_changed = False
 
     ######################## Creature Summary Events #######################
-    # fmt: off
-    creature_headings = ("Name", "Type", "Appeared", "Age", "Impact", "Prevalence", "Trend", "Status")
 
-    # fmt: on
-    def creature_values(creature):
-        values = (
-            creature.creature_name,
-            creature.creature_type,
-            creature.appeared,
-            creature.age,
-            creature.get_level("impact"),
-            creature.get_level("prevalence"),
-            creature.get_level("trend"),
-            creature.status.get(),
-        )
-        return [sg.Input(value, size=(11, 1)) for value in values]
-
-    if event == "VIEW ALL CREATURES":
+    elif event == "VIEW ALL CREATURES":
         window.Disable()
+        
+        header_row = [[summary_head_format(title) for title in creature_headings]]
         # fmt: off
-        header_row = [
-            [
-                sg.Input(title, size=(11, 1), text_color="white", background_color="#004225") 
-                for title in creature_headings
-            ]
-        ]
-
         creatures = [
-            creature_values(creature)
+            creature_fields(creature)
             for creature in sorted_organisms(garden.creatures.values(), sort_key="creature_name")
         ]
-
+        # fmt: on
         creature_table = header_row + creatures
 
-        creature_summary_column = [sg.Column(creature_table, size=(750, 500), scrollable=True)]
+        creature_summary_column = [organism_column_format(creature_table)]
 
         creature_summary_layout = [creature_summary_column, [sg.Button("Close")]]
 
         creature_summary_window = sg.Window(
             "Creature Summary", creature_summary_layout, keep_on_top=True
         )
-        # fmt: on
+
         while True:
             creature_sum_event, creature_sum_values = creature_summary_window.read()
             print(creature_sum_event, creature_sum_values)
@@ -682,47 +738,24 @@ while True:
                 break
 
     ########################## Plant Summary Events ########################
-    # fmt: off
-    plant_headings = ("Name", "Type", "Planted", "Age", "Impact", "Prevalence", "Trend", "Status")
 
-    # fmt: on
-    def plant_values(plant):
-        values = (
-            plant.plant_name,
-            plant.plant_type,
-            plant.planted,
-            plant.age,
-            plant.get_level("impact"),
-            plant.get_level("prevalence"),
-            plant.get_level("trend"),
-            plant.status.get(),
-        )
-        return [sg.Input(value, size=(11, 1)) for value in values]
-
-    if event == "VIEW ALL PLANTS":
+    elif event == "VIEW ALL PLANTS":
         window.Disable()
-        # fmt: off
-        header_row = [
-            [
-                sg.Input(title, size=(11, 1), text_color="white", background_color="#004225")
-                for title in plant_headings
-            ]
-        ]
-        
+ 
+        header_row = [[summary_head_format(title) for title in plant_headings]]
+       # fmt: off
         plants = [
-            plant_values(plant) 
+            plant_fields(plant) 
             for plant in sorted_organisms(garden.plants.values(), sort_key="plant_name")
         ]
 
         plant_table = header_row + plants
 
-        plant_summary_column = [sg.Column(plant_table, size=(750, 500), scrollable=True)]
+        plant_summary_column = [organism_column_format(plant_table)]
 
         plant_summary_layout = [plant_summary_column, [sg.Button("Close")]]
 
-        plant_summary_window = sg.Window(
-            "Plant Summary", plant_summary_layout, keep_on_top=True
-        )
+        plant_summary_window = sg.Window("Plant Summary", plant_summary_layout, keep_on_top=True)
         # fmt: on
         while True:
             plant_sum_event, plant_sum_values = plant_summary_window.read()
@@ -734,74 +767,28 @@ while True:
                 break
 
     ########################## Task Summary Events #########################
-    # fmt: off
-    task_headings = (
-        "Name", "Progress", "Next Due", "Assignee", "Length", "Creatures", "Plants", "Status",
-    )
 
-    # fmt: on
-    def task_values(task):
-        other_values = (
-            task.get_current_progress(),
-            task.get_next_due_date(),
-            task.assignee,
-            task.length,
-            ", ".join(task.linked_creatures),
-            ", ".join(task.linked_plants),
-            task.status.get(),
-        )
-        task_name = [sg.Input(task.task_name, size=(18, 1))]
-        other_values = [sg.Input(value, size=(11, 1)) for value in other_values]
-        return task_name + other_values
-
-    def sorted_tasks():
-        """Sorts tasks instances by status, progress, due date, assignee, and name."""
-        tasks = list(garden.tasks.values())
-        tasks.sort(key=attrgetter("assignee", "task_name"))
-        tasks.sort(key=lambda task: task.get_next_due_date())
-        tasks.sort(key=_progress_order, reverse=True)
-        tasks.sort(key=lambda task: str(task.status), reverse=True)
-        return tasks
-    
-    def _progress_order(task):
-        # Key for sorting tasks so those not yet due are placed before all others
-        # Note that the overall order is reversed once this key has been applied to every task
-        progress = task.get_current_progress()
-        return "A" if progress == "Not yet due" else progress
-
-    if event == "VIEW ALL TASKS":
+    elif event == "VIEW ALL TASKS":
 
         window.Disable()
-
+        # fmt: off
         name_head = [
-            sg.Input(
-                task_headings[0],
-                size=(18, 1),
-                text_color="white",
-                background_color="#004225",
-            )
+            sg.Input(task_headings[0], size=(18, 1), text_color="white", background_color="#004225")
         ]
-        other_head = [
-            sg.Input(
-                title, size=(11, 1), text_color="white", background_color="#004225"
-            )
-            for title in task_headings[1:]
-        ]
+        other_head = [summary_head_format(title) for title in task_headings[1:]]
 
         header_row = [name_head + other_head]
 
-        tasks = [task_values(task) for task in sorted_tasks()]
+        tasks = [task_fields(task) for task in sorted_tasks(garden.tasks.values())]
 
         task_table = header_row + tasks
 
         task_summary_column = [sg.Column(task_table, size=(800, 500), scrollable=True)]
 
         task_summary_layout = [task_summary_column, [sg.Button("Close")]]
-
-        task_summary_window = sg.Window(
-            "Task Summary", task_summary_layout, keep_on_top=True
-        )
-
+        
+        task_summary_window = sg.Window("Task Summary", task_summary_layout, keep_on_top=True)
+        # fmt: on
         while True:
             task_sum_event, task_sum_values = task_summary_window.read()
             print(task_sum_event, task_sum_values)
@@ -896,7 +883,7 @@ while True:
 
     ######################### Manage Plant Events ##########################
 
-    def clear_plant_values():
+    def clear_plant_fields():
         for value in ("NAME", "TYPE", "AGE", "PLANTED DATE", "STATUS", "NOTES"):
             window[f"-PLANT {value}-"].update("")
         for value in ("IMPACT", "PREVALENCE", "TREND"):
@@ -932,19 +919,19 @@ while True:
             plant.status.archive()
         garden.add_item("plants", plant)
         update_plant_dropdowns()
-        clear_plant_values()
+        clear_plant_fields()
         window["-SUMMARY TOTAL PLANTS-"].update(len(garden.plants))
         garden_changed = True
 
     elif event == "PLANT REMOVE":
         garden.remove_item("plants", values["-PLANT NAME-"])
         update_plant_dropdowns()
-        clear_plant_values()
+        clear_plant_fields()
         window["-SUMMARY TOTAL PLANTS-"].update(len(garden.plants))
         garden_changed = True
 
     elif values["-PLANT NAME-"] == "":
-        clear_plant_values()
+        clear_plant_fields()
 
     # If a plant is selected populate the relevant fields with its values
     elif values["-PLANT NAME-"]:  # Something is highlighted in the dropdown
