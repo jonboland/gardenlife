@@ -120,22 +120,22 @@ garden_elements = [select_garden, garden_blank] + garden_details + [garden_butto
 garden_tab = [[sg.Column(garden_elements, pad=((30, 40), 40))]]
 
 
-# ------------------------------ Manage Creatures Tab ------------------------------ #
+# ------------------------ Shared Tab Functions & Constants ------------------------ #
 
 
-CREATURE_BUTTON_TEXT = ("CREATE/UPDATE", "REMOVE")
-CREATURE_FIELD_SIZE = (25, 1)
+ITEM_BUTTON_TEXT = ("CREATE/UPDATE", "REMOVE")
+FIELD_SIZE = (25, 1)
 
 
-def creature_label(label):
+def item_label(label):
     return sg.Text(label, size=(13, 1), pad=(0, 10))
 
 
-def creature_slider_label(label):
+def organism_slider_label(label):
     return sg.Text(label, size=(12, 1), pad=((0, 8), (20, 0)))
 
 
-def creature_slider(key=None, tooltip=None):
+def organism_slider(key=None, tooltip=None):
     return sg.Slider(
         range=(1, 5),
         key=key,
@@ -146,8 +146,11 @@ def creature_slider(key=None, tooltip=None):
     )
 
 
+# ------------------------------ Manage Creatures Tab ------------------------------ #
+
+
 creature_name = [
-    creature_label("Creature name:"),
+    item_label("Creature name:"),
     sg.Combo(
         sorted([""] + list(garden.creatures)),
         size=(25, 10),
@@ -157,7 +160,7 @@ creature_name = [
 ]
 
 creature_type = [
-    creature_label("Creature type:"),
+    item_label("Creature type:"),
     sg.Combo(
         sorted(
             [""]
@@ -173,19 +176,19 @@ creature_type = [
 ]
 
 creature_age = [
-    creature_label("Creature age:"),
-    sg.Input(size=CREATURE_FIELD_SIZE, key="-CREATURE AGE-"),
+    item_label("Creature age:"),
+    sg.Input(size=FIELD_SIZE, key="-CREATURE AGE-"),
 ]
 # fmt: off
 creature_appeared = [
     sg.Text("Appeared date:", size=(13, 1), pad=(0, (6, 30))),
-    sg.Input(size=CREATURE_FIELD_SIZE, key="-CREATURE APPEARED DATE-", pad=(5, (6, 30))),
+    sg.Input(size=FIELD_SIZE, key="-CREATURE APPEARED DATE-", pad=(5, (6, 30))),
     sg.CalendarButton("PICK", format="%d/%m/%Y", pad=(0, (6, 30))),
 ]
 
 creature_impact = [
-    creature_slider_label("Impact level:"),
-    creature_slider(
+    organism_slider_label("Impact level:"),
+    organism_slider(
         key="-CREATURE IMPACT SLIDER-",
         tooltip="Impact levels — 1: very negative, 2: negative, "
                 "3: neutral, 4: positive, 5: very positive",
@@ -193,8 +196,8 @@ creature_impact = [
 ]
 
 creature_prevalence = [
-    creature_slider_label("Prevalence level:"),
-    creature_slider(
+    organism_slider_label("Prevalence level:"),
+    organism_slider(
         key="-CREATURE PREVALENCE SLIDER-", 
         tooltip="Prevalence levels — 1: very low, 2: low, "
                 "3: medium, 4: high, 5: very high",
@@ -202,8 +205,8 @@ creature_prevalence = [
 ]
 
 creature_trend = [
-    creature_slider_label("Trend level:"),
-    creature_slider(
+    organism_slider_label("Trend level:"),
+    organism_slider(
         key="-CREATURE TREND SLIDER-", 
         tooltip="Trend levels — 1: rapidly decreasing, 2: decreasing, "
                 "3: stable, 4: increasing, 5: rapidly increasing",
@@ -212,7 +215,7 @@ creature_trend = [
 
 creature_status = [
     sg.Text("Status:", size=(8, 1), pad=(0, 10)),
-    sg.Combo(["current", "archived"], size=CREATURE_FIELD_SIZE, key="-CREATURE STATUS-"),
+    sg.Combo(["current", "archived"], size=FIELD_SIZE, key="-CREATURE STATUS-"),
 ]
 
 creature_notes_label = [sg.Text("Notes:", size=(8, 1), pad=(0, 10))]
@@ -221,7 +224,7 @@ creature_notes_field = [sg.Multiline(size=(35, 10), pad=(0, 10), key="-CREATURE 
 # fmt: on
 creature_buttons = [
     sg.Button(name, size=(15, 2), pad=((0, 7), (32, 0)), key=f"CREATURE {name}")
-    for name in CREATURE_BUTTON_TEXT
+    for name in ITEM_BUTTON_TEXT
 ]
 
 creatures_left_column = [
@@ -252,31 +255,8 @@ creatures_tab = [
 # -------------------------------- Manage Plants Tab ------------------------------- #
 
 
-PLANT_BUTTON_TEXT = ("CREATE/UPDATE", "REMOVE")
-PLANT_FIELD_SIZE = (25, 1)
-
-
-def plant_label(label):
-    return sg.Text(label, size=(13, 1), pad=(0, 10))
-
-
-def plant_slider_label(label):
-    return sg.Text(label, size=(12, 1), pad=((0, 8), (20, 0)))
-
-
-def plant_slider(key=None, tooltip=None):
-    return sg.Slider(
-        range=(1, 5),
-        key=key,
-        orientation="horizontal",
-        default_value=3,
-        size=(19.7, 19),
-        tooltip=tooltip,
-    )
-
-
 plant_name = [
-    plant_label("Plant name:"),
+    item_label("Plant name:"),
     sg.Combo(
         sorted([""] + list(garden.plants)),
         size=(25, 10),
@@ -286,7 +266,7 @@ plant_name = [
 ]
 # fmt: off
 plant_type = [
-    plant_label("Plant type:"),
+    item_label("Plant type:"),
     sg.Combo(
         sorted([""] + [plant.plant_type for plant in garden.plants.values() if plant.plant_type]),
         size=(25, 10),
@@ -295,19 +275,19 @@ plant_type = [
 ]
 # fmt: on
 plant_age = [
-    plant_label("Plant age:"),
-    sg.Input(size=PLANT_FIELD_SIZE, key="-PLANT AGE-"),
+    item_label("Plant age:"),
+    sg.Input(size=FIELD_SIZE, key="-PLANT AGE-"),
 ]
 
 plant_appeared = [
     sg.Text("Planted date:", size=(13, 1), pad=(0, (6, 30))),
-    sg.Input(size=PLANT_FIELD_SIZE, key="-PLANT PLANTED DATE-", pad=(5, (6, 30))),
+    sg.Input(size=FIELD_SIZE, key="-PLANT PLANTED DATE-", pad=(5, (6, 30))),
     sg.CalendarButton("PICK", format="%d/%m/%Y", pad=(0, (6, 30)), key="-PLANT PICK-"),
 ]
 
 plant_impact = [
-    plant_slider_label("Impact level:"),
-    plant_slider(
+    organism_slider_label("Impact level:"),
+    organism_slider(
         key="-PLANT IMPACT SLIDER-",
         tooltip="Impact levels — 1: very negative, 2: negative, "
         "3: neutral, 4: positive, 5: very positive",
@@ -315,8 +295,8 @@ plant_impact = [
 ]
 
 plant_prevalence = [
-    plant_slider_label("Prevalence level:"),
-    plant_slider(
+    organism_slider_label("Prevalence level:"),
+    organism_slider(
         key="-PLANT PREVALENCE SLIDER-",
         tooltip="Prevalence levels — 1: very low, 2: low, "
         "3: medium, 4: high, 5: very high",
@@ -324,8 +304,8 @@ plant_prevalence = [
 ]
 
 plant_trend = [
-    plant_slider_label("Trend level:"),
-    plant_slider(
+    organism_slider_label("Trend level:"),
+    organism_slider(
         key="-PLANT TREND SLIDER-",
         tooltip="Trend levels — 1: rapidly decreasing, 2: decreasing, "
         "3: stable, 4: increasing, 5: rapidly increasing",
@@ -334,7 +314,7 @@ plant_trend = [
 
 plant_status = [
     sg.Text("Status:", size=(8, 1), pad=(0, 10)),
-    sg.Combo(["current", "archived"], size=PLANT_FIELD_SIZE, key="-PLANT STATUS-"),
+    sg.Combo(["current", "archived"], size=FIELD_SIZE, key="-PLANT STATUS-"),
 ]
 
 plant_notes_label = [sg.Text("Notes:", size=(8, 1), pad=(0, 10))]
@@ -343,7 +323,7 @@ plant_notes_field = [sg.Multiline(size=(35, 10), pad=(0, 10), key="-PLANT NOTES-
 
 plant_buttons = [
     sg.Button(name, size=(15, 2), pad=((0, 7), (32, 0)), key=f"PLANT {name}")
-    for name in PLANT_BUTTON_TEXT
+    for name in ITEM_BUTTON_TEXT
 ]
 
 plants_left_column = [
@@ -374,31 +354,23 @@ plants_tab = [
 # -------------------------------- Manage Tasks Tab -------------------------------- #
 
 
-TASK_BUTTON_TEXT = ("CREATE/UPDATE", "REMOVE")
-TASK_FIELD_SIZE = (25, 1)
-
-
-def task_label(label):
-    return sg.Text(label, size=(13, 1), pad=(0, 10))
-
-
 task_name = [
-    task_label("Task name:"),
+    item_label("Task name:"),
     sg.Combo(
         sorted([""] + list(garden.tasks)),
-        size=TASK_FIELD_SIZE,
+        size=FIELD_SIZE,
         key="-TASK NAME-",
         enable_events=True,
     ),
 ]
 
 task_progress = [
-    task_label("Progress:"),
+    item_label("Progress:"),
     sg.Text("", size=(22, 1), relief=SUNKEN, key="-TASK PROGRESS-"),
 ]
 
 task_next_due = [
-    task_label("Next due:"),
+    item_label("Next due:"),
     sg.Text("", size=(22, 1), relief=SUNKEN, key="-TASK NEXT DUE-"),
 ]
 
@@ -410,12 +382,12 @@ task_first_horizontal_line = [sg.Text("_" * 41, pad=(0, 0))]
 
 task_assignee = [
     sg.Text("Assignee:", size=(13, 1), pad=(0, (16, 10))),
-    sg.Input(size=TASK_FIELD_SIZE, key="-TASK ASSIGNEE-", pad=(4, (10, 0))),
+    sg.Input(size=FIELD_SIZE, key="-TASK ASSIGNEE-", pad=(4, (10, 0))),
 ]
 
 task_length = [
     sg.Text("Length:", size=(13, 1), pad=(0, (10, 0))),
-    sg.Input(size=TASK_FIELD_SIZE, key="-TASK LENGTH-", pad=(4, (10, 0))),
+    sg.Input(size=FIELD_SIZE, key="-TASK LENGTH-", pad=(4, (10, 0))),
 ]
 
 task_second_horizontal_line = [sg.Text("_" * 41, pad=(0, 0))]
@@ -445,7 +417,7 @@ task_link_organisms = [
 
 task_status = [
     sg.Text("Status:", size=(8, 1), pad=((2, 0), 10)),
-    sg.Combo(["current", "archived"], size=TASK_FIELD_SIZE, key="-TASK STATUS-"),
+    sg.Combo(["current", "archived"], size=FIELD_SIZE, key="-TASK STATUS-"),
 ]
 
 task_notes_label = [sg.Text("Description:", size=(10, 1), pad=(2, 10))]
@@ -507,7 +479,7 @@ task_schedule_frame = [
 
 task_buttons = [
     sg.Button(name, size=(15, 2), pad=((4, 4), (22, 0)), key=f"TASK {name}")
-    for name in TASK_BUTTON_TEXT
+    for name in ITEM_BUTTON_TEXT
 ]
 
 plants_left_column = [
@@ -565,9 +537,9 @@ window = sg.Window(
 # ----------------------- Summary Event Headings & Functions ----------------------- #
 
 # fmt: off
-creature_headings = ("Name", "Type", "Appeared", "Age", "Impact", "Prevalence", "Trend", "Status")
-plant_headings = ("Name", "Type", "Planted", "Age", "Impact", "Prevalence", "Trend", "Status")
-task_headings = ("Name", "Progress", "Next Due", "Assignee", "Length", "Creatures", "Plants", "Status")
+CREATURE_HEADS = ("Name", "Type", "Appeared", "Age", "Impact", "Prevalence", "Trend", "Status")
+PLANT_HEADS = ("Name", "Type", "Planted", "Age", "Impact", "Prevalence", "Trend", "Status")
+TASK_HEADS = ("Name", "Progress", "Next Due", "Assignee", "Length", "Creatures", "Plants", "Status")
 # fmt: on
 
 def summary_head_format(title):
@@ -711,7 +683,7 @@ while True:
     elif event == "VIEW ALL CREATURES":
         window.Disable()
         
-        header_row = [[summary_head_format(title) for title in creature_headings]]
+        header_row = [[summary_head_format(title) for title in CREATURE_HEADS]]
         # fmt: off
         creatures = [
             creature_fields(creature)
@@ -742,7 +714,7 @@ while True:
     elif event == "VIEW ALL PLANTS":
         window.Disable()
  
-        header_row = [[summary_head_format(title) for title in plant_headings]]
+        header_row = [[summary_head_format(title) for title in PLANT_HEADS]]
        # fmt: off
         plants = [
             plant_fields(plant) 
@@ -773,9 +745,9 @@ while True:
         window.Disable()
         # fmt: off
         name_head = [
-            sg.Input(task_headings[0], size=(18, 1), text_color="white", background_color="#004225")
+            sg.Input(TASK_HEADS[0], size=(18, 1), text_color="white", background_color="#004225")
         ]
-        other_head = [summary_head_format(title) for title in task_headings[1:]]
+        other_head = [summary_head_format(title) for title in TASK_HEADS[1:]]
 
         header_row = [name_head + other_head]
 
