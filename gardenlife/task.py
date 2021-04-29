@@ -47,9 +47,9 @@ class Task:
         }
         # Convert string to datetime object. Set start date to today if no date supplied
         start_date = self._set_date(start_date)
-        freq = FREQS[freq] if freq else MONTHLY
+        freq = FREQS.get(freq, MONTHLY)
         count = int(count) if count else 1
-        bymonth = [int(num) for num in bymonth.split(" ")] if bymonth else None
+        bymonth = [int(month) for month in bymonth.split(" ")] if bymonth else None
         interval = int(interval) if interval else 1
         self.schedule = list(
             rrule(dtstart=start_date, freq=freq, count=count, bymonth=bymonth, interval=interval)
