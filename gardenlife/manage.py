@@ -1,4 +1,5 @@
 from calendar import Calendar
+from datetime import datetime
 from operator import attrgetter
 import pickle
 from tkinter.constants import SUNKEN, GROOVE
@@ -13,11 +14,14 @@ from organisms import Creature, Plant
 from task import Task
 
 
+ACCENT_COLOR = "#004225"
+
+
 sg.theme(new_theme="LightGray1")
-sg.theme_button_color(("white", "#004225"))
+sg.theme_button_color(("white", ACCENT_COLOR))
 sg.theme_input_background_color("light grey")
 sg.theme_input_text_color("black")
-sg.theme_slider_color("#004225")
+sg.theme_slider_color(ACCENT_COLOR)
 
 
 try:
@@ -390,14 +394,14 @@ task_link_organisms = [
         select_mode=sg.LISTBOX_SELECT_MODE_EXTENDED,
         size=(17, 5),
         pad=((1, 26), 0),
-        highlight_background_color="#004225",
+        highlight_background_color=ACCENT_COLOR,
         key="-TASK LINKED CREATURES-",
     ),
     sg.Listbox(
         values=(sorted(list(garden.plants))),
         select_mode=sg.LISTBOX_SELECT_MODE_EXTENDED,
         size=(17, 5),
-        highlight_background_color="#004225",
+        highlight_background_color=ACCENT_COLOR,
         key="-TASK LINKED PLANTS-",
     ),
 ]
@@ -424,9 +428,10 @@ task_start = [
 task_frequency = [
     sg.Text("Frequency:", size=(8, 1), pad=(3, (6, 0))),
     sg.Combo(
-        ["daily", "weekly", "monthly", "yearly"],
+        ["", "daily", "weekly", "monthly", "yearly"],
         size=(18, 1),
-        pad=(5, (6, 0)),
+        pad=(5, (6, 0)), 
+        readonly=True,
         key="-TASK FREQUENCY-",
     ),
 ]
@@ -513,7 +518,7 @@ tab_details = {
 all_tabs = [[sg.Tab(label, tab, pad=(10, 10)) for label, tab in tab_details.items()]]
 
 # fmt: off
-layout = [[sg.Menu(menu_definition)], [sg.TabGroup(all_tabs, tab_background_color="#004225")]]
+layout = [[sg.Menu(menu_definition)], [sg.TabGroup(all_tabs, tab_background_color=ACCENT_COLOR)]]
 # fmt: on
 # Create the window
 window = sg.Window(
@@ -529,8 +534,11 @@ PLANT_HEADS = ("Name", "Type", "Planted", "Age", "Impact", "Prevalence", "Trend"
 TASK_HEADS = ("Name", "Progress", "Next Due", "Assignee", "Length", "Creatures", "Plants", "Status")
 # fmt: on
 
+
 def summary_head_format(title):
-    return sg.Input(title, size=(11, 1), text_color="white", background_color="#004225")
+    return sg.Input(
+        title, size=(11, 1), text_color="white", background_color=ACCENT_COLOR
+    )
 
 
 def summary_field_format(value):
@@ -570,19 +578,19 @@ def plant_fields(plant):
 
 
 def task_fields(task):
-        """Converts task values into task summary fields."""
-        name_field = [sg.Input(task.task_name, size=(18, 1))]
-        other_values = (
-            task.get_current_progress(),
-            task.get_next_due_date(),
-            task.assignee,
-            task.length,
-            ", ".join(task.linked_creatures),
-            ", ".join(task.linked_plants),
-            task.status.get(),
-        )
-        other_fields = [summary_field_format(value) for value in other_values]
-        return name_field + other_fields
+    """Converts task values into task summary fields."""
+    name_field = [sg.Input(task.task_name, size=(18, 1))]
+    other_values = (
+        task.get_current_progress(),
+        task.get_next_due_date(),
+        task.assignee,
+        task.length,
+        ", ".join(task.linked_creatures),
+        ", ".join(task.linked_plants),
+        task.status.get(),
+    )
+    other_fields = [summary_field_format(value) for value in other_values]
+    return name_field + other_fields
 
 
 def sorted_organisms(organisms, sort_key):
@@ -608,7 +616,45 @@ def _progress_order(task):
     return "A" if progress == "Not yet due" else progress
 
 
-# ----------------------------------- Event Loop ----------------------------------- #
+# --------------------------- Validation Popups & Data ----------------------------- #
+
+
+MONTHS = [str(month) for month in range(1, 13)]
+
+
+def invalid_date_popup(field, date):
+    return sg.popup(
+        f"The {field} field contains {date}, which is not a valid date. "
+        "The format should be DD/MM/YYYY. Please correct and try again.",
+        title="Date Format Error",
+        button_color=ACCENT_COLOR,
+        keep_on_top=True,
+    )
+
+
+def invalid_digit_popup(field, digit):
+    return sg.popup(
+        f"The {field} field contains {digit}, which is not a valid digit. "
+        "Please correct and try again.",
+        title="Digit Error",
+        button_color=ACCENT_COLOR,
+        keep_on_top=True,
+    )
+
+# fmt: off
+def invalid_bymonth_popup(bymonth):
+    print(bymonth)
+    return sg.popup(
+        f'The By month field contains "{bymonth}", which includes an invalid month or months. '
+        f"Months must be digits between 1 and 12, separated by a single space.\n"
+        f"Please correct and try again.",
+        title="Month Format Error",
+        button_color=ACCENT_COLOR,
+        keep_on_top=True,
+    )
+# fmt: on
+
+# ---------------------------------- Event Loop ------------------------------------ #
 
 
 # Keeps track of whether any changes have been made since the garden was saved
@@ -669,7 +715,7 @@ while True:
 
     elif event == "VIEW ALL CREATURES":
         window.Disable()
-        
+
         header_row = [[summary_head_format(title) for title in CREATURE_HEADS]]
         # fmt: off
         creatures = [
@@ -700,9 +746,9 @@ while True:
 
     elif event == "VIEW ALL PLANTS":
         window.Disable()
- 
+
         header_row = [[summary_head_format(title) for title in PLANT_HEADS]]
-       # fmt: off
+        # fmt: off
         plants = [
             plant_fields(plant) 
             for plant in sorted_organisms(garden.plants.values(), sort_key="plant_name")
@@ -732,7 +778,7 @@ while True:
         window.Disable()
         # fmt: off
         name_head = [
-            sg.Input(TASK_HEADS[0], size=(18, 1), text_color="white", background_color="#004225")
+            sg.Input(TASK_HEADS[0], size=(18, 1), text_color="white", background_color=ACCENT_COLOR)
         ]
         other_head = [summary_head_format(title) for title in TASK_HEADS[1:]]
 
@@ -760,19 +806,27 @@ while True:
     ######################### Manage Garden Events #########################
 
     elif event == "UPDATE GARDEN":
-        # Update the garden instance
-        garden.name = values["-GARDEN NAME-"]
-        garden.location = values["-LOCATION-"]
-        garden.size = values["-SIZE-"]
-        garden.owners = values["-OWNER NAMES-"].split()
-        garden.since = values["-OWNED SINCE-"]
-        # Then update the associated summary fields
-        window["-SUMMARY GARDEN NAME-"].update(garden.name)
-        window["-SUMMARY LOCATION-"].update(garden.location)
-        window["-SUMMARY SIZE-"].update(garden.garden_size())
-        window["-SUMMARY OWNED BY-"].update(garden.ownership())
-        window["-SUMMARY OWNED FOR-"].update(garden.ownership_length())
-        garden_changed = True
+        # Validate owned since date
+        owned_since = values["-OWNED SINCE-"].strip()
+        try:
+            valid_date = datetime.strptime(owned_since, "%d/%m/%Y")
+        except ValueError:
+            invalid_date_popup(field="Owned since", date=owned_since)
+
+        else:
+            # Update the garden instance
+            garden.name = values["-GARDEN NAME-"]
+            garden.location = values["-LOCATION-"]
+            garden.size = values["-SIZE-"]
+            garden.owners = values["-OWNER NAMES-"].split()
+            garden.since = owned_since
+            # Then update the associated summary fields
+            window["-SUMMARY GARDEN NAME-"].update(garden.name)
+            window["-SUMMARY LOCATION-"].update(garden.location)
+            window["-SUMMARY SIZE-"].update(garden.garden_size())
+            window["-SUMMARY OWNED BY-"].update(garden.ownership())
+            window["-SUMMARY OWNED FOR-"].update(garden.ownership_length())
+            garden_changed = True
 
     ####################### Manage Creatures Events ########################
 
@@ -795,23 +849,31 @@ while True:
         )
 
     if event == "CREATURE CREATE/UPDATE":
-        creature = Creature(
-            creature_name=values["-CREATURE NAME-"],
-            creature_type=values["-CREATURE TYPE-"],
-            age=values["-CREATURE AGE-"],
-            appeared=values["-CREATURE APPEARED DATE-"],
-            notes=values["-CREATURE NOTES-"],
-            impact=values["-CREATURE IMPACT SLIDER-"],
-            prevalence=values["-CREATURE PREVALENCE SLIDER-"],
-            trend=values["-CREATURE TREND SLIDER-"],
-        )
-        if values["-CREATURE STATUS-"] == "archived":
-            creature.status.archive()
-        garden.add_item("creatures", creature)
-        update_creature_dropdowns()
-        clear_creature_values()
-        window["-SUMMARY TOTAL CREATURES-"].update(len(garden.creatures))
-        garden_changed = True
+        # Validate appeared date
+        creature_appeared = values["-CREATURE APPEARED DATE-"].strip()
+        try:
+            valid_date = datetime.strptime(creature_appeared, "%d/%m/%Y")
+        except ValueError:
+            invalid_date_popup(field="Appeared date", date=creature_appeared)
+
+        else:
+            creature = Creature(
+                creature_name=values["-CREATURE NAME-"],
+                creature_type=values["-CREATURE TYPE-"],
+                age=values["-CREATURE AGE-"],
+                appeared=creature_appeared,
+                notes=values["-CREATURE NOTES-"],
+                impact=values["-CREATURE IMPACT SLIDER-"],
+                prevalence=values["-CREATURE PREVALENCE SLIDER-"],
+                trend=values["-CREATURE TREND SLIDER-"],
+            )
+            if values["-CREATURE STATUS-"] == "archived":
+                creature.status.archive()
+            garden.add_item("creatures", creature)
+            update_creature_dropdowns()
+            clear_creature_values()
+            window["-SUMMARY TOTAL CREATURES-"].update(len(garden.creatures))
+            garden_changed = True
 
     elif event == "CREATURE REMOVE":
         garden.remove_item("creatures", values["-CREATURE NAME-"])
@@ -857,23 +919,31 @@ while True:
 
     # fmt: on
     if event == "PLANT CREATE/UPDATE":
-        plant = Plant(
-            plant_name=values["-PLANT NAME-"],
-            plant_type=values["-PLANT TYPE-"],
-            age=values["-PLANT AGE-"],
-            planted=values["-PLANT PLANTED DATE-"],
-            notes=values["-PLANT NOTES-"],
-            impact=values["-PLANT IMPACT SLIDER-"],
-            prevalence=values["-PLANT PREVALENCE SLIDER-"],
-            trend=values["-PLANT TREND SLIDER-"],
-        )
-        if values["-PLANT STATUS-"] == "archived":
-            plant.status.archive()
-        garden.add_item("plants", plant)
-        update_plant_dropdowns()
-        clear_plant_fields()
-        window["-SUMMARY TOTAL PLANTS-"].update(len(garden.plants))
-        garden_changed = True
+        # Validate planted date
+        plant_planted = values["-PLANT PLANTED DATE-"].strip()
+        try:
+            valid_date = datetime.strptime(plant_planted, "%d/%m/%Y")
+        except ValueError:
+            invalid_date_popup(field="Planted date", date=plant_planted)
+
+        else:
+            plant = Plant(
+                plant_name=values["-PLANT NAME-"],
+                plant_type=values["-PLANT TYPE-"],
+                age=values["-PLANT AGE-"],
+                planted=plant_planted,
+                notes=values["-PLANT NOTES-"],
+                impact=values["-PLANT IMPACT SLIDER-"],
+                prevalence=values["-PLANT PREVALENCE SLIDER-"],
+                trend=values["-PLANT TREND SLIDER-"],
+            )
+            if values["-PLANT STATUS-"] == "archived":
+                plant.status.archive()
+            garden.add_item("plants", plant)
+            update_plant_dropdowns()
+            clear_plant_fields()
+            window["-SUMMARY TOTAL PLANTS-"].update(len(garden.plants))
+            garden_changed = True
 
     elif event == "PLANT REMOVE":
         garden.remove_item("plants", values["-PLANT NAME-"])
@@ -928,43 +998,62 @@ while True:
         window["-TASK LINKED PLANTS-"].update(sorted(list(garden.plants)))
 
     if event == "TASK CREATE/UPDATE":
-        task = Task(
-            task_name=values["-TASK NAME-"],
-            assignee=values["-TASK ASSIGNEE-"],
-            length=values["-TASK LENGTH-"],
-            linked_creatures=values["-TASK LINKED CREATURES-"],
-            linked_plants=values["-TASK LINKED PLANTS-"],
-            description=values["-TASK NOTES-"],
-        )
-
-        if values["-TASK STATUS-"] == "archived":
-            task.status.archive()
-
-        task.set_schedule(
-            start_date=values["-TASK START-"],
-            freq=values["-TASK FREQUENCY-"],
-            count=values["-TASK COUNT-"],
-            bymonth=values["-TASK BY MONTH-"],
-            interval=values["-TASK INTERVAL-"],
-        )
-        # If the task already exists add any pre-existing completed dates to it
-        if task_instance():
-            task.completed_dates = task_instance().completed_dates
-        # Add the task to the garden, overwriting the old version if it already exists
-        garden.add_item("tasks", task)
-        # Clear the task variable once the task has been added to the garden
-        update_task_dropdown()
-        clear_task_values()
-        clear_organism_links()
-        # Update the total tasks number shown on the summary tab
-        window["-SUMMARY TOTAL TASKS-"].update(len(garden.tasks))
-        window["-SUMMARY OUTSTANDING TASKS-"].update(
-            sum(
-                task.get_current_progress() in {"Due", "Overdue", "Very overdue"}
-                for task in garden.tasks.values()
+        # Strip and validate set schedule values
+        # NB: Frequency is not validated because it's a readonly dropdown
+        start_date = values["-TASK START-"].strip()
+        count = values["-TASK COUNT-"].strip()
+        bymonth = values["-TASK BY MONTH-"].strip()
+        interval = values["-TASK INTERVAL-"].strip()
+        try:
+            valid_date = datetime.strptime(start_date, "%d/%m/%Y")
+        except ValueError:
+            invalid_date_popup(field="First due", date=start_date)
+            continue
+        if count and not count.isdigit():
+            invalid_digit_popup(field="Count", digit=count)
+        elif bymonth and any(month not in MONTHS for month in bymonth.split(" ")):
+            invalid_bymonth_popup(bymonth)
+        elif interval and not interval.isdigit():
+            invalid_digit_popup(field="Interval", digit=interval)
+        # If there are no validation errors, create/update the task
+        else:
+            task = Task(
+                task_name=values["-TASK NAME-"],
+                assignee=values["-TASK ASSIGNEE-"],
+                length=values["-TASK LENGTH-"],
+                linked_creatures=values["-TASK LINKED CREATURES-"],
+                linked_plants=values["-TASK LINKED PLANTS-"],
+                description=values["-TASK NOTES-"],
             )
-        )
-        garden_changed = True
+
+            if values["-TASK STATUS-"] == "archived":
+                task.status.archive()
+
+            task.set_schedule(
+                start_date=start_date,
+                freq=values["-TASK FREQUENCY-"],
+                count=count,
+                bymonth=bymonth,
+                interval=interval,
+            )
+            # If the task already exists add any pre-existing completed dates to it
+            if task_instance():
+                task.completed_dates = task_instance().completed_dates
+            # Add the task to the garden, overwriting the old version if it already exists
+            garden.add_item("tasks", task)
+            # Clear the task variable once the task has been added to the garden
+            update_task_dropdown()
+            clear_task_values()
+            clear_organism_links()
+            # Update the total tasks number shown on the summary tab
+            window["-SUMMARY TOTAL TASKS-"].update(len(garden.tasks))
+            window["-SUMMARY OUTSTANDING TASKS-"].update(
+                sum(
+                    task.get_current_progress() in {"Due", "Overdue", "Very overdue"}
+                    for task in garden.tasks.values()
+                )
+            )
+            garden_changed = True
 
     elif event == "TASK REMOVE":
         garden.remove_item("tasks", values["-TASK NAME-"])
