@@ -79,11 +79,11 @@ version = "2.4.7"
 
 [[package]]
 category = "main"
-description = "Python GUIs for Humans. Launched in 2018. It's 2021 & PySimpleGUI is an ACTIVE project. Super-simple to create custom GUI's. 300 Demo programs & Cookbook for rapid start. Extensive documentation. Main docs at www.PySimpleGUI.org. Your success is the focus. Examples using Machine Learning (GUI, OpenCV Integration,  Chatterbot), Rainmeter Style Desktop Widgets, Matplotlib + Pyplot, PIL support, add GUI to command line scripts, PDF & Image Viewers. Great for beginners & advanced GUI programmers"
+description = "Python GUIs for Humans. Launched in 2018. It's 2021 & PySimpleGUI is an ACTIVE & supported project. Super-simple to create custom GUI's. 300 Demo programs & Cookbook for rapid start. Extensive documentation. Main docs at www.PySimpleGUI.org. Your success is the focus. Examples using Machine Learning (GUI, OpenCV Integration), Rainmeter Style Desktop Widgets, Matplotlib + Pyplot, PIL support, add GUI to command line scripts, PDF & Image Viewers. Great for beginners & advanced GUI programmers"
 name = "pysimplegui"
 optional = false
 python-versions = "*"
-version = "4.34.0"
+version = "4.40.0"
 
 [[package]]
 category = "dev"
@@ -119,6 +119,17 @@ version = "2.8.1"
 six = ">=1.5"
 
 [[package]]
+category = "dev"
+description = "a python refactoring library..."
+name = "rope"
+optional = false
+python-versions = "*"
+version = "0.19.0"
+
+[package.extras]
+dev = ["pytest"]
+
+[[package]]
 category = "main"
 description = "Python 2 and 3 compatibility utilities"
 name = "six"
@@ -135,7 +146,7 @@ python-versions = "*"
 version = "0.2.5"
 
 [metadata]
-content-hash = "b977e6af720e1feffef3c89293f0013156b07852fbe5044177a4bc971a8b2c0d"
+content-hash = "41052fe09ce8a328787cf3fb09777b9c9b3f0f0fb0415ef7e36259a7a089339a"
 python-versions = "^3.8"
 
 [metadata.files]
@@ -172,8 +183,8 @@ pyparsing = [
     {file = "pyparsing-2.4.7.tar.gz", hash = "sha256:c203ec8783bf771a155b207279b9bccb8dea02d8f0c9e5f8ead507bc3246ecc1"},
 ]
 pysimplegui = [
-    {file = "PySimpleGUI-4.34.0-py3-none-any.whl", hash = "sha256:b7b986512d77bf50a92207579bed4cf7f2f287ce14a82f4b57c5f368bca54c9c"},
-    {file = "PySimpleGUI-4.34.0.tar.gz", hash = "sha256:1169d3434137242eca2c95ca13ec21de398990563e8f58a10b581ebd127b13cd"},
+    {file = "PySimpleGUI-4.40.0-py3-none-any.whl", hash = "sha256:e0a08b64eda98d4cdbb4261be1c3a6be6c57478d4d22e0d86190814e69581609"},
+    {file = "PySimpleGUI-4.40.0.tar.gz", hash = "sha256:5813a05f0da0fac1b56ec289d105b51841cc97bea8aca12d0896011969bfbc09"},
 ]
 pytest = [
     {file = "pytest-5.4.3-py3-none-any.whl", hash = "sha256:5c0db86b698e8f170ba4582a492248919255fcd4c79b1ee64ace34301fb589a1"},
@@ -182,6 +193,9 @@ pytest = [
 python-dateutil = [
     {file = "python-dateutil-2.8.1.tar.gz", hash = "sha256:73ebfe9dbf22e832286dafa60473e4cd239f8592f699aa5adaf10050e6e1823c"},
     {file = "python_dateutil-2.8.1-py2.py3-none-any.whl", hash = "sha256:75bb3f31ea686f1197762692a9ee6a7550b59fc6ca3a1f4b5d7e32fb98e2da2a"},
+]
+rope = [
+    {file = "rope-0.19.0.tar.gz", hash = "sha256:64e6d747532e1f5c8009ec5aae3e5523a5bcedf516f39a750d57d8ed749d90da"},
 ]
 six = [
     {file = "six-1.15.0-py2.py3-none-any.whl", hash = "sha256:8b74bedcbbbaca38ff6d7491d76f2b06b3592611af620f8426e82dddb04a5ced"},
