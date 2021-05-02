@@ -92,7 +92,6 @@ garden_details = {
     "Location:": garden.location,
     "Size:": garden.size,
     "Owner names:": " ".join(garden.owners),
-    "Owned since:": garden.since,
 }
 
 
@@ -115,11 +114,19 @@ garden_details = [
     for label, value in garden_details.items()
 ]
 
+owned_since = [
+    garden_label_format("Owned since:"),
+    sg.Input(garden.since, size=(30, 1), key="-OWNED SINCE-"),
+    sg.CalendarButton("PICK", format="%d/%m/%Y", pad=(0, 0)),
+]
+
 garden_buttons = [
     sg.Button(name, size=(15, 2), pad=((43, 0), 30)) for name in GARDEN_BUTTON_TEXT
 ]
 
-garden_elements = [select_garden, garden_blank] + garden_details + [garden_buttons]
+garden_elements = (
+    [select_garden, garden_blank] + garden_details + [owned_since, garden_buttons]
+)
 
 garden_tab = [[sg.Column(garden_elements, pad=((30, 40), 40))]]
 
@@ -430,7 +437,7 @@ task_frequency = [
     sg.Combo(
         ["", "daily", "weekly", "monthly", "yearly"],
         size=(18, 1),
-        pad=(5, (6, 0)), 
+        pad=(5, (6, 0)),
         readonly=True,
         key="-TASK FREQUENCY-",
     ),
@@ -640,6 +647,7 @@ def invalid_digit_popup(field, digit):
         button_color=ACCENT_COLOR,
         keep_on_top=True,
     )
+
 
 # fmt: off
 def invalid_bymonth_popup(bymonth):
