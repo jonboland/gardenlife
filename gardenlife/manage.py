@@ -35,7 +35,7 @@ except (OSError, IOError):
 # -------------------------------------- Menu -------------------------------------- #
 
 
-menu_definition = [["File", ["Save", "Exit"]], ["Help", ["About..."]]]
+menu_definition = [["File", ["Save", "Exit"]], ["Help", ["About...", "Open web tutorial"]]]
 
 
 # ------------------------------- Garden Summary Tab ------------------------------- #
@@ -727,6 +727,9 @@ while True:
             button_color=ACCENT_COLOR,
             keep_on_top=True, 
         )
+
+    elif event == "Open web tutorial":
+        webbrowser.open("https://github.com/jonboland/gardenlife/blob/master/README.rst")
 
     ######################## Creature Summary Events #######################
 
