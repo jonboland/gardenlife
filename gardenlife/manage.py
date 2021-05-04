@@ -5,6 +5,7 @@ import pickle
 from tkinter.constants import SUNKEN, GROOVE
 import traceback
 import sys
+import webbrowser
 
 import PySimpleGUI as sg
 from PySimpleGUI.PySimpleGUI import Column
@@ -34,7 +35,7 @@ except (OSError, IOError):
 # -------------------------------------- Menu -------------------------------------- #
 
 
-menu_definition = [["File", ["Save", "Exit"]], ["About..."]]
+menu_definition = [["File", ["Save", "Exit"]], ["Help", ["About..."]]]
 
 
 # ------------------------------- Garden Summary Tab ------------------------------- #
@@ -651,7 +652,6 @@ def invalid_digit_popup(field, digit):
 
 # fmt: off
 def invalid_bymonth_popup(bymonth):
-    print(bymonth)
     return sg.popup(
         f'The By month field contains "{bymonth}", which includes an invalid month or months. '
         f"Months must be digits between 1 and 12, separated by a single space.\n"
@@ -718,6 +718,15 @@ while True:
         with open("garden.pickle", "wb") as file:
             pickle.dump(garden, file)
         garden_changed = False
+ 
+    elif event == "About...":
+        sg.popup(
+            "gardenlife v1.0\n\n"
+            "A garden management application created by Jon Boland.\n",
+            title="About...",
+            button_color=ACCENT_COLOR,
+            keep_on_top=True, 
+        )
 
     ######################## Creature Summary Events #######################
 
