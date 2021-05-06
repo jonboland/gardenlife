@@ -644,7 +644,6 @@ def invalid_date_popup(field, date):
         f"The {field} field contains {date}, which is not a valid date. "
         "The format should be DD/MM/YYYY. Please correct and try again.",
         title="Date Format Error",
-        button_color=ACCENT_COLOR,
         keep_on_top=True,
     )
 
@@ -654,7 +653,6 @@ def invalid_digit_popup(field, digit):
         f"The {field} field contains {digit}, which is not a valid digit. "
         "Please correct and try again.",
         title="Digit Error",
-        button_color=ACCENT_COLOR,
         keep_on_top=True,
     )
 
@@ -666,7 +664,15 @@ def invalid_bymonth_popup(bymonth):
         f"Months must be digits between 1 and 12, separated by a single space.\n"
         f"Please correct and try again.",
         title="Month Format Error",
-        button_color=ACCENT_COLOR,
+        keep_on_top=True,
+    )
+
+
+def no_due_dates_popup():
+    return sg.popup(
+        "Based on the current schedule, there are no due dates for this task. "
+        "Please alter the schedule and try again.",
+        title="No Due Dates Error",
         keep_on_top=True,
     )
 # fmt: on
@@ -1074,9 +1080,6 @@ while True:
                 description=values["-TASK NOTES-"],
             )
 
-            if values["-TASK STATUS-"] == "archived":
-                task.status.archive()
-
             task.set_schedule(
                 start_date=start_date,
                 freq=values["-TASK FREQUENCY-"],
@@ -1084,13 +1087,21 @@ while True:
                 bymonth=bymonth,
                 interval=interval,
             )
+            # Handle rare situation where provided shedule doesn't produce any due dates
+            if not task.schedule:           
+                no_due_dates_popup()
+                continue
+
+            if values["-TASK STATUS-"] == "archived":
+                task.status.archive()
+
             # If the task already exists add any pre-existing completed dates to it
             if task_instance():
                 task.completed_dates = task_instance().completed_dates
             # Add the task to the garden, overwriting the old version if it already exists
             garden.add_item("tasks", task)
-            # Clear the task variable once the task has been added to the garden
             update_task_dropdown()
+            # Clear the task fields and variable once the task has been added to the garden
             clear_task_values()
             clear_organism_links()
             # Update the task numbers shown on the summary tab
