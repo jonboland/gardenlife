@@ -82,10 +82,33 @@ summary_tab = [
 ]
 
 
+# ------------------------ Shared Tab Functions & Constants ------------------------ #
+
+
+ITEM_BUTTON_TEXT = ("CREATE/UPDATE", "REMOVE")
+FIELD_SIZE = (25, 1)
+
+
+def item_label(label):
+    return sg.Text(label, size=(13, 1), pad=(0, 10))
+
+
+def organism_slider_label(label):
+    return sg.Text(label, size=(12, 1), pad=((0, 8), (20, 0)))
+
+
+def organism_slider(key=None, tooltip=None):
+    return sg.Slider(
+        range=(1, 5),
+        key=key,
+        orientation="horizontal",
+        default_value=3,
+        size=(19.7, 19),
+        tooltip=tooltip,
+    )
+
+
 # -------------------------------- Manage Garden Tab ------------------------------- #
-
-
-GARDEN_BUTTON_TEXT = ("CREATE GARDEN", "UPDATE GARDEN")
 
 
 garden_details = {
@@ -122,7 +145,8 @@ owned_since = [
 ]
 
 garden_buttons = [
-    sg.Button(name, size=(15, 2), pad=((43, 0), 30)) for name in GARDEN_BUTTON_TEXT
+    sg.Button(name, size=(15, 2), pad=((43, 0), 30), key=f"GARDEN {name}") 
+    for name in ITEM_BUTTON_TEXT
 ]
 
 garden_elements = (
@@ -130,32 +154,6 @@ garden_elements = (
 )
 
 garden_tab = [[sg.Column(garden_elements, pad=((30, 40), 40))]]
-
-
-# ------------------------ Shared Tab Functions & Constants ------------------------ #
-
-
-ITEM_BUTTON_TEXT = ("CREATE/UPDATE", "REMOVE")
-FIELD_SIZE = (25, 1)
-
-
-def item_label(label):
-    return sg.Text(label, size=(13, 1), pad=(0, 10))
-
-
-def organism_slider_label(label):
-    return sg.Text(label, size=(12, 1), pad=((0, 8), (20, 0)))
-
-
-def organism_slider(key=None, tooltip=None):
-    return sg.Slider(
-        range=(1, 5),
-        key=key,
-        orientation="horizontal",
-        default_value=3,
-        size=(19.7, 19),
-        tooltip=tooltip,
-    )
 
 
 # ------------------------------ Manage Creatures Tab ------------------------------ #
@@ -862,6 +860,9 @@ while True:
             window["-SUMMARY OWNED BY-"].update(garden.ownership())
             window["-SUMMARY OWNED FOR-"].update(garden.ownership_length())
             garden_changed = True
+
+    elif event == "GARDEN REMOVE":
+        pass
 
     ####################### Manage Creatures Events ########################
 
