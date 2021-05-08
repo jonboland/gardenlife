@@ -158,7 +158,7 @@ garden_details = [
 
 owned_since = [
     garden_label_format("Owned since:"),
-    sg.Input(garden.since, size=(30, 1), key="-OWNED SINCE-"),
+    sg.Input(garden.since, size=(30, 1), tooltip="DD/MM/YYYY", key="-OWNED SINCE-"),
     sg.CalendarButton("PICK", format="%d/%m/%Y", pad=(0, 0)),
 ]
 
@@ -200,7 +200,7 @@ creature_age = [item_label("Creature age:"), sg.Input(size=FIELD_SIZE, key="-CRE
 
 creature_appeared = [
     sg.Text("Appeared date:", size=(13, 1), pad=(0, (6, 30))),
-    sg.Input(size=FIELD_SIZE, key="-CREATURE APPEARED DATE-", pad=(5, (6, 30))),
+    sg.Input(size=FIELD_SIZE, pad=(5, (6, 30)), tooltip="DD/MM/YYYY", key="-CREATURE APPEARED DATE-"),
     sg.CalendarButton("PICK", format="%d/%m/%Y", pad=(0, (6, 30))),
 ]
 
@@ -296,7 +296,7 @@ plant_age = [item_label("Plant age:"), sg.Input(size=FIELD_SIZE, key="-PLANT AGE
 
 plant_appeared = [
     sg.Text("Planted date:", size=(13, 1), pad=(0, (6, 30))),
-    sg.Input(size=FIELD_SIZE, key="-PLANT PLANTED DATE-", pad=(5, (6, 30))),
+    sg.Input(size=FIELD_SIZE, pad=(5, (6, 30)), tooltip="DD/MM/YYYY", key="-PLANT PLANTED DATE-"),
     sg.CalendarButton("PICK", format="%d/%m/%Y", pad=(0, (6, 30)), key="-PLANT PICK-"),
 ]
 
@@ -443,7 +443,7 @@ task_description_field = [
 
 task_start = [
     sg.Text("First due:", size=(8, 1), pad=(3, (13, 0))),
-    sg.Input(size=(18, 1), key="-TASK START-", pad=(5, (13, 0))),
+    sg.Input(size=(18, 1), pad=(5, (13, 0)), tooltip="DD/MM/YYYY", key="-TASK START-"),
     sg.CalendarButton(
         "PICK", format="%d/%m/%Y", pad=((0, 7), (13, 0)), key="-TASK PICK START-"
     ),
@@ -462,17 +462,35 @@ task_frequency = [
 
 task_count = [
     sg.Text("Count:", size=(8, 1), pad=(3, (8, 0))),
-    sg.Input(size=(18, 1), key="-TASK COUNT-", pad=(5, (8, 0))),
+    sg.Input(
+        size=(18, 1), 
+        pad=(5, (8, 0)), 
+        tooltip="Number of times task should be completed", 
+        key="-TASK COUNT-"
+    )
 ]
 
 task_by_month = [
     sg.Text("By month:", size=(8, 1), pad=(3, (8, 0))),
-    sg.Input(size=(18, 1), key="-TASK BY MONTH-", pad=(5, (8, 0))),
+    sg.Input(
+        size=(18, 1),
+        pad=(5, (8, 0)),
+        tooltip="Digits between 1 and 12 separated by spaces\n"
+        "For example: 1 3 5\n"
+        "Specifies months when task should be completed",
+        key="-TASK BY MONTH-",
+    )
 ]
 
 task_interval = [
     sg.Text("Interval:", size=(8, 1), pad=(3, (8, 20))),
-    sg.Input(size=(18, 1), key="-TASK INTERVAL-", pad=(5, (8, 20))),
+    sg.Input(
+        size=(18, 1),
+        tooltip="Digit representing interval between due dates\n"
+        "For example: if frequency is monthly, 2 means every 2 months",
+        pad=(5, (8, 20)),
+        key="-TASK INTERVAL-",
+    )
 ]
 
 schedule_contents = [
