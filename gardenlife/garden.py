@@ -13,15 +13,16 @@ SEASONS = {
 class Garden:
     """Class to represent a garden."""
 
-    def __init__(self, name, location, size, since, *owners):
+    def __init__(self, name, location, size, since, owners):
         self.name = name
         self.location = location
         self.size = size
-        self.owners = owners
         self.since = since
+        self.owners = owners
         self.creatures = dict()
         self.plants = dict()
         self.tasks = dict()
+        self.timestamp = datetime.min  # Records when the add/remove_item methods were last used
 
     def __repr__(self):
         return (
@@ -84,12 +85,13 @@ class Garden:
                 return season
 
     def add_item(self, category, item):
-        """Add a creature, plant or task to the garden."""
+        """Add a creature, plant or task to the garden. Overwrite if already exists."""
         if category not in {"creatures", "plants", "tasks"}:
             raise ValueError(f"{category} is not a valid category")
         item_type = getattr(self, category)
         item_name = getattr(item, f"{category[:-1]}_name")
         item_type[item_name] = item
+        self.timestamp = datetime.today()
 
     def remove_item(self, category, item):
         """Remove a creature, plant or task from the garden."""
@@ -101,3 +103,4 @@ class Garden:
                 f'The {category[:-1]} "{item}" was not found in this garden.'
             )
         del item_type[item]
+        self.timestamp = datetime.today()
