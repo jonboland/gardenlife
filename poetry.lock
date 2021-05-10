@@ -119,14 +119,6 @@ version = "2.8.1"
 six = ">=1.5"
 
 [[package]]
-category = "main"
-description = "RevisionDict works like an ordinary dictionary with additional revision keeping of changes."
-name = "revisiondict"
-optional = false
-python-versions = "*"
-version = "1.0.0"
-
-[[package]]
 category = "dev"
 description = "a python refactoring library..."
 name = "rope"
@@ -154,7 +146,7 @@ python-versions = "*"
 version = "0.2.5"
 
 [metadata]
-content-hash = "66fc2fdf6ca2cb9be5cd648dfa0183fcb070c70d8c8bd48db3b2b80ceaff9197"
+content-hash = "41052fe09ce8a328787cf3fb09777b9c9b3f0f0fb0415ef7e36259a7a089339a"
 python-versions = "^3.8"
 
 [metadata.files]
@@ -201,10 +193,6 @@ pytest = [
 python-dateutil = [
     {file = "python-dateutil-2.8.1.tar.gz", hash = "sha256:73ebfe9dbf22e832286dafa60473e4cd239f8592f699aa5adaf10050e6e1823c"},
     {file = "python_dateutil-2.8.1-py2.py3-none-any.whl", hash = "sha256:75bb3f31ea686f1197762692a9ee6a7550b59fc6ca3a1f4b5d7e32fb98e2da2a"},
-]
-revisiondict = [
-    {file = "revisiondict-1.0.0-py2.py3-none-any.whl", hash = "sha256:0704ff0af0944890140808f1144a9327f11d710db99b4a9dd20d6d9a860944d4"},
-    {file = "revisiondict-1.0.0.tar.gz", hash = "sha256:00a862ad32cbb14b5e065a8192a5e2b7ffed9df395e2ad0776bdc159ce726392"},
 ]
 rope = [
     {file = "rope-0.19.0.tar.gz", hash = "sha256:64e6d747532e1f5c8009ec5aae3e5523a5bcedf516f39a750d57d8ed749d90da"},
