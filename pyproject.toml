@@ -8,7 +8,6 @@ authors = ["jonboland <jon.boland@gmail.com>"]
 python = "^3.8"
 python-dateutil = "^2.8.1"
 pysimplegui = "^4.39.0"
-revisiondict = "^1.0.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
