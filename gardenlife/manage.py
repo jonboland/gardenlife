@@ -221,7 +221,7 @@ creature_trend = [
 
 creature_status = [
     sg.Text("Status:", size=(8, 1), pad=(0, 10)),
-    sg.Combo(["current", "archived"], size=FIELD_SIZE, key="-CREATURE STATUS-"),
+    sg.Combo(["", "current", "archived"], size=FIELD_SIZE, readonly=True, background_color="#F2F2F2", key="-CREATURE STATUS-"),
 ]
 
 creature_notes_label = [sg.Text("Notes:", size=(8, 1), pad=(0, 10))]
@@ -321,7 +321,7 @@ plant_trend = [
 
 plant_status = [
     sg.Text("Status:", size=(8, 1), pad=(0, 10)),
-    sg.Combo(["current", "archived"], size=FIELD_SIZE, key="-PLANT STATUS-"),
+    sg.Combo(["", "current", "archived"], size=FIELD_SIZE, readonly=True, background_color="#F2F2F2", key="-PLANT STATUS-"),
 ]
 
 plant_notes_label = [sg.Text("Notes:", size=(8, 1), pad=(0, 10))]
@@ -422,7 +422,7 @@ task_link_organisms = [
 
 task_status = [
     sg.Text("Status:", size=(8, 1), pad=((2, 0), 10)),
-    sg.Combo(["current", "archived"], size=FIELD_SIZE, key="-TASK STATUS-"),
+    sg.Combo(["", "current", "archived"], size=FIELD_SIZE, readonly=True, background_color="#F2F2F2", key="-TASK STATUS-"),
 ]
 
 task_notes_label = [sg.Text("Description:", size=(10, 1), pad=(2, 10))]
