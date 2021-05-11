@@ -22,7 +22,7 @@ class Garden:
         self.creatures = dict()
         self.plants = dict()
         self.tasks = dict()
-        self.timestamp = datetime.min  # Records when the add/remove_item methods were last used
+        self.timestamp = datetime.today()
 
     def __repr__(self):
         return (

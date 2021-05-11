@@ -32,7 +32,6 @@ try:
 except FileNotFoundError:
     gardens = dict()
     default_garden = Garden("", "", 0, datetime.today().strftime("%d/%m/%Y"), " ")
-    default_garden.timestamp = datetime.min
     gardens[""] = default_garden
 # Load the most recently created/updated garden
 garden = max(gardens.values(), key=attrgetter("timestamp"))
@@ -41,10 +40,7 @@ garden = max(gardens.values(), key=attrgetter("timestamp"))
 # -------------------------------------- Menu -------------------------------------- #
 
 
-menu_definition = [
-    ["File", ["Save", "Exit"]],
-    ["Help", ["About...", "Open web tutorial"]],
-]
+menu_definition = [["File", ["Save", "Exit"]], ["Help", ["About...", "Open web tutorial"]]]
 
 
 # ------------------------------- Garden Summary Tab ------------------------------- #
@@ -57,7 +53,6 @@ outstanding_tasks = sum(
 )
 
 summary_details = {
-    "Current season:": garden.season(),
     "Garden name:": garden.name,
     "Location:": garden.location,
     "Size:": garden.garden_size(),
@@ -67,6 +62,7 @@ summary_details = {
     "Total plants:": len(garden.plants),
     "Total tasks:": len(garden.tasks),
     "Outstanding tasks:": outstanding_tasks,
+    "Current season:": garden.season(),
 }
 
 summary = [
@@ -118,6 +114,9 @@ def organism_slider(key=None, tooltip=None):
 # -------------------------------- Manage Garden Tab ------------------------------- #
 
 
+MG_FIELD_SIZE = (34, 1)
+
+
 garden_details = {
     "Garden name:": garden.name,
     "Location:": garden.location,
@@ -135,7 +134,8 @@ select_garden = [
     sg.Combo(
         sorted(list(gardens)),
         default_value=garden.name,
-        size=(30, 10),
+        size=(34, 10),
+        background_color="#F2F2F2",
         enable_events=True,
         readonly=True,
         key="-SELECT GARDEN-",
@@ -147,19 +147,19 @@ garden_blank = [sg.Text("", size=(0, 1))]  # Blank row to add space below select
 garden_details = [
     [
         garden_label_format(label),
-        sg.Input(value, size=(30, 1), key=f"-{label[:-1].upper()}-"),
+        sg.Input(value, size=MG_FIELD_SIZE, key=f"-{label[:-1].upper()}-"),
     ]
     for label, value in garden_details.items()
 ]
 
 owned_since = [
     garden_label_format("Owned since:"),
-    sg.Input(garden.since, size=(30, 1), tooltip="DD/MM/YYYY", key="-OWNED SINCE-"),
+    sg.Input(garden.since, size=MG_FIELD_SIZE, tooltip="DD/MM/YYYY", key="-OWNED SINCE-"),
     sg.CalendarButton("PICK", format="%d/%m/%Y", pad=(0, 0)),
 ]
 
 garden_buttons = [
-    sg.Button(name, size=(15, 2), pad=((43, 0), 30), key=f"GARDEN {name}") for name in ITEM_BUTTON_TEXT
+    sg.Button(name, size=(18, 2), pad=((32.5, 0), 30), key=f"GARDEN {name}") for name in ITEM_BUTTON_TEXT
 ]
 
 garden_elements = [select_garden, garden_blank] + garden_details + [owned_since, garden_buttons]
@@ -225,7 +225,13 @@ creature_trend = [
 
 creature_status = [
     sg.Text("Status:", size=(8, 1), pad=(0, 10)),
-    sg.Combo(["current", "archived"], size=FIELD_SIZE, key="-CREATURE STATUS-"),
+    sg.Combo(
+        ["", "current", "archived"],
+        size=FIELD_SIZE,
+        readonly=True,
+        background_color="#F2F2F2",
+        key="-CREATURE STATUS-",
+    ),
 ]
 
 creature_notes_label = [sg.Text("Notes:", size=(8, 1), pad=(0, 10))]
@@ -325,7 +331,13 @@ plant_trend = [
 
 plant_status = [
     sg.Text("Status:", size=(8, 1), pad=(0, 10)),
-    sg.Combo(["current", "archived"], size=FIELD_SIZE, key="-PLANT STATUS-"),
+    sg.Combo(
+        ["", "current", "archived"],
+        size=FIELD_SIZE,
+        readonly=True,
+        background_color="#F2F2F2",
+        key="-PLANT STATUS-",
+    ),
 ]
 
 plant_notes_label = [sg.Text("Notes:", size=(8, 1), pad=(0, 10))]
@@ -426,7 +438,13 @@ task_link_organisms = [
 
 task_status = [
     sg.Text("Status:", size=(8, 1), pad=((2, 0), 10)),
-    sg.Combo(["current", "archived"], size=FIELD_SIZE, key="-TASK STATUS-"),
+    sg.Combo(
+        ["", "current", "archived"],
+        size=FIELD_SIZE,
+        readonly=True,
+        background_color="#F2F2F2",
+        key="-TASK STATUS-",
+    ),
 ]
 
 task_notes_label = [sg.Text("Description:", size=(10, 1), pad=(2, 10))]
@@ -446,6 +464,7 @@ task_frequency = [
         size=(18, 1),
         pad=(5, (6, 0)),
         readonly=True,
+        background_color="#F2F2F2",
         key="-TASK FREQUENCY-",
     ),
 ]
@@ -492,13 +511,7 @@ schedule_contents = [
 ]
 
 task_schedule_frame = [
-    sg.Frame(
-        "Schedule",
-        schedule_contents,
-        relief=GROOVE,  # SUNKEN, RAISED, RIDGE, GROOVE
-        border_width=2,
-        size=(25, 5),
-    )
+    sg.Frame("Schedule", schedule_contents, relief=GROOVE, border_width=2, size=(25, 5))
 ]
 
 task_buttons = [
@@ -644,7 +657,7 @@ def _progress_order(task):
 
 def update_garden_dropdown():
     garden_names = sorted(list(gardens))
-    return window["-SELECT GARDEN-"].update(values=garden_names, size=(30, 10))
+    return window["-SELECT GARDEN-"].update(values=garden_names, size=(34, 10))
 
 
 def clear_garden_values():
@@ -764,7 +777,6 @@ def clear_all_values_and_links():
     clear_garden_values()
     clear_summary_values()
     clear_all_item_values_and_links()
-
 
 
 # --------------------------- Validation Popups & Data ----------------------------- #
@@ -944,7 +956,7 @@ while True:
         header_row = [[summary_head_format(title) for title in PLANT_HEADS]]
 
         plants = [
-            plant_fields(plant) 
+            plant_fields(plant)
             for plant in sorted_organisms(garden.plants.values(), sort_key="plant_name")
         ]
 
@@ -974,7 +986,7 @@ while True:
         name_head = [
             sg.Input(TASK_HEADS[0], size=(18, 1), text_color="white", background_color=ACCENT_COLOR)
         ]
-        
+
         other_head = [summary_head_format(title) for title in TASK_HEADS[1:]]
 
         header_row = [name_head + other_head]
@@ -986,7 +998,7 @@ while True:
         task_summary_column = [sg.Column(task_table, size=(800, 500), scrollable=True)]
 
         task_summary_layout = [task_summary_column, [sg.Button("Close")]]
-        
+
         task_summary_window = sg.Window("Task Summary", task_summary_layout, keep_on_top=True)
 
         while True:
@@ -1017,10 +1029,7 @@ while True:
             invalid_date_popup(field="Owned since", date=g_since)
         # If there are no validation errors, create/update the garden
         else:
-            cu_garden = Garden(
-                g_name, values["-LOCATION-"], values["-SIZE-"], g_since, g_owners.split()
-            )
-            cu_garden.timestamp = datetime.today()
+            cu_garden = Garden(g_name, values["-LOCATION-"], values["-SIZE-"], g_since, g_owners.split())
             # If garden already exists add all existing items to the updated version
             garden_instance = gardens.get(g_name)
             if garden_instance:
@@ -1069,7 +1078,7 @@ while True:
             window["-SUMMARY TOTAL TASKS-"].update(len(garden.tasks))
             window["-SUMMARY OUTSTANDING TASKS-"].update(outstanding_tasks)
         # Then update the item dropdowns and clear item field values and links
-        update_all_item_dropdowns() 
+        update_all_item_dropdowns()
         clear_all_item_values_and_links()
 
     ####################### Manage Creatures Events ########################
