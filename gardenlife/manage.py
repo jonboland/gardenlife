@@ -53,7 +53,6 @@ outstanding_tasks = sum(
 )
 
 summary_details = {
-    "Current season:": garden.season(),
     "Garden name:": garden.name,
     "Location:": garden.location,
     "Size:": garden.garden_size(),
@@ -63,6 +62,7 @@ summary_details = {
     "Total plants:": len(garden.plants),
     "Total tasks:": len(garden.tasks),
     "Outstanding tasks:": outstanding_tasks,
+    "Current season:": garden.season(),
 }
 
 summary = [
@@ -114,6 +114,9 @@ def organism_slider(key=None, tooltip=None):
 # -------------------------------- Manage Garden Tab ------------------------------- #
 
 
+MG_FIELD_SIZE = (34, 1)
+
+
 garden_details = {
     "Garden name:": garden.name,
     "Location:": garden.location,
@@ -131,7 +134,7 @@ select_garden = [
     sg.Combo(
         sorted(list(gardens)),
         default_value=garden.name,
-        size=(30, 10),
+        size=(34, 10),
         background_color="#F2F2F2",
         enable_events=True,
         readonly=True,
@@ -144,19 +147,19 @@ garden_blank = [sg.Text("", size=(0, 1))]  # Blank row to add space below select
 garden_details = [
     [
         garden_label_format(label),
-        sg.Input(value, size=(30, 1), key=f"-{label[:-1].upper()}-"),
+        sg.Input(value, size=MG_FIELD_SIZE, key=f"-{label[:-1].upper()}-"),
     ]
     for label, value in garden_details.items()
 ]
 
 owned_since = [
     garden_label_format("Owned since:"),
-    sg.Input(garden.since, size=(30, 1), tooltip="DD/MM/YYYY", key="-OWNED SINCE-"),
+    sg.Input(garden.since, size=MG_FIELD_SIZE, tooltip="DD/MM/YYYY", key="-OWNED SINCE-"),
     sg.CalendarButton("PICK", format="%d/%m/%Y", pad=(0, 0)),
 ]
 
 garden_buttons = [
-    sg.Button(name, size=(15, 2), pad=((43, 0), 30), key=f"GARDEN {name}") for name in ITEM_BUTTON_TEXT
+    sg.Button(name, size=(18, 2), pad=((32.5, 0), 30), key=f"GARDEN {name}") for name in ITEM_BUTTON_TEXT
 ]
 
 garden_elements = [select_garden, garden_blank] + garden_details + [owned_since, garden_buttons]
@@ -654,7 +657,7 @@ def _progress_order(task):
 
 def update_garden_dropdown():
     garden_names = sorted(list(gardens))
-    return window["-SELECT GARDEN-"].update(values=garden_names, size=(30, 10))
+    return window["-SELECT GARDEN-"].update(values=garden_names, size=(34, 10))
 
 
 def clear_garden_values():
