@@ -32,7 +32,6 @@ try:
 except FileNotFoundError:
     gardens = dict()
     default_garden = Garden("", "", 0, datetime.today().strftime("%d/%m/%Y"), " ")
-    default_garden.timestamp = datetime.min
     gardens[""] = default_garden
 # Load the most recently created/updated garden
 garden = max(gardens.values(), key=attrgetter("timestamp"))
@@ -41,10 +40,7 @@ garden = max(gardens.values(), key=attrgetter("timestamp"))
 # -------------------------------------- Menu -------------------------------------- #
 
 
-menu_definition = [
-    ["File", ["Save", "Exit"]],
-    ["Help", ["About...", "Open web tutorial"]],
-]
+menu_definition = [["File", ["Save", "Exit"]], ["Help", ["About...", "Open web tutorial"]]]
 
 
 # ------------------------------- Garden Summary Tab ------------------------------- #
@@ -766,7 +762,6 @@ def clear_all_values_and_links():
     clear_all_item_values_and_links()
 
 
-
 # --------------------------- Validation Popups & Data ----------------------------- #
 
 
@@ -944,7 +939,7 @@ while True:
         header_row = [[summary_head_format(title) for title in PLANT_HEADS]]
 
         plants = [
-            plant_fields(plant) 
+            plant_fields(plant)
             for plant in sorted_organisms(garden.plants.values(), sort_key="plant_name")
         ]
 
@@ -974,7 +969,7 @@ while True:
         name_head = [
             sg.Input(TASK_HEADS[0], size=(18, 1), text_color="white", background_color=ACCENT_COLOR)
         ]
-        
+
         other_head = [summary_head_format(title) for title in TASK_HEADS[1:]]
 
         header_row = [name_head + other_head]
@@ -986,7 +981,7 @@ while True:
         task_summary_column = [sg.Column(task_table, size=(800, 500), scrollable=True)]
 
         task_summary_layout = [task_summary_column, [sg.Button("Close")]]
-        
+
         task_summary_window = sg.Window("Task Summary", task_summary_layout, keep_on_top=True)
 
         while True:
@@ -1017,10 +1012,7 @@ while True:
             invalid_date_popup(field="Owned since", date=g_since)
         # If there are no validation errors, create/update the garden
         else:
-            cu_garden = Garden(
-                g_name, values["-LOCATION-"], values["-SIZE-"], g_since, g_owners.split()
-            )
-            cu_garden.timestamp = datetime.today()
+            cu_garden = Garden(g_name, values["-LOCATION-"], values["-SIZE-"], g_since, g_owners.split())
             # If garden already exists add all existing items to the updated version
             garden_instance = gardens.get(g_name)
             if garden_instance:
@@ -1069,7 +1061,7 @@ while True:
             window["-SUMMARY TOTAL TASKS-"].update(len(garden.tasks))
             window["-SUMMARY OUTSTANDING TASKS-"].update(outstanding_tasks)
         # Then update the item dropdowns and clear item field values and links
-        update_all_item_dropdowns() 
+        update_all_item_dropdowns()
         clear_all_item_values_and_links()
 
     ####################### Manage Creatures Events ########################
