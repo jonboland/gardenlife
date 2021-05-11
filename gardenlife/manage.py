@@ -132,6 +132,7 @@ select_garden = [
         sorted(list(gardens)),
         default_value=garden.name,
         size=(30, 10),
+        background_color="#F2F2F2",
         enable_events=True,
         readonly=True,
         key="-SELECT GARDEN-",
@@ -221,7 +222,13 @@ creature_trend = [
 
 creature_status = [
     sg.Text("Status:", size=(8, 1), pad=(0, 10)),
-    sg.Combo(["", "current", "archived"], size=FIELD_SIZE, readonly=True, background_color="#F2F2F2", key="-CREATURE STATUS-"),
+    sg.Combo(
+        ["", "current", "archived"],
+        size=FIELD_SIZE,
+        readonly=True,
+        background_color="#F2F2F2",
+        key="-CREATURE STATUS-",
+    ),
 ]
 
 creature_notes_label = [sg.Text("Notes:", size=(8, 1), pad=(0, 10))]
@@ -321,7 +328,13 @@ plant_trend = [
 
 plant_status = [
     sg.Text("Status:", size=(8, 1), pad=(0, 10)),
-    sg.Combo(["", "current", "archived"], size=FIELD_SIZE, readonly=True, background_color="#F2F2F2", key="-PLANT STATUS-"),
+    sg.Combo(
+        ["", "current", "archived"],
+        size=FIELD_SIZE,
+        readonly=True,
+        background_color="#F2F2F2",
+        key="-PLANT STATUS-",
+    ),
 ]
 
 plant_notes_label = [sg.Text("Notes:", size=(8, 1), pad=(0, 10))]
@@ -422,7 +435,13 @@ task_link_organisms = [
 
 task_status = [
     sg.Text("Status:", size=(8, 1), pad=((2, 0), 10)),
-    sg.Combo(["", "current", "archived"], size=FIELD_SIZE, readonly=True, background_color="#F2F2F2", key="-TASK STATUS-"),
+    sg.Combo(
+        ["", "current", "archived"],
+        size=FIELD_SIZE,
+        readonly=True,
+        background_color="#F2F2F2",
+        key="-TASK STATUS-",
+    ),
 ]
 
 task_notes_label = [sg.Text("Description:", size=(10, 1), pad=(2, 10))]
@@ -442,6 +461,7 @@ task_frequency = [
         size=(18, 1),
         pad=(5, (6, 0)),
         readonly=True,
+        background_color="#F2F2F2",
         key="-TASK FREQUENCY-",
     ),
 ]
@@ -488,13 +508,7 @@ schedule_contents = [
 ]
 
 task_schedule_frame = [
-    sg.Frame(
-        "Schedule",
-        schedule_contents,
-        relief=GROOVE,  # SUNKEN, RAISED, RIDGE, GROOVE
-        border_width=2,
-        size=(25, 5),
-    )
+    sg.Frame("Schedule", schedule_contents, relief=GROOVE, border_width=2, size=(25, 5))
 ]
 
 task_buttons = [
