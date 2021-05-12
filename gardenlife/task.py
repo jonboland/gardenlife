@@ -34,7 +34,6 @@ class Task:
     def __eq__(self, other):
         return repr(self) == other
 
-    # fmt: off
     def set_schedule(self, start_date=None, freq=None, count=None, bymonth=None, interval=None):
         """Sets the task's scheduled dates."""
         # Store the raw schedule values to repopulate UI fields
@@ -54,7 +53,6 @@ class Task:
         self.schedule = list(
             rrule(dtstart=start_date, freq=freq, count=count, bymonth=bymonth, interval=interval)
         )
-    # format: on
     
     def update_completed_dates(self, all_progress):
         """
@@ -120,9 +118,8 @@ class Task:
             return "Overdue"
         elif missed_dates_with_completed > 1:
             return "Very overdue"
-        # If there are aren't any missed dates the task is up to date
+        # If there aren't any missed dates the task is up to date
         return "Completed"
-        # ***Add "Due" state when task due today and completed dates exist*** 
 
     def get_next_due_date(self):
         if not self.completed_dates:

@@ -49,6 +49,7 @@ class Plant(Organism):
         self,
         plant_name,
         plant_type,
+        edible=False,
         planted=None,
         notes=None,
         age=None,
@@ -66,6 +67,7 @@ class Plant(Organism):
         )
         self.plant_name = plant_name  # Eg Ash, Bean, Poppy, Thistle
         self.plant_type = plant_type  # Eg Tree, Vegetable, Flower, Weed
+        self.edible = edible
         self.planted = planted
         self.status = Status()
 
