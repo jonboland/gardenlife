@@ -348,6 +348,10 @@ plant_status = [
     ),
 ]
 
+plant_edible = [
+    sg.Text("Edible:", size=(8, 1), pad=(0, 10)), sg.Checkbox("", pad=(0, 0), key="-PLANT EDIBLE-")
+]
+
 plant_notes_label = [sg.Text("Notes:", size=(8, 1), pad=(0, 10))]
 
 plant_notes_field = [sg.Multiline(size=(35, 10), pad=(0, 10), key="-PLANT NOTES-")]
@@ -369,6 +373,7 @@ plants_left_column = [
 
 plants_right_column = [
     plant_status,
+    plant_edible,
     plant_notes_label,
     plant_notes_field,
     plant_buttons,
@@ -714,7 +719,7 @@ def plant_instance():
 
 
 def clear_plant_values():
-    for value in ("NAME", "TYPE", "AGE", "PLANTED DATE", "STATUS", "NOTES"):
+    for value in ("NAME", "TYPE", "AGE", "PLANTED DATE", "EDIBLE", "STATUS", "NOTES"):
         window[f"-PLANT {value}-"].update("")
     for value in ("IMPACT", "PREVALENCE", "TREND"):
         window[f"-PLANT {value} SLIDER-"].update(3)
@@ -1188,6 +1193,7 @@ try:
                     plant_type=values["-PLANT TYPE-"],
                     age=values["-PLANT AGE-"],
                     planted=p_planted,
+                    edible=values["-PLANT EDIBLE-"],
                     notes=values["-PLANT NOTES-"],
                     impact=values["-PLANT IMPACT SLIDER-"],
                     prevalence=values["-PLANT PREVALENCE SLIDER-"],
@@ -1220,6 +1226,7 @@ try:
             window["-PLANT AGE-"].update(plant_instance().age)
             window["-PLANT PLANTED DATE-"].update(plant_instance().planted)
             window["-PLANT STATUS-"].update(plant_instance().status.get())
+            window["-PLANT EDIBLE-"].update(plant_instance().edible)
             window["-PLANT NOTES-"].update(plant_instance().notes)
             window["-PLANT IMPACT SLIDER-"].update(plant_instance().impact)
             window["-PLANT PREVALENCE SLIDER-"].update(plant_instance().prevalence)
@@ -1355,7 +1362,6 @@ try:
 
         # If a task is selected populate the relevant fields with its values
         elif event == "-TASK NAME-":
-            test = 10 / 0
             window["-TASK PROGRESS-"].update(task_instance().get_current_progress())
             window["-TASK NEXT DUE-"].update(task_instance().get_next_due_date())
             window["-TASK ASSIGNEE-"].update(task_instance().assignee)
@@ -1371,6 +1377,7 @@ try:
             window["-TASK INTERVAL-"].update(task_instance().raw_schedule["interval"])
             # Assign instance to task variable so progress can be added
             task = task_instance()
+
 except Exception as e:
     logger.exception("Fatal Error")
     fatal_error(e)
