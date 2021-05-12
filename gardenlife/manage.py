@@ -28,9 +28,9 @@ sg.theme_slider_color(ACCENT_COLOR)
 try:
     with open("gardens.pickle", "rb") as file:
         gardens = pickle.load(file)
-# Create the gardens dict and default garden when the app is opened for the first time
+# Create the gardens dict and default garden if they don't already exist
 except FileNotFoundError:
-    gardens = dict()
+    gardens = {}
     default_garden = Garden("", "", 0, datetime.today().strftime("%d/%m/%Y"), " ")
     gardens[""] = default_garden
 # Load the most recently created/updated garden
@@ -785,10 +785,10 @@ def clear_all_values_and_links():
 MONTHS = [str(month) for month in range(1, 13)]
 
 
-def remove_confirmation_popup(element):
+def remove_confirmation_popup(name, element):
     return sg.popup_ok_cancel(
-        f"Are you sure you want to remove this {element}?\n"
-        "It will be permanently deleted.\n\n"
+        f"Are you sure you want to remove {name}?\n"
+        f"This {element} will be permanently deleted.\n\n"
         "Click OK if you wish to proceed.\n",
         title="Remove Confirmation",
         keep_on_top=True,
@@ -1045,8 +1045,8 @@ while True:
             gardens_changed = True
 
     elif event == "GARDEN REMOVE":
-        confirmation = remove_confirmation_popup("garden")
-        if confirmation == "OK":
+        g_confirmation = remove_confirmation_popup(garden.name, "garden")
+        if g_confirmation == "OK":
             del gardens[values["-GARDEN NAME-"]]
             update_garden_dropdown()
             clear_all_item_dropdowns()
@@ -1120,11 +1120,13 @@ while True:
             gardens_changed = True
 
     elif event == "CREATURE REMOVE":
-        garden.remove_item("creatures", values["-CREATURE NAME-"])
-        update_creature_dropdowns()
-        clear_creature_values()
-        window["-SUMMARY TOTAL CREATURES-"].update(len(garden.creatures))
-        gardens_changed = True
+        c_confirmation = remove_confirmation_popup(values["-CREATURE NAME-"], "creature")
+        if c_confirmation == "OK":
+            garden.remove_item("creatures", values["-CREATURE NAME-"])
+            update_creature_dropdowns()
+            clear_creature_values()
+            window["-SUMMARY TOTAL CREATURES-"].update(len(garden.creatures))
+            gardens_changed = True
 
     elif values["-CREATURE NAME-"] == "":
         clear_creature_values()
@@ -1180,11 +1182,13 @@ while True:
             gardens_changed = True
 
     elif event == "PLANT REMOVE":
-        garden.remove_item("plants", values["-PLANT NAME-"])
-        update_plant_dropdowns()
-        clear_plant_values()
-        window["-SUMMARY TOTAL PLANTS-"].update(len(garden.plants))
-        gardens_changed = True
+        p_confirmation = remove_confirmation_popup(values["-PLANT NAME-"], "plant")
+        if p_confirmation == "OK":
+            garden.remove_item("plants", values["-PLANT NAME-"])
+            update_plant_dropdowns()
+            clear_plant_values()
+            window["-SUMMARY TOTAL PLANTS-"].update(len(garden.plants))
+            gardens_changed = True
 
     elif values["-PLANT NAME-"] == "":
         clear_plant_values()
@@ -1276,18 +1280,20 @@ while True:
             gardens_changed = True
 
     elif event == "TASK REMOVE":
-        garden.remove_item("tasks", values["-TASK NAME-"])
-        update_task_dropdown()
-        clear_task_values()
-        clear_organism_links()
-        window["-SUMMARY TOTAL TASKS-"].update(len(garden.tasks))
-        window["-SUMMARY OUTSTANDING TASKS-"].update(
-            sum(
-                task.get_current_progress() in {"Due", "Overdue", "Very overdue"}
-                for task in garden.tasks.values()
+        t_confirmation = remove_confirmation_popup(values["-TASK NAME-"], "task")
+        if t_confirmation == "OK":
+            garden.remove_item("tasks", values["-TASK NAME-"])
+            update_task_dropdown()
+            clear_task_values()
+            clear_organism_links()
+            window["-SUMMARY TOTAL TASKS-"].update(len(garden.tasks))
+            window["-SUMMARY OUTSTANDING TASKS-"].update(
+                sum(
+                    task.get_current_progress() in {"Due", "Overdue", "Very overdue"}
+                    for task in garden.tasks.values()
+                )
             )
-        )
-        gardens_changed = True
+            gardens_changed = True
 
     elif values["-TASK NAME-"] == "":
         clear_task_values()
