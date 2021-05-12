@@ -16,10 +16,7 @@ from organisms import Creature, Plant
 from task import Task
 
 
-logging.basicConfig(
-    filename="gardenlife.log", 
-    format="%(asctime)s %(levelname)s %(name)s %(message)s"
-)
+logging.basicConfig(filename="gardenlife.log", format="%(asctime)s %(levelname)s %(name)s %(message)s")
 logger = logging.getLogger(__name__)
 
 
@@ -349,7 +346,8 @@ plant_status = [
 ]
 
 plant_edible = [
-    sg.Text("Edible:", size=(8, 1), pad=(0, 10)), sg.Checkbox("", pad=(0, 0), key="-PLANT EDIBLE-")
+    sg.Text("Edible:", size=(8, 1), pad=(0, 10)),
+    sg.Checkbox("", pad=(0, 0), key="-PLANT EDIBLE-"),
 ]
 
 plant_notes_label = [sg.Text("Notes:", size=(8, 1), pad=(0, 10))]
@@ -792,33 +790,94 @@ def clear_all_values_and_links():
     clear_all_item_values_and_links()
 
 
+def view_creatures_window():
+    window.Disable()
+
+    header_row = [[summary_head_format(title) for title in CREATURE_HEADS]]
+
+    creatures = [
+        creature_fields(creature)
+        for creature in sorted_organisms(garden.creatures.values(), sort_key="creature_name")
+    ]
+
+    creature_table = header_row + creatures
+
+    creature_summary_column = [organism_column_format(creature_table)]
+
+    creature_summary_layout = [creature_summary_column, [sg.Button("Close")]]
+
+    creature_summary_window = sg.Window(
+        "Creature Summary", creature_summary_layout, keep_on_top=True
+    )
+
+    while True:
+        creature_sum_event, creature_sum_values = creature_summary_window.read()
+        print(creature_sum_event, creature_sum_values)
+
+        if creature_sum_event in (sg.WIN_CLOSED, "Close"):
+            creature_summary_window.close()
+            window.Enable()
+            break
+
+
 def view_plants_window(plant, attr):
-        window.Disable()
+    window.Disable()
 
-        header_row = [[summary_head_format(title) for title in PLANT_HEADS]]
+    header_row = [[summary_head_format(title) for title in PLANT_HEADS]]
 
-        plants = [
-            plant_fields(plant)
-            for plant in sorted_organisms(garden.plants.values(), sort_key="plant_name") if getattr(plant, attr)
-        ]
+    plants = [
+        plant_fields(plant)
+        for plant in sorted_organisms(garden.plants.values(), sort_key="plant_name")
+        if getattr(plant, attr)
+    ]
 
-        plant_table = header_row + plants
+    plant_table = header_row + plants
 
-        plant_summary_column = [organism_column_format(plant_table)]
+    plant_summary_column = [organism_column_format(plant_table)]
 
-        plant_summary_layout = [plant_summary_column, [sg.Button("Close")]]
+    plant_summary_layout = [plant_summary_column, [sg.Button("Close")]]
 
-        plant_summary_window = sg.Window("Plant Summary", plant_summary_layout, keep_on_top=True)
+    plant_summary_window = sg.Window("Plant Summary", plant_summary_layout, keep_on_top=True)
 
-        while True:
-            plant_sum_event, plant_sum_values = plant_summary_window.read()
-            print(plant_sum_event, plant_sum_values)
+    while True:
+        plant_sum_event, plant_sum_values = plant_summary_window.read()
+        print(plant_sum_event, plant_sum_values)
 
-            if plant_sum_event in (sg.WIN_CLOSED, "Close"):
-                plant_summary_window.close()
-                window.Enable()
-                break
+        if plant_sum_event in (sg.WIN_CLOSED, "Close"):
+            plant_summary_window.close()
+            window.Enable()
+            break
 
+
+def view_tasks_window():
+    window.Disable()
+
+    name_head = [
+        sg.Input(TASK_HEADS[0], size=(18, 1), text_color="white", background_color=ACCENT_COLOR)
+    ]
+
+    other_head = [summary_head_format(title) for title in TASK_HEADS[1:]]
+
+    header_row = [name_head + other_head]
+
+    tasks = [task_fields(task) for task in sorted_tasks(garden.tasks.values())]
+
+    task_table = header_row + tasks
+
+    task_summary_column = [sg.Column(task_table, size=(800, 500), scrollable=True)]
+
+    task_summary_layout = [task_summary_column, [sg.Button("Close")]]
+
+    task_summary_window = sg.Window("Task Summary", task_summary_layout, keep_on_top=True)
+
+    while True:
+        task_sum_event, task_sum_values = task_summary_window.read()
+        print(task_sum_event, task_sum_values)
+
+        if task_sum_event in (sg.WIN_CLOSED, "Close"):
+            task_summary_window.close()
+            window.Enable()
+            break
 
 
 # ------------------------------------ Popups -------------------------------------- #
@@ -831,10 +890,10 @@ def fatal_error(error):
     sg.popup(
         "Sorry for the disruption.",
         "Unfortunately, gardenlife has stopped working because the following fatal error occured:",
-        error, 
+        error,
         traceback.format_exc(),
-        title="Fatal Error", 
-        keep_on_top=True, 
+        title="Fatal Error",
+        keep_on_top=True,
     )
 
 
@@ -971,38 +1030,10 @@ try:
         elif event == "Open web tutorial":
             webbrowser.open("https://github.com/jonboland/gardenlife/blob/master/README.rst")
 
-        ######################## Creature Summary Events #######################
+        ################ Creature, Plant, & Task Summary Events ################
 
         elif event == "VIEW ALL CREATURES":
-            window.Disable()
-
-            header_row = [[summary_head_format(title) for title in CREATURE_HEADS]]
-
-            creatures = [
-                creature_fields(creature)
-                for creature in sorted_organisms(garden.creatures.values(), sort_key="creature_name")
-            ]
-
-            creature_table = header_row + creatures
-
-            creature_summary_column = [organism_column_format(creature_table)]
-
-            creature_summary_layout = [creature_summary_column, [sg.Button("Close")]]
-
-            creature_summary_window = sg.Window(
-                "Creature Summary", creature_summary_layout, keep_on_top=True
-            )
-
-            while True:
-                creature_sum_event, creature_sum_values = creature_summary_window.read()
-                print(creature_sum_event, creature_sum_values)
-
-                if creature_sum_event in (sg.WIN_CLOSED, "Close"):
-                    creature_summary_window.close()
-                    window.Enable()
-                    break
-
-        ########################## Plant Summary Events ########################
+            view_creatures_window()
 
         elif event == "VIEW ALL PLANTS":
             view_plants_window("plant", "plant_name")
@@ -1010,38 +1041,8 @@ try:
         elif event == "VIEW EDIBLE PLANTS":
             view_plants_window("plant", "edible")
 
-        ########################## Task Summary Events #########################
-
         elif event == "VIEW ALL TASKS":
-
-            window.Disable()
-
-            name_head = [
-                sg.Input(TASK_HEADS[0], size=(18, 1), text_color="white", background_color=ACCENT_COLOR)
-            ]
-
-            other_head = [summary_head_format(title) for title in TASK_HEADS[1:]]
-
-            header_row = [name_head + other_head]
-
-            tasks = [task_fields(task) for task in sorted_tasks(garden.tasks.values())]
-
-            task_table = header_row + tasks
-
-            task_summary_column = [sg.Column(task_table, size=(800, 500), scrollable=True)]
-
-            task_summary_layout = [task_summary_column, [sg.Button("Close")]]
-
-            task_summary_window = sg.Window("Task Summary", task_summary_layout, keep_on_top=True)
-
-            while True:
-                task_sum_event, task_sum_values = task_summary_window.read()
-                print(task_sum_event, task_sum_values)
-
-                if task_sum_event in (sg.WIN_CLOSED, "Close"):
-                    task_summary_window.close()
-                    window.Enable()
-                    break
+            view_tasks_window()
 
         ######################### Manage Garden Events #########################
 
@@ -1062,7 +1063,9 @@ try:
                 invalid_date_popup(field="Owned since", date=g_since)
             # If there are no validation errors, create/update the garden
             else:
-                cu_garden = Garden(g_name, values["-LOCATION-"], values["-SIZE-"], g_since, g_owners.split())
+                cu_garden = Garden(
+                    g_name, values["-LOCATION-"], values["-SIZE-"], g_since, g_owners.split()
+                )
                 # If garden already exists add all existing items to the updated version
                 garden_instance = gardens.get(g_name)
                 if garden_instance:
