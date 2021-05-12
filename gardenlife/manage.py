@@ -54,7 +54,7 @@ menu_definition = [["File", ["Save", "Exit"]], ["Help", ["About...", "Open web t
 # ------------------------------- Garden Summary Tab ------------------------------- #
 
 
-REPORT_BUTTON_TEXT = ("VIEW ALL CREATURES", "VIEW ALL PLANTS", "VIEW ALL TASKS")
+REPORT_BUTTON_TEXT = ("VIEW ALL CREATURES", "VIEW ALL PLANTS", "VIEW EDIBLE PLANTS", "VIEW ALL TASKS")
 
 outstanding_tasks = sum(
     task.get_current_progress() in {"Due", "Overdue", "Very overdue"} for task in garden.tasks.values()
@@ -88,7 +88,7 @@ report_buttons = [
 summary_tab = [
     [
         sg.Column(summary, pad=((30, 40), 40)),
-        sg.Column(report_buttons, size=(200, 190), pad=((25, 40), 0)),
+        sg.Column(report_buttons, size=(200, 260), pad=((25, 40), 0)),
     ]
 ]
 
@@ -792,6 +792,35 @@ def clear_all_values_and_links():
     clear_all_item_values_and_links()
 
 
+def view_plants_window(plant, attr):
+        window.Disable()
+
+        header_row = [[summary_head_format(title) for title in PLANT_HEADS]]
+
+        plants = [
+            plant_fields(plant)
+            for plant in sorted_organisms(garden.plants.values(), sort_key="plant_name") if getattr(plant, attr)
+        ]
+
+        plant_table = header_row + plants
+
+        plant_summary_column = [organism_column_format(plant_table)]
+
+        plant_summary_layout = [plant_summary_column, [sg.Button("Close")]]
+
+        plant_summary_window = sg.Window("Plant Summary", plant_summary_layout, keep_on_top=True)
+
+        while True:
+            plant_sum_event, plant_sum_values = plant_summary_window.read()
+            print(plant_sum_event, plant_sum_values)
+
+            if plant_sum_event in (sg.WIN_CLOSED, "Close"):
+                plant_summary_window.close()
+                window.Enable()
+                break
+
+
+
 # ------------------------------------ Popups -------------------------------------- #
 
 
@@ -976,31 +1005,10 @@ try:
         ########################## Plant Summary Events ########################
 
         elif event == "VIEW ALL PLANTS":
-            window.Disable()
+            view_plants_window("plant", "plant_name")
 
-            header_row = [[summary_head_format(title) for title in PLANT_HEADS]]
-
-            plants = [
-                plant_fields(plant)
-                for plant in sorted_organisms(garden.plants.values(), sort_key="plant_name")
-            ]
-
-            plant_table = header_row + plants
-
-            plant_summary_column = [organism_column_format(plant_table)]
-
-            plant_summary_layout = [plant_summary_column, [sg.Button("Close")]]
-
-            plant_summary_window = sg.Window("Plant Summary", plant_summary_layout, keep_on_top=True)
-
-            while True:
-                plant_sum_event, plant_sum_values = plant_summary_window.read()
-                print(plant_sum_event, plant_sum_values)
-
-                if plant_sum_event in (sg.WIN_CLOSED, "Close"):
-                    plant_summary_window.close()
-                    window.Enable()
-                    break
+        elif event == "VIEW EDIBLE PLANTS":
+            view_plants_window("plant", "edible")
 
         ########################## Task Summary Events #########################
 
