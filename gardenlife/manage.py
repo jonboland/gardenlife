@@ -889,11 +889,11 @@ def fatal_error(error):
     )
 
 
-def no_garden_popup(item):
+def garden_not_selected_popup(item):
     return sg.popup(
         f"It wasn't possible to add the {item} because a garden hasn't been selected. "
         "Please choose a garden on the Manage Garden tab and try again.",
-        title="No Garden Error",
+        title="Garden Not Selected Error",
         keep_on_top=True,
     )
 
@@ -1117,7 +1117,7 @@ try:
             c_appeared = values["-CREATURE APPEARED DATE-"].strip()
             # Check that a garden has been selected
             if not values["-SELECT GARDEN-"]:
-                no_garden_popup("creature")
+                garden_not_selected_popup("creature")
                 continue
             if not c_name:
                 invalid_name_popup("creature name")
@@ -1177,7 +1177,7 @@ try:
             p_planted = values["-PLANT PLANTED DATE-"].strip()
             # Check that a garden has been selected
             if not values["-SELECT GARDEN-"]:
-                no_garden_popup("plant")
+                garden_not_selected_popup("plant")
                 continue
             if not p_name:
                 invalid_name_popup("plant name")
@@ -1236,7 +1236,7 @@ try:
         if event == "TASK CREATE/UPDATE":
             # Check that a garden has been selected
             if not values["-SELECT GARDEN-"]:
-                no_garden_popup("creature")
+                garden_not_selected_popup("creature")
                 continue
             # Strip and validate task name and set schedule values
             # NB: Frequency is not validated because it's a readonly dropdown
