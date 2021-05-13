@@ -10,14 +10,14 @@ FREQS = {"daily": DAILY, "weekly": WEEKLY, "monthly": MONTHLY, "yearly": YEARLY}
 class Task:
     def __init__(
         self,
-        task_name,
+        name,
         description=None,
         assignee=None,
         length=None,
         linked_creatures=None,
         linked_plants=None,
     ):
-        self.task_name = task_name
+        self.name = name
         self.schedule = [self._set_date()]
         self.description = description
         self.assignee = assignee
@@ -29,7 +29,7 @@ class Task:
         self.status = Status()
 
     def __repr__(self):
-        return f"Task: {self.task_name}"
+        return f"Task: {self.name}"
 
     def __eq__(self, other):
         return repr(self) == other
