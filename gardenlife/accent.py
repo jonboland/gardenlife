@@ -1,0 +1,1 @@
+ACCENT_COLOR = "#004225"
