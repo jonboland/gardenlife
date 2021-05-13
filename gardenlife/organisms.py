@@ -1,5 +1,4 @@
 from organism import Organism
-from status import Status
 
 
 class Creature(Organism):
@@ -25,7 +24,6 @@ class Creature(Organism):
         self.creature_name = creature_name  # Eg Badger, Mouse, Bee, Pigeon
         self.creature_type = creature_type  # Eg Mammal, Rodent, Insect, Bird
         self.appeared = appeared
-        self.status = Status()
 
     def __repr__(self):
         return f"{self.__class__.__name__}({self.creature_name}, {self.creature_type})"
@@ -69,7 +67,6 @@ class Plant(Organism):
         self.plant_type = plant_type  # Eg Tree, Vegetable, Flower, Weed
         self.edible = edible
         self.planted = planted
-        self.status = Status()
 
     def __repr__(self):
         return f"{self.__class__.__name__}({self.plant_name}, {self.plant_type})"

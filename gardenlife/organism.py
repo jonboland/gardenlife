@@ -1,3 +1,6 @@
+from status import Status
+
+
 LEVELS = {
     "impact_levels": {
         1: "very negative",
@@ -31,6 +34,7 @@ class Organism:
         self.prevalence = prevalence
         self.trend = trend
         self.organism_kind = organism_kind
+        self.status = Status()
 
     @property
     def impact(self):
