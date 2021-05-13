@@ -188,7 +188,7 @@ creature_name = [
 creature_type = [
     item_label("Creature type:"),
     sg.Combo(
-        sorted([""] + list(set(c.creature_type for c in garden.creatures.values() if c.creature_type))),
+        sorted([""] + list(set(c.org_type for c in garden.creatures.values() if c.org_type))),
         size=(25, 10),
         key="-CREATURE TYPE-",
     ),
@@ -286,7 +286,7 @@ plant_name = [
 plant_type = [
     item_label("Plant type:"),
     sg.Combo(
-        sorted([""] + list(set(p.plant_type for p in garden.plants.values() if p.plant_type))),
+        sorted([""] + list(set(p.org_type for p in garden.plants.values() if p.org_type))),
         size=(25, 10),
         key="-PLANT TYPE-",
     ),
@@ -592,8 +592,8 @@ def organism_column_format(table):
 
 def creature_fields(creature):
     values = (
-        creature.creature_name,
-        creature.creature_type,
+        creature.name,
+        creature.org_type,
         creature.appeared,
         creature.get_level("impact"),
         creature.get_level("prevalence"),
@@ -605,8 +605,8 @@ def creature_fields(creature):
 
 def plant_fields(plant):
     values = (
-        plant.plant_name,
-        plant.plant_type,
+        plant.name,
+        plant.org_type,
         plant.planted,
         plant.get_level("impact"),
         plant.get_level("prevalence"),
@@ -618,7 +618,7 @@ def plant_fields(plant):
 
 def task_fields(task):
     """Converts task values into task summary fields."""
-    name_field = [sg.Input(task.task_name, size=(18, 1))]
+    name_field = [sg.Input(task.name, size=(18, 1))]
     other_values = (
         task.get_current_progress(),
         task.get_next_due_date(),
@@ -641,7 +641,7 @@ def sorted_organisms(organisms, sort_key):
 def sorted_tasks(tasks):
     """Sorts tasks instances by status, progress, due date, assignee, and name."""
     tasks = list(tasks)
-    tasks.sort(key=attrgetter("assignee", "task_name"))
+    tasks.sort(key=attrgetter("assignee", "name"))
     tasks.sort(key=lambda task: task.get_next_due_date())
     tasks.sort(key=_progress_order, reverse=True)
     tasks.sort(key=lambda task: str(task.status), reverse=True)
@@ -650,7 +650,7 @@ def sorted_tasks(tasks):
 
 def _progress_order(task):
     # Key for sorting tasks so those not yet due are placed before all others
-    # Note that the overall order is reversed once this key has been applied to every task
+    # Note that the overall order is then reversed once this key has been applied to every task
     progress = task.get_current_progress()
     return "A" if progress == "Not yet due" else progress
 
@@ -689,7 +689,7 @@ def creature_instance():
 
 def update_creature_dropdowns():
     creature_names = sorted([""] + list(garden.creatures))
-    types = {c.creature_type for c in garden.creatures.values() if c.creature_type}
+    types = {c.org_type for c in garden.creatures.values() if c.org_type}
     creature_types = sorted([""] + list(types))
     return (
         window["-CREATURE NAME-"].update(values=creature_names, size=(25, 10)),
@@ -717,7 +717,7 @@ def clear_plant_values():
 
 def update_plant_dropdowns():
     plant_names = sorted([""] + list(garden.plants))
-    types = {p.plant_type for p in garden.plants.values() if p.plant_type}
+    types = {p.org_type for p in garden.plants.values() if p.org_type}
     plant_types = sorted([""] + list(types))
     return (
         window["-PLANT NAME-"].update(values=plant_names, size=(25, 10)),
@@ -789,7 +789,7 @@ def view_creatures_window():
 
     creatures = [
         creature_fields(creature)
-        for creature in sorted_organisms(garden.creatures.values(), sort_key="creature_name")
+        for creature in sorted_organisms(garden.creatures.values(), sort_key="name")
     ]
 
     creature_table = header_row + creatures
@@ -819,7 +819,7 @@ def view_plants_window(plant, attr):
 
     plants = [
         plant_fields(plant)
-        for plant in sorted_organisms(garden.plants.values(), sort_key="plant_name")
+        for plant in sorted_organisms(garden.plants.values(), sort_key="name")
         if getattr(plant, attr)
     ]
 
@@ -878,7 +878,7 @@ def view_tasks_window():
 MONTHS = [str(month) for month in range(1, 13)]
 
 
-def fatal_error(error):
+def fatal_error_popup(error):
     sg.popup(
         "Sorry for the disruption.",
         "Unfortunately, gardenlife has stopped working because the following fatal error occured:",
@@ -1028,7 +1028,7 @@ try:
             view_creatures_window()
 
         elif event == "VIEW ALL PLANTS":
-            view_plants_window("plant", "plant_name")
+            view_plants_window("plant", "name")
 
         elif event == "VIEW EDIBLE PLANTS":
             view_plants_window("plant", "edible")
@@ -1130,8 +1130,8 @@ try:
 
             else:
                 creature = Creature(
-                    creature_name=c_name,
-                    creature_type=values["-CREATURE TYPE-"],
+                    name=c_name,
+                    org_type=values["-CREATURE TYPE-"],
                     appeared=c_appeared,
                     notes=values["-CREATURE NOTES-"],
                     impact=values["-CREATURE IMPACT SLIDER-"],
@@ -1160,8 +1160,8 @@ try:
 
         # If a creature is selected populate the relevant fields with its values
         elif event == "-CREATURE NAME-":
-            window["-CREATURE NAME-"].update(creature_instance().creature_name)
-            window["-CREATURE TYPE-"].update(creature_instance().creature_type)
+            window["-CREATURE NAME-"].update(creature_instance().name)
+            window["-CREATURE TYPE-"].update(creature_instance().org_type)
             window["-CREATURE APPEARED DATE-"].update(creature_instance().appeared)
             window["-CREATURE STATUS-"].update(creature_instance().status.get())
             window["-CREATURE NOTES-"].update(creature_instance().notes)
@@ -1190,8 +1190,8 @@ try:
 
             else:
                 plant = Plant(
-                    plant_name=p_name,
-                    plant_type=values["-PLANT TYPE-"],
+                    name=p_name,
+                    org_type=values["-PLANT TYPE-"],
                     planted=p_planted,
                     edible=values["-PLANT EDIBLE-"],
                     notes=values["-PLANT NOTES-"],
@@ -1221,8 +1221,8 @@ try:
 
         # If a plant is selected populate the relevant fields with its values
         elif event == "-PLANT NAME-":
-            window["-PLANT NAME-"].update(plant_instance().plant_name)
-            window["-PLANT TYPE-"].update(plant_instance().plant_type)
+            window["-PLANT NAME-"].update(plant_instance().name)
+            window["-PLANT TYPE-"].update(plant_instance().org_type)
             window["-PLANT PLANTED DATE-"].update(plant_instance().planted)
             window["-PLANT STATUS-"].update(plant_instance().status.get())
             window["-PLANT EDIBLE-"].update(plant_instance().edible)
@@ -1263,7 +1263,7 @@ try:
             # If there are no validation errors, create/update the task
             else:
                 task = Task(
-                    task_name=t_name,
+                    name=t_name,
                     assignee=values["-TASK ASSIGNEE-"],
                     length=values["-TASK LENGTH-"],
                     linked_creatures=values["-TASK LINKED CREATURES-"],
@@ -1379,7 +1379,7 @@ try:
 
 except Exception as e:
     logger.exception("Fatal Error")
-    fatal_error(e)
+    fatal_error_popup(e)
 
     ########################################################################
 
