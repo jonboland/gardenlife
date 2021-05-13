@@ -4,7 +4,6 @@ from operator import attrgetter
 import logging
 import pickle
 from tkinter.constants import SUNKEN, GROOVE
-import traceback
 import sys
 import webbrowser
 
@@ -14,6 +13,7 @@ from PySimpleGUI.PySimpleGUI import Column
 from garden import Garden
 from organisms import Creature, Plant
 from task import Task
+import popups
 
 
 logging.basicConfig(filename="gardenlife.log", format="%(asctime)s %(levelname)s %(name)s %(message)s")
@@ -872,87 +872,6 @@ def view_tasks_window():
             break
 
 
-# ------------------------------------ Popups -------------------------------------- #
-
-
-MONTHS = [str(month) for month in range(1, 13)]
-
-
-def fatal_error_popup(error):
-    sg.popup(
-        "Sorry for the disruption.",
-        "Unfortunately, gardenlife has stopped working because the following fatal error occured:",
-        error,
-        traceback.format_exc(),
-        title="Fatal Error",
-        keep_on_top=True,
-    )
-
-
-def garden_not_selected_popup(item):
-    return sg.popup(
-        f"It wasn't possible to add the {item} because a garden hasn't been selected. "
-        "Please choose a garden on the Manage Garden tab and try again.",
-        title="Garden Not Selected Error",
-        keep_on_top=True,
-    )
-
-
-def remove_confirmation_popup(name, element):
-    return sg.popup_ok_cancel(
-        f"Are you sure you want to remove {name}?",
-        f"This {element} will be permanently deleted.\n",
-        "Click OK if you wish to proceed.\n",
-        title="Remove Confirmation",
-        keep_on_top=True,
-    )
-
-
-def invalid_name_popup(field):
-    return sg.popup(
-        f"The {field} field cannot be blank. Please add a name and try again.",
-        title="Blank Name Error",
-        keep_on_top=True,
-    )
-
-
-def invalid_date_popup(field, date):
-    return sg.popup(
-        f"The {field} field contains {date}, which is not a valid date. "
-        "The format should be DD/MM/YYYY. Please correct and try again.",
-        title="Date Format Error",
-        keep_on_top=True,
-    )
-
-
-def invalid_digit_popup(field, digit):
-    return sg.popup(
-        f"The {field} field contains {digit}, which is not a valid digit. "
-        "Please correct and try again.",
-        title="Digit Error",
-        keep_on_top=True,
-    )
-
-
-def invalid_bymonth_popup(bymonth):
-    return sg.popup(
-        f'The By month field contains "{bymonth}", which includes an invalid month or months. '
-        "Months must be digits between 1 and 12, separated by a single space.",
-        "Please correct and try again.",
-        title="Month Format Error",
-        keep_on_top=True,
-    )
-
-
-def no_due_dates_popup():
-    return sg.popup(
-        "Based on the current schedule, there are no due dates for this task. "
-        "Please alter the schedule and try again.",
-        title="No Due Dates Error",
-        keep_on_top=True,
-    )
-
-
 # ---------------------------------- Event Loop ------------------------------------ #
 
 
@@ -1012,12 +931,7 @@ try:
             gardens_changed = False
 
         elif event == "About...":
-            sg.popup(
-                "gardenlife v1.0\n\n" "A garden management application created by Jon Boland.\n",
-                title="About...",
-                button_color=ACCENT_COLOR,
-                keep_on_top=True,
-            )
+            popups.about_popup()
 
         elif event == "Open web tutorial":
             webbrowser.open("https://github.com/jonboland/gardenlife/blob/master/README.rst")
@@ -1044,15 +958,15 @@ try:
             g_owners = values["-OWNER NAMES-"].strip()
             g_since = values["-OWNED SINCE-"].strip()
             if not g_name:
-                invalid_name_popup("garden name")
+                popups.invalid_name_popup("garden name")
                 continue
             if not g_owners:
-                invalid_name_popup("owner names")
+                popups.invalid_name_popup("owner names")
                 continue
             try:
                 valid_date = datetime.strptime(g_since, "%d/%m/%Y")
             except ValueError:
-                invalid_date_popup(field="Owned since", date=g_since)
+                popups.invalid_date_popup(field="Owned since", date=g_since)
             # If there are no validation errors, create/update the garden
             else:
                 cu_garden = Garden(
@@ -1073,7 +987,7 @@ try:
                 gardens_changed = True
 
         elif event == "GARDEN REMOVE":
-            g_confirmation = remove_confirmation_popup(garden.name, "garden")
+            g_confirmation = popups.remove_confirmation_popup(garden.name, "garden")
             if g_confirmation == "OK":
                 del gardens[values["-GARDEN NAME-"]]
                 update_garden_dropdown()
@@ -1117,16 +1031,16 @@ try:
             c_appeared = values["-CREATURE APPEARED DATE-"].strip()
             # Check that a garden has been selected
             if not values["-SELECT GARDEN-"]:
-                garden_not_selected_popup("creature")
+                popups.garden_not_selected_popup("creature")
                 continue
             if not c_name:
-                invalid_name_popup("creature name")
+                popups.invalid_name_popup("creature name")
                 continue
             try:
                 if c_appeared:
                     valid_date = datetime.strptime(c_appeared, "%d/%m/%Y")
             except ValueError:
-                invalid_date_popup(field="Appeared date", date=c_appeared)
+                popups.invalid_date_popup(field="Appeared date", date=c_appeared)
 
             else:
                 creature = Creature(
@@ -1147,7 +1061,7 @@ try:
                 gardens_changed = True
 
         elif event == "CREATURE REMOVE":
-            c_confirmation = remove_confirmation_popup(values["-CREATURE NAME-"], "creature")
+            c_confirmation = popups.remove_confirmation_popup(values["-CREATURE NAME-"], "creature")
             if c_confirmation == "OK":
                 garden.remove_item("creatures", values["-CREATURE NAME-"])
                 update_creature_dropdowns()
@@ -1177,16 +1091,16 @@ try:
             p_planted = values["-PLANT PLANTED DATE-"].strip()
             # Check that a garden has been selected
             if not values["-SELECT GARDEN-"]:
-                garden_not_selected_popup("plant")
+                popups.garden_not_selected_popup("plant")
                 continue
             if not p_name:
-                invalid_name_popup("plant name")
+                popups.invalid_name_popup("plant name")
                 continue
             try:
                 if p_planted:
                     valid_date = datetime.strptime(p_planted, "%d/%m/%Y")
             except ValueError:
-                invalid_date_popup(field="Planted date", date=p_planted)
+                popups.invalid_date_popup(field="Planted date", date=p_planted)
 
             else:
                 plant = Plant(
@@ -1208,7 +1122,7 @@ try:
                 gardens_changed = True
 
         elif event == "PLANT REMOVE":
-            p_confirmation = remove_confirmation_popup(values["-PLANT NAME-"], "plant")
+            p_confirmation = popups.remove_confirmation_popup(values["-PLANT NAME-"], "plant")
             if p_confirmation == "OK":
                 garden.remove_item("plants", values["-PLANT NAME-"])
                 update_plant_dropdowns()
@@ -1236,7 +1150,7 @@ try:
         if event == "TASK CREATE/UPDATE":
             # Check that a garden has been selected
             if not values["-SELECT GARDEN-"]:
-                garden_not_selected_popup("creature")
+                popups.garden_not_selected_popup("creature")
                 continue
             # Strip and validate task name and set schedule values
             # NB: Frequency is not validated because it's a readonly dropdown
@@ -1246,20 +1160,20 @@ try:
             bymonth = values["-TASK BY MONTH-"].strip()
             interval = values["-TASK INTERVAL-"].strip()
             if not t_name:
-                invalid_name_popup("task name")
+                popups.invalid_name_popup("task name")
                 continue
             try:
                 if start_date:
                     valid_date = datetime.strptime(start_date, "%d/%m/%Y")
             except ValueError:
-                invalid_date_popup(field="First due", date=start_date)
+                popups.invalid_date_popup(field="First due", date=start_date)
                 continue
             if count and not count.isdigit():
-                invalid_digit_popup(field="Count", digit=count)
-            elif bymonth and any(month not in MONTHS for month in bymonth.split(" ")):
-                invalid_bymonth_popup(bymonth)
+                popups.invalid_digit_popup(field="Count", digit=count)
+            elif bymonth and any(month not in popups.MONTHS for month in bymonth.split(" ")):
+                popups.invalid_bymonth_popup(bymonth)
             elif interval and not interval.isdigit():
-                invalid_digit_popup(field="Interval", digit=interval)
+                popups.invalid_digit_popup(field="Interval", digit=interval)
             # If there are no validation errors, create/update the task
             else:
                 task = Task(
@@ -1280,7 +1194,7 @@ try:
                 )
                 # Handle rare situation where provided shedule doesn't produce any due dates
                 if not task.schedule:
-                    no_due_dates_popup()
+                    popups.no_due_dates_popup()
                     continue
 
                 if values["-TASK STATUS-"] == "archived":
@@ -1306,7 +1220,7 @@ try:
                 gardens_changed = True
 
         elif event == "TASK REMOVE":
-            t_confirmation = remove_confirmation_popup(values["-TASK NAME-"], "task")
+            t_confirmation = popups.remove_confirmation_popup(values["-TASK NAME-"], "task")
             if t_confirmation == "OK":
                 garden.remove_item("tasks", values["-TASK NAME-"])
                 update_task_dropdown()
@@ -1357,7 +1271,7 @@ try:
                         window.Enable()
                         break
             else:
-                sg.popup("Task must be created before progress is added.", keep_on_top=True)
+                popups.task_not_created_popup()
 
         # If a task is selected populate the relevant fields with its values
         elif event == "-TASK NAME-":
@@ -1379,7 +1293,7 @@ try:
 
 except Exception as e:
     logger.exception("Fatal Error")
-    fatal_error_popup(e)
+    popups.fatal_error_popup(e)
 
     ########################################################################
 
