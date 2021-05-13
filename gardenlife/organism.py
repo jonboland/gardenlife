@@ -27,14 +27,30 @@ LEVELS = {
 
 
 class Organism:
-    def __init__(self, notes, age, impact, prevalence, trend, organism_kind):
+    def __init__(
+        self, 
+        name,  # Eg Badger, Mouse, Ash, Leek 
+        org_type,  # Eg Mammal, Rodent, Tree, Vegetable
+        notes=None,
+        age=None,
+        impact=3,
+        prevalence=3,
+        trend=3,
+    ):
+        self.name = name
+        self.org_type = org_type
         self.notes = notes
         self.age = age
         self.impact = impact
         self.prevalence = prevalence
         self.trend = trend
-        self.organism_kind = organism_kind
         self.status = Status()
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}({self.name}, {self.org_type})"
+
+    def __eq__(self, other):
+        return self.org_type == other.org_type and self.name == other.name
 
     @property
     def impact(self):
@@ -65,9 +81,6 @@ class Organism:
         if trend not in range(1, 6):
             raise ValueError(f"{trend} is not a valid trend level")
         self._trend = trend
-
-    def __repr__(self):
-        return f"{self.__class__.__name__} of type {self.kind}."
 
     def get_level(self, measure):
         return LEVELS[f"{measure}_levels"][getattr(self, measure)]
