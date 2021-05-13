@@ -89,7 +89,7 @@ class Garden:
         if category not in {"creatures", "plants", "tasks"}:
             raise ValueError(f"{category} is not a valid category")
         item_type = getattr(self, category)
-        item_name = getattr(item, f"{category[:-1]}_name")
+        item_name = getattr(item, "name")
         item_type[item_name] = item
         self.timestamp = datetime.today()
 
