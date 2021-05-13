@@ -194,8 +194,6 @@ creature_type = [
     ),
 ]
 
-creature_age = [item_label("Creature age:"), sg.Input(size=FIELD_SIZE, key="-CREATURE AGE-")]
-
 creature_appeared = [
     sg.Text("Appeared date:", size=(13, 1), pad=(0, (6, 30))),
     sg.Input(size=FIELD_SIZE, pad=(5, (6, 30)), tooltip="DD/MM/YYYY", key="-CREATURE APPEARED DATE-"),
@@ -251,7 +249,6 @@ creature_buttons = [
 creatures_left_column = [
     creature_name,
     creature_type,
-    creature_age,
     creature_appeared,
     creature_impact,
     creature_prevalence,
@@ -294,8 +291,6 @@ plant_type = [
         key="-PLANT TYPE-",
     ),
 ]
-
-plant_age = [item_label("Plant age:"), sg.Input(size=FIELD_SIZE, key="-PLANT AGE-")]
 
 plant_appeared = [
     sg.Text("Planted date:", size=(13, 1), pad=(0, (6, 30))),
@@ -362,7 +357,6 @@ plant_buttons = [
 plants_left_column = [
     plant_name,
     plant_type,
-    plant_age,
     plant_appeared,
     plant_impact,
     plant_prevalence,
@@ -579,17 +573,17 @@ window = sg.Window("gardenlife", layout, keep_on_top=True, enable_close_attempte
 # ----------------------- Summary Event Headings & Functions ----------------------- #
 
 
-CREATURE_HEADS = ("Name", "Type", "Appeared", "Age", "Impact", "Prevalence", "Trend", "Status")
-PLANT_HEADS = ("Name", "Type", "Planted", "Age", "Impact", "Prevalence", "Trend", "Status")
+CREATURE_HEADS = ("Name", "Type", "Appeared", "Impact", "Prevalence", "Trend", "Status")
+PLANT_HEADS = ("Name", "Type", "Planted", "Impact", "Prevalence", "Trend", "Status")
 TASK_HEADS = ("Name", "Progress", "Next Due", "Assignee", "Length", "Creatures", "Plants", "Status")
 
 
 def summary_head_format(title):
-    return sg.Input(title, size=(11, 1), text_color="white", background_color=ACCENT_COLOR)
+    return sg.Input(title, size=(13, 1), text_color="white", background_color=ACCENT_COLOR)
 
 
 def summary_field_format(value):
-    return sg.Input(value, size=(11, 1))
+    return sg.Input(value, size=(13, 1))
 
 
 def organism_column_format(table):
@@ -601,7 +595,6 @@ def creature_fields(creature):
         creature.creature_name,
         creature.creature_type,
         creature.appeared,
-        creature.age,
         creature.get_level("impact"),
         creature.get_level("prevalence"),
         creature.get_level("trend"),
@@ -615,7 +608,6 @@ def plant_fields(plant):
         plant.plant_name,
         plant.plant_type,
         plant.planted,
-        plant.age,
         plant.get_level("impact"),
         plant.get_level("prevalence"),
         plant.get_level("trend"),
@@ -706,7 +698,7 @@ def update_creature_dropdowns():
 
 
 def clear_creature_values():
-    for value in ("NAME", "TYPE", "AGE", "APPEARED DATE", "STATUS", "NOTES"):
+    for value in ("NAME", "TYPE", "APPEARED DATE", "STATUS", "NOTES"):
         window[f"-CREATURE {value}-"].update("")
     for value in ("IMPACT", "PREVALENCE", "TREND"):
         window[f"-CREATURE {value} SLIDER-"].update(3)
@@ -717,7 +709,7 @@ def plant_instance():
 
 
 def clear_plant_values():
-    for value in ("NAME", "TYPE", "AGE", "PLANTED DATE", "EDIBLE", "STATUS", "NOTES"):
+    for value in ("NAME", "TYPE", "PLANTED DATE", "EDIBLE", "STATUS", "NOTES"):
         window[f"-PLANT {value}-"].update("")
     for value in ("IMPACT", "PREVALENCE", "TREND"):
         window[f"-PLANT {value} SLIDER-"].update(3)
@@ -864,7 +856,7 @@ def view_tasks_window():
 
     task_table = header_row + tasks
 
-    task_summary_column = [sg.Column(task_table, size=(800, 500), scrollable=True)]
+    task_summary_column = [sg.Column(task_table, size=(880, 500), scrollable=True)]
 
     task_summary_layout = [task_summary_column, [sg.Button("Close")]]
 
@@ -1140,7 +1132,6 @@ try:
                 creature = Creature(
                     creature_name=c_name,
                     creature_type=values["-CREATURE TYPE-"],
-                    age=values["-CREATURE AGE-"],
                     appeared=c_appeared,
                     notes=values["-CREATURE NOTES-"],
                     impact=values["-CREATURE IMPACT SLIDER-"],
@@ -1171,7 +1162,6 @@ try:
         elif event == "-CREATURE NAME-":
             window["-CREATURE NAME-"].update(creature_instance().creature_name)
             window["-CREATURE TYPE-"].update(creature_instance().creature_type)
-            window["-CREATURE AGE-"].update(creature_instance().age)
             window["-CREATURE APPEARED DATE-"].update(creature_instance().appeared)
             window["-CREATURE STATUS-"].update(creature_instance().status.get())
             window["-CREATURE NOTES-"].update(creature_instance().notes)
@@ -1202,7 +1192,6 @@ try:
                 plant = Plant(
                     plant_name=p_name,
                     plant_type=values["-PLANT TYPE-"],
-                    age=values["-PLANT AGE-"],
                     planted=p_planted,
                     edible=values["-PLANT EDIBLE-"],
                     notes=values["-PLANT NOTES-"],
@@ -1234,7 +1223,6 @@ try:
         elif event == "-PLANT NAME-":
             window["-PLANT NAME-"].update(plant_instance().plant_name)
             window["-PLANT TYPE-"].update(plant_instance().plant_type)
-            window["-PLANT AGE-"].update(plant_instance().age)
             window["-PLANT PLANTED DATE-"].update(plant_instance().planted)
             window["-PLANT STATUS-"].update(plant_instance().status.get())
             window["-PLANT EDIBLE-"].update(plant_instance().edible)
