@@ -23,10 +23,6 @@ def clear_summary_values(window):
         window[f"-SUMMARY {value}-"].update("")
 
 
-def creature_instance(garden, values):
-    return garden.creatures.get(values["-CREATURE NAME-"])
-
-
 def update_creature_dropdowns(window, garden):
     creature_names = sorted([""] + list(garden.creatures))
     types = {c.org_type for c in garden.creatures.values() if c.org_type}
@@ -44,10 +40,6 @@ def clear_creature_values(window):
         window[f"-CREATURE {value} SLIDER-"].update(3)
 
 
-def plant_instance(garden, values):
-    return garden.plants.get(values["-PLANT NAME-"])
-
-
 def clear_plant_values(window):
     for value in ("NAME", "TYPE", "PLANTED DATE", "EDIBLE", "STATUS", "NOTES"):
         window[f"-PLANT {value}-"].update("")
@@ -63,10 +55,6 @@ def update_plant_dropdowns(window, garden):
         window["-PLANT NAME-"].update(values=plant_names, size=(25, 10)),
         window["-PLANT TYPE-"].update(values=plant_types, size=(25, 10)),
     )
-
-
-def task_instance(garden, values):
-    return garden.tasks.get(values["-TASK NAME-"])
 
 
 def clear_task_values(window):
@@ -98,10 +86,10 @@ def clear_organism_links(window, garden):
     window["-TASK LINKED PLANTS-"].update(sorted(list(garden.plants)))
 
 
-def update_all_item_dropdowns():
-    update_creature_dropdowns()
-    update_plant_dropdowns()
-    update_task_dropdown()
+def update_all_item_dropdowns(window, garden):
+    update_creature_dropdowns(window, garden)
+    update_plant_dropdowns(window, garden)
+    update_task_dropdown(window, garden)
 
 
 def clear_all_item_dropdowns(window):
@@ -109,14 +97,14 @@ def clear_all_item_dropdowns(window):
         window[f"-{value}-"].update(values="", size=(25, 10))
 
 
-def clear_all_item_values_and_links():
-    clear_creature_values()
-    clear_plant_values()
-    clear_task_values()
-    clear_organism_links()
+def clear_all_item_values_and_links(window, garden):
+    clear_creature_values(window)
+    clear_plant_values(window)
+    clear_task_values(window)
+    clear_organism_links(window, garden)
 
 
-def clear_all_values_and_links():
-    clear_garden_values()
-    clear_summary_values()
-    clear_all_item_values_and_links()
+def clear_all_values_and_links(window, garden):
+    clear_garden_values(window)
+    clear_summary_values(window)
+    clear_all_item_values_and_links(window, garden)
