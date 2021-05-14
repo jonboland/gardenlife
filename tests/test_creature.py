@@ -4,17 +4,19 @@ import context
 import organisms
 
 
+
+
 @pytest.fixture
 def badger():
     return organisms.Creature(
         "badger",
         "mammal",
-        "03/07/2020",
-        "Digs holes in various parts of the garden.",
-        10,
-        3,
-        2,
-        4,
+        appeared="03/07/2020",
+        notes="Digs holes in various parts of the garden.",
+        age=10,
+        impact=3,
+        prevalence=2,
+        trend=4,
     )
 
 

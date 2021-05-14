@@ -63,12 +63,6 @@ class Garden:
         acres = "acre" if self.size in {1, "1"} else "acres"
         return f"{self.size} {acres}"
 
-    @classmethod
-    def from_string(cls, garden_details):
-        """Construct a garden from a hyphen separated string."""
-        name, location, size, since, *owners = garden_details.split("-")
-        return cls(name, location, size, since, *owners)
-
     @staticmethod
     def season(current_month=None):
         """Return the current season."""
