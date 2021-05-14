@@ -32,9 +32,9 @@ class Task:
     def __eq__(self, other):
         return repr(self) == other
 
-    def set_schedule(self, start_date=None, freq=None, count=None, bymonth=None, interval=None):
-        """Sets the task's scheduled dates."""
-        # Store the raw schedule values to repopulate UI fields
+    def set_schedule(self, start_date, freq, count, bymonth, interval):
+        """Sets the task's scheduled dates using dateutils.rrule."""
+        # Stores the raw schedule values to repopulate UI fields
         self.raw_schedule = {
             "start date": start_date,
             "freq": freq,
@@ -42,16 +42,24 @@ class Task:
             "bymonth": bymonth,
             "interval": interval,
         }
-        # Convert string to datetime object. Set start date to today if no date supplied
+        # Converts string to datetime object. Set start date to today if not supplied
         start_date = self._set_date(start_date)
+        # Sets the frequency to the required value or monthly if not supplied
         freq = FREQS.get(freq, FREQS["monthly"])
         count = int(count) if count else 1
         bymonth = [int(month) for month in bymonth.split(" ")] if bymonth else None
         interval = int(interval) if interval else 1
+        # Creates the specified list of scheduled dates with dateutils.rrule
         self.schedule = list(
-            rrule(dtstart=start_date, freq=freq, count=count, bymonth=bymonth, interval=interval)
+            rrule(
+                dtstart=start_date,
+                freq=freq,
+                count=count,
+                bymonth=bymonth,
+                interval=interval,
+            )
         )
-    
+
     def update_completed_dates(self, all_progress):
         """
         Takes a dict containing all scheduled dates as keys in string format.
@@ -103,7 +111,7 @@ class Task:
             if missed_dates_no_completed == 1:
                 return "Overdue"
             # If number of missed dates isn't 1 it must be greater than 1
-            return "Very overdue"        
+            return "Very overdue"
 
         if current_date in self.schedule and current_date > self.completed_dates[-1]:
             return "Due"

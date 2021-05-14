@@ -28,7 +28,7 @@ def unsaved_changes_window(window, gardens):
 
     while True:
         confirm_event, confirm_values = confirm_window.read()
-        print(confirm_event, confirm_values)
+        # print(confirm_event, confirm_values)
 
         if confirm_event == "Save":
             with open("gardens.pickle", "wb") as file:
@@ -63,7 +63,7 @@ def add_progress_window(window, task):
 
     while True:
         progress_event, progress_values = progress_window.read()
-        print(progress_event, progress_values)
+        # print(progress_event, progress_values)
 
         if progress_event == "Add":
             task.update_completed_dates(progress_values)
@@ -94,7 +94,7 @@ def view_creatures_window(window, garden):
 
     while True:
         creature_sum_event, creature_sum_values = creature_summary_window.read()
-        print(creature_sum_event, creature_sum_values)
+        # print(creature_sum_event, creature_sum_values)
 
         if creature_sum_event in (sg.WIN_CLOSED, "Close"):
             creature_summary_window.close()
@@ -123,7 +123,7 @@ def view_plants_window(window, garden, attr):
 
     while True:
         plant_sum_event, plant_sum_values = plant_summary_window.read()
-        print(plant_sum_event, plant_sum_values)
+        # print(plant_sum_event, plant_sum_values)
 
         if plant_sum_event in (sg.WIN_CLOSED, "Close"):
             plant_summary_window.close()
@@ -158,7 +158,7 @@ def view_tasks_window(window, garden):
 
     while True:
         task_sum_event, task_sum_values = task_summary_window.read()
-        print(task_sum_event, task_sum_values)
+        # print(task_sum_event, task_sum_values)
 
         if task_sum_event in (sg.WIN_CLOSED, "Close"):
             task_summary_window.close()
