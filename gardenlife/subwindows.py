@@ -6,7 +6,7 @@ import PySimpleGUI as sg
 from constants import ACCENT_COLOR, CREATURE_HEADS, PLANT_HEADS, TASK_HEADS
 import summary_funcs
 
- 
+
 def unsaved_changes_window(window, gardens):
     window.Disable()
 
@@ -135,9 +135,7 @@ def view_tasks_window(window, garden):
     window.Disable()
 
     name_head = [
-        sg.Input(
-            TASK_HEADS[0], size=(18, 1), text_color="white", background_color=ACCENT_COLOR
-        )
+        sg.Input(TASK_HEADS[0], size=(18, 1), text_color="white", background_color=ACCENT_COLOR)
     ]
 
     other_head = [summary_funcs.summary_head_format(title) for title in TASK_HEADS[1:]]

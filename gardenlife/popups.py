@@ -34,7 +34,7 @@ def garden_not_selected(item):
 def task_not_created():
     sg.popup(
         "The task must be created before progress is added.\n",
-        title="Task Not Created Error", 
+        title="Task Not Created Error",
         keep_on_top=True,
     )
 

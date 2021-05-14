@@ -93,7 +93,13 @@ def update_all_item_dropdowns(window, garden):
 
 
 def clear_all_item_dropdowns(window):
-    for value in ("CREATURE NAME", "CREATURE TYPE", "PLANT NAME", "PLANT TYPE", "TASK NAME"):
+    for value in (
+        "CREATURE NAME",
+        "CREATURE TYPE",
+        "PLANT NAME",
+        "PLANT TYPE",
+        "TASK NAME",
+    ):
         window[f"-{value}-"].update(values="", size=(25, 10))
 
 
@@ -108,3 +114,4 @@ def clear_all_values_and_links(window, garden):
     clear_garden_values(window)
     clear_summary_values(window)
     clear_all_item_values_and_links(window, garden)
+    

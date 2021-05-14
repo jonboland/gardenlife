@@ -9,7 +9,7 @@ from task import Task
 @pytest.fixture
 def cut_hedges():
     task = Task(
-        name="cut hedges", 
+        name="cut hedges",
         description="Cut all hedges in garden ready for Summer and Winter.",
         assignee="Bob",
         length="8",
@@ -23,7 +23,9 @@ def cut_hedges():
 @pytest.fixture
 def cut_hedges_too():
     task = Task("cut hedges")
-    task.set_schedule(freq="", start_date="01/05/2020", count="", bymonth="", interval=1)
+    task.set_schedule(
+        freq="", start_date="01/05/2020", count="", bymonth="", interval=1
+    )
     return task
 
 
@@ -32,7 +34,9 @@ def prune_tree():
     task = Task("prune tree", "Prune tree by front gate.", "Jill", "2")
     return task
 
+
 # Status
+
 
 def test_status_current(cut_hedges):
     assert cut_hedges.status.get() == "current"
@@ -48,7 +52,9 @@ def test_status_unarchived(cut_hedges):
     cut_hedges.status.unarchive()
     assert cut_hedges.status.get() == "current"
 
+
 # Equality
+
 
 def test_equality_comparison_false(cut_hedges, prune_tree):
     assert (cut_hedges == prune_tree) == False
@@ -57,11 +63,13 @@ def test_equality_comparison_false(cut_hedges, prune_tree):
 def test_equality_comparison_true(cut_hedges, cut_hedges_too):
     assert (cut_hedges == cut_hedges_too) == True
 
+
 # Set schedule
+
 
 def test_set_schedule_without_start_date(prune_tree):
     prune_tree.set_schedule(start_date="", freq="", count="", bymonth="", interval="")
-    assert prune_tree.schedule[0].strftime("%d/%m/%Y")  == time.strftime("%d/%m/%Y")
+    assert prune_tree.schedule[0].strftime("%d/%m/%Y") == time.strftime("%d/%m/%Y")
 
 
 def test_set_schedule_with_start_date(prune_tree):
@@ -75,7 +83,9 @@ def test_set_schedule_with_start_date(prune_tree):
         datetime(2021, 1, 1, 0, 0),
     ]
 
+
 # Add completed dates
+
 
 def test_add_one_completed_date(cut_hedges):
     scheduled_dates = {
@@ -88,6 +98,7 @@ def test_add_one_completed_date(cut_hedges):
     cut_hedges.update_completed_dates(scheduled_dates)
     assert cut_hedges.completed_dates == [datetime(2020, 5, 1, 0, 0)]
 
+
 def test_add_two_completed_date(cut_hedges):
     scheduled_dates = {
         "01/05/2020": True,
@@ -98,9 +109,10 @@ def test_add_two_completed_date(cut_hedges):
     }
     cut_hedges.update_completed_dates(scheduled_dates)
     assert cut_hedges.completed_dates == [
-        datetime(2020, 5, 1, 0, 0), 
+        datetime(2020, 5, 1, 0, 0),
         datetime(2021, 5, 1, 0, 0),
     ]
+
 
 def test_add_same_two_completed_date_twice(cut_hedges):
     scheduled_dates = {
@@ -113,9 +125,10 @@ def test_add_same_two_completed_date_twice(cut_hedges):
     cut_hedges.update_completed_dates(scheduled_dates)
     cut_hedges.update_completed_dates(scheduled_dates)
     assert cut_hedges.completed_dates == [
-        datetime(2020, 5, 1, 0, 0), 
+        datetime(2020, 5, 1, 0, 0),
         datetime(2021, 5, 1, 0, 0),
     ]
+
 
 def test_remove_one_completed_date(cut_hedges):
     scheduled_dates = {
@@ -137,6 +150,7 @@ def test_remove_one_completed_date(cut_hedges):
     cut_hedges.update_completed_dates(scheduled_dates)
     assert cut_hedges.completed_dates == []
 
+
 def test_remove_two_completed_dates(cut_hedges):
     scheduled_dates = {
         "01/05/2020": True,
@@ -147,7 +161,7 @@ def test_remove_two_completed_dates(cut_hedges):
     }
     cut_hedges.update_completed_dates(scheduled_dates)
     assert cut_hedges.completed_dates == [
-        datetime(2020, 5, 1, 0, 0), 
+        datetime(2020, 5, 1, 0, 0),
         datetime(2021, 5, 1, 0, 0),
         datetime(2022, 5, 1, 0, 0),
     ]
@@ -161,7 +175,9 @@ def test_remove_two_completed_dates(cut_hedges):
     cut_hedges.update_completed_dates(scheduled_dates)
     assert cut_hedges.completed_dates == [datetime(2020, 5, 1, 0, 0)]
 
+
 # Get all progress
+
 
 def test_get_all_progress_no_completed_dates(cut_hedges):
     assert cut_hedges.get_all_progress() == {
@@ -184,7 +200,9 @@ def test_get_all_progress_with_completed_dates(cut_hedges):
         "01/05/2022": False,
     }
 
+
 # Get current progress
+
 
 def test_current_progress_no_completed_dates_not_yet_due(cut_hedges):
     current_progress = cut_hedges.get_current_progress(current_date="30/04/2020")
@@ -233,7 +251,9 @@ def test_current_progress_with_completed_dates_no_missed_dates(cut_hedges):
     current_progress = cut_hedges.get_current_progress(current_date="01/04/2021")
     assert current_progress == "Completed"
 
+
 # Get next date date
+
 
 def test_get_next_due_date_no_completed_dates(cut_hedges):
     next_due = cut_hedges.get_next_due_date()
