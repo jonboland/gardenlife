@@ -9,13 +9,14 @@ import webbrowser
 import PySimpleGUI as sg
 from PySimpleGUI.PySimpleGUI import Column
 
+from constants import ACCENT_COLOR, FIELD_SIZE, IB_TEXT, MG_FIELD_SIZE, MONTHS, RB_TEXT
 from garden import Garden
 from organisms import Creature, Plant
 from task import Task
-from constants import ACCENT_COLOR, FIELD_SIZE, IB_TEXT, MG_FIELD_SIZE, MONTHS, RB_TEXT
 import event_funcs
 import popups
 import subwindows
+import tab_funcs
 
 
 logging.basicConfig(filename="gardenlife.log", format="%(asctime)s %(levelname)s %(name)s %(message)s")
@@ -87,28 +88,6 @@ summary_tab = [
 ]
 
 
-# ------------------------ Shared Tab Functions & Constants ------------------------ #
-
-
-def item_label(label):
-    return sg.Text(label, size=(13, 1), pad=(0, 10))
-
-
-def organism_slider_label(label):
-    return sg.Text(label, size=(12, 1), pad=((0, 8), (20, 0)))
-
-
-def organism_slider(key=None, tooltip=None):
-    return sg.Slider(
-        range=(1, 5),
-        key=key,
-        orientation="horizontal",
-        default_value=3,
-        size=(19.7, 19),
-        tooltip=tooltip,
-    )
-
-
 # -------------------------------- Manage Garden Tab ------------------------------- #
 
 
@@ -120,12 +99,8 @@ garden_details = {
 }
 
 
-def garden_label_format(label):
-    return sg.Text(label, size=(15, 1), pad=(0, 10), justification="right")
-
-
 select_garden = [
-    garden_label_format("Select garden:"),
+    tab_funcs.garden_label_format("Select garden:"),
     sg.Combo(
         sorted(list(gardens)),
         default_value=garden.name,
@@ -141,14 +116,14 @@ garden_blank = [sg.Text("", size=(0, 1))]  # Blank row to add space below select
 
 garden_details = [
     [
-        garden_label_format(label),
+        tab_funcs.garden_label_format(label),
         sg.Input(value, size=MG_FIELD_SIZE, key=f"-{label[:-1].upper()}-"),
     ]
     for label, value in garden_details.items()
 ]
 
 owned_since = [
-    garden_label_format("Owned since:"),
+    tab_funcs.garden_label_format("Owned since:"),
     sg.Input(garden.since, size=MG_FIELD_SIZE, tooltip="DD/MM/YYYY", key="-OWNED SINCE-"),
     sg.CalendarButton("PICK", format="%d/%m/%Y", pad=(0, 0)),
 ]
@@ -166,7 +141,7 @@ garden_tab = [[sg.Column(garden_elements, pad=((30, 40), 40))]]
 
 
 creature_name = [
-    item_label("Creature name:"),
+    tab_funcs.item_label("Creature name:"),
     sg.Combo(
         sorted([""] + list(garden.creatures)),
         size=(25, 10),
@@ -176,7 +151,7 @@ creature_name = [
 ]
 
 creature_type = [
-    item_label("Creature type:"),
+    tab_funcs.item_label("Creature type:"),
     sg.Combo(
         sorted([""] + list(set(c.org_type for c in garden.creatures.values() if c.org_type))),
         size=(25, 10),
@@ -191,8 +166,8 @@ creature_appeared = [
 ]
 
 creature_impact = [
-    organism_slider_label("Impact level:"),
-    organism_slider(
+    tab_funcs.organism_slider_label("Impact level:"),
+    tab_funcs.organism_slider(
         key="-CREATURE IMPACT SLIDER-",
         tooltip="Impact levels — 1: very negative, 2: negative, "
         "3: neutral, 4: positive, 5: very positive",
@@ -200,16 +175,16 @@ creature_impact = [
 ]
 
 creature_prevalence = [
-    organism_slider_label("Prevalence level:"),
-    organism_slider(
+    tab_funcs.organism_slider_label("Prevalence level:"),
+    tab_funcs.organism_slider(
         key="-CREATURE PREVALENCE SLIDER-",
         tooltip="Prevalence levels — 1: very low, 2: low, " "3: medium, 4: high, 5: very high",
     ),
 ]
 
 creature_trend = [
-    organism_slider_label("Trend level:"),
-    organism_slider(
+    tab_funcs.organism_slider_label("Trend level:"),
+    tab_funcs.organism_slider(
         key="-CREATURE TREND SLIDER-",
         tooltip="Trend levels — 1: rapidly decreasing, 2: decreasing, "
         "3: stable, 4: increasing, 5: rapidly increasing",
@@ -264,7 +239,7 @@ creatures_tab = [
 
 
 plant_name = [
-    item_label("Plant name:"),
+    tab_funcs.item_label("Plant name:"),
     sg.Combo(
         sorted([""] + list(garden.plants)),
         size=(25, 10),
@@ -274,7 +249,7 @@ plant_name = [
 ]
 
 plant_type = [
-    item_label("Plant type:"),
+    tab_funcs.item_label("Plant type:"),
     sg.Combo(
         sorted([""] + list(set(p.org_type for p in garden.plants.values() if p.org_type))),
         size=(25, 10),
@@ -294,8 +269,8 @@ plant_appeared = [
 ]
 
 plant_impact = [
-    organism_slider_label("Impact level:"),
-    organism_slider(
+    tab_funcs.organism_slider_label("Impact level:"),
+    tab_funcs.organism_slider(
         key="-PLANT IMPACT SLIDER-",
         tooltip="Impact levels — 1: very negative, 2: negative, "
         "3: neutral, 4: positive, 5: very positive",
@@ -303,16 +278,16 @@ plant_impact = [
 ]
 
 plant_prevalence = [
-    organism_slider_label("Prevalence level:"),
-    organism_slider(
+    tab_funcs.organism_slider_label("Prevalence level:"),
+    tab_funcs.organism_slider(
         key="-PLANT PREVALENCE SLIDER-",
         tooltip="Prevalence levels — 1: very low, 2: low, " "3: medium, 4: high, 5: very high",
     ),
 ]
 
 plant_trend = [
-    organism_slider_label("Trend level:"),
-    organism_slider(
+    tab_funcs.organism_slider_label("Trend level:"),
+    tab_funcs.organism_slider(
         key="-PLANT TREND SLIDER-",
         tooltip="Trend levels — 1: rapidly decreasing, 2: decreasing, "
         "3: stable, 4: increasing, 5: rapidly increasing",
@@ -373,7 +348,7 @@ plants_tab = [
 
 
 task_name = [
-    item_label("Task name:"),
+    tab_funcs.item_label("Task name:"),
     sg.Combo(
         sorted([""] + list(garden.tasks)),
         size=FIELD_SIZE,
@@ -383,12 +358,12 @@ task_name = [
 ]
 
 task_progress = [
-    item_label("Progress:"),
+    tab_funcs.item_label("Progress:"),
     sg.Text("", size=(22, 1), relief=SUNKEN, key="-TASK PROGRESS-"),
 ]
 
 task_next_due = [
-    item_label("Next due:"),
+    tab_funcs.item_label("Next due:"),
     sg.Text("", size=(22, 1), relief=SUNKEN, key="-TASK NEXT DUE-"),
 ]
 
