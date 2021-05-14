@@ -9,13 +9,14 @@ import webbrowser
 import PySimpleGUI as sg
 from PySimpleGUI.PySimpleGUI import Column
 
+from constants import ACCENT_COLOR, FIELD_SIZE, IB_TEXT, MG_FIELD_SIZE, MONTHS, RB_TEXT
 from garden import Garden
 from organisms import Creature, Plant
 from task import Task
-from accent import ACCENT_COLOR
 import event_funcs
 import popups
 import subwindows
+import tab_funcs
 
 
 logging.basicConfig(filename="gardenlife.log", format="%(asctime)s %(levelname)s %(name)s %(message)s")
@@ -50,8 +51,6 @@ menu_definition = [["File", ["Save", "Exit"]], ["Help", ["About...", "Open web t
 # ------------------------------- Garden Summary Tab ------------------------------- #
 
 
-REPORT_BUTTON_TEXT = ("VIEW ALL CREATURES", "VIEW ALL PLANTS", "VIEW EDIBLE PLANTS", "VIEW ALL TASKS")
-
 outstanding_tasks = sum(
     task.get_current_progress() in {"Due", "Overdue", "Very overdue"} for task in garden.tasks.values()
 )
@@ -78,7 +77,7 @@ summary = [
 ]
 
 report_buttons = [
-    [sg.Button(name, size=(20, 2), pad=(0, 10), border_width=2)] for name in REPORT_BUTTON_TEXT
+    [sg.Button(name, size=(20, 2), pad=(0, 10), border_width=2)] for name in RB_TEXT
 ]
 
 summary_tab = [
@@ -89,36 +88,7 @@ summary_tab = [
 ]
 
 
-# ------------------------ Shared Tab Functions & Constants ------------------------ #
-
-
-ITEM_BUTTON_TEXT = ("CREATE/UPDATE", "REMOVE")
-FIELD_SIZE = (25, 1)
-
-
-def item_label(label):
-    return sg.Text(label, size=(13, 1), pad=(0, 10))
-
-
-def organism_slider_label(label):
-    return sg.Text(label, size=(12, 1), pad=((0, 8), (20, 0)))
-
-
-def organism_slider(key=None, tooltip=None):
-    return sg.Slider(
-        range=(1, 5),
-        key=key,
-        orientation="horizontal",
-        default_value=3,
-        size=(19.7, 19),
-        tooltip=tooltip,
-    )
-
-
 # -------------------------------- Manage Garden Tab ------------------------------- #
-
-
-MG_FIELD_SIZE = (34, 1)
 
 
 garden_details = {
@@ -129,12 +99,8 @@ garden_details = {
 }
 
 
-def garden_label_format(label):
-    return sg.Text(label, size=(15, 1), pad=(0, 10), justification="right")
-
-
 select_garden = [
-    garden_label_format("Select garden:"),
+    tab_funcs.garden_label_format("Select garden:"),
     sg.Combo(
         sorted(list(gardens)),
         default_value=garden.name,
@@ -150,20 +116,20 @@ garden_blank = [sg.Text("", size=(0, 1))]  # Blank row to add space below select
 
 garden_details = [
     [
-        garden_label_format(label),
+        tab_funcs.garden_label_format(label),
         sg.Input(value, size=MG_FIELD_SIZE, key=f"-{label[:-1].upper()}-"),
     ]
     for label, value in garden_details.items()
 ]
 
 owned_since = [
-    garden_label_format("Owned since:"),
+    tab_funcs.garden_label_format("Owned since:"),
     sg.Input(garden.since, size=MG_FIELD_SIZE, tooltip="DD/MM/YYYY", key="-OWNED SINCE-"),
     sg.CalendarButton("PICK", format="%d/%m/%Y", pad=(0, 0)),
 ]
 
 garden_buttons = [
-    sg.Button(name, size=(18, 2), pad=((32.5, 0), 30), key=f"GARDEN {name}") for name in ITEM_BUTTON_TEXT
+    sg.Button(name, size=(18, 2), pad=((32.5, 0), 30), key=f"GARDEN {name}") for name in IB_TEXT
 ]
 
 garden_elements = [select_garden, garden_blank] + garden_details + [owned_since, garden_buttons]
@@ -175,7 +141,7 @@ garden_tab = [[sg.Column(garden_elements, pad=((30, 40), 40))]]
 
 
 creature_name = [
-    item_label("Creature name:"),
+    tab_funcs.item_label("Creature name:"),
     sg.Combo(
         sorted([""] + list(garden.creatures)),
         size=(25, 10),
@@ -185,7 +151,7 @@ creature_name = [
 ]
 
 creature_type = [
-    item_label("Creature type:"),
+    tab_funcs.item_label("Creature type:"),
     sg.Combo(
         sorted([""] + list(set(c.org_type for c in garden.creatures.values() if c.org_type))),
         size=(25, 10),
@@ -200,8 +166,8 @@ creature_appeared = [
 ]
 
 creature_impact = [
-    organism_slider_label("Impact level:"),
-    organism_slider(
+    tab_funcs.organism_slider_label("Impact level:"),
+    tab_funcs.organism_slider(
         key="-CREATURE IMPACT SLIDER-",
         tooltip="Impact levels — 1: very negative, 2: negative, "
         "3: neutral, 4: positive, 5: very positive",
@@ -209,16 +175,16 @@ creature_impact = [
 ]
 
 creature_prevalence = [
-    organism_slider_label("Prevalence level:"),
-    organism_slider(
+    tab_funcs.organism_slider_label("Prevalence level:"),
+    tab_funcs.organism_slider(
         key="-CREATURE PREVALENCE SLIDER-",
         tooltip="Prevalence levels — 1: very low, 2: low, " "3: medium, 4: high, 5: very high",
     ),
 ]
 
 creature_trend = [
-    organism_slider_label("Trend level:"),
-    organism_slider(
+    tab_funcs.organism_slider_label("Trend level:"),
+    tab_funcs.organism_slider(
         key="-CREATURE TREND SLIDER-",
         tooltip="Trend levels — 1: rapidly decreasing, 2: decreasing, "
         "3: stable, 4: increasing, 5: rapidly increasing",
@@ -242,7 +208,7 @@ creature_notes_field = [sg.Multiline(size=(35, 10), pad=(0, 10), key="-CREATURE 
 
 creature_buttons = [
     sg.Button(name, size=(15, 2), pad=((0, 7), (32, 0)), key=f"CREATURE {name}")
-    for name in ITEM_BUTTON_TEXT
+    for name in IB_TEXT
 ]
 
 creatures_left_column = [
@@ -273,7 +239,7 @@ creatures_tab = [
 
 
 plant_name = [
-    item_label("Plant name:"),
+    tab_funcs.item_label("Plant name:"),
     sg.Combo(
         sorted([""] + list(garden.plants)),
         size=(25, 10),
@@ -283,7 +249,7 @@ plant_name = [
 ]
 
 plant_type = [
-    item_label("Plant type:"),
+    tab_funcs.item_label("Plant type:"),
     sg.Combo(
         sorted([""] + list(set(p.org_type for p in garden.plants.values() if p.org_type))),
         size=(25, 10),
@@ -303,8 +269,8 @@ plant_appeared = [
 ]
 
 plant_impact = [
-    organism_slider_label("Impact level:"),
-    organism_slider(
+    tab_funcs.organism_slider_label("Impact level:"),
+    tab_funcs.organism_slider(
         key="-PLANT IMPACT SLIDER-",
         tooltip="Impact levels — 1: very negative, 2: negative, "
         "3: neutral, 4: positive, 5: very positive",
@@ -312,16 +278,16 @@ plant_impact = [
 ]
 
 plant_prevalence = [
-    organism_slider_label("Prevalence level:"),
-    organism_slider(
+    tab_funcs.organism_slider_label("Prevalence level:"),
+    tab_funcs.organism_slider(
         key="-PLANT PREVALENCE SLIDER-",
         tooltip="Prevalence levels — 1: very low, 2: low, " "3: medium, 4: high, 5: very high",
     ),
 ]
 
 plant_trend = [
-    organism_slider_label("Trend level:"),
-    organism_slider(
+    tab_funcs.organism_slider_label("Trend level:"),
+    tab_funcs.organism_slider(
         key="-PLANT TREND SLIDER-",
         tooltip="Trend levels — 1: rapidly decreasing, 2: decreasing, "
         "3: stable, 4: increasing, 5: rapidly increasing",
@@ -350,7 +316,7 @@ plant_notes_field = [sg.Multiline(size=(35, 10), pad=(0, 10), key="-PLANT NOTES-
 
 plant_buttons = [
     sg.Button(name, size=(15, 2), pad=((0, 7), (32, 0)), key=f"PLANT {name}")
-    for name in ITEM_BUTTON_TEXT
+    for name in IB_TEXT
 ]
 
 plants_left_column = [
@@ -382,7 +348,7 @@ plants_tab = [
 
 
 task_name = [
-    item_label("Task name:"),
+    tab_funcs.item_label("Task name:"),
     sg.Combo(
         sorted([""] + list(garden.tasks)),
         size=FIELD_SIZE,
@@ -392,12 +358,12 @@ task_name = [
 ]
 
 task_progress = [
-    item_label("Progress:"),
+    tab_funcs.item_label("Progress:"),
     sg.Text("", size=(22, 1), relief=SUNKEN, key="-TASK PROGRESS-"),
 ]
 
 task_next_due = [
-    item_label("Next due:"),
+    tab_funcs.item_label("Next due:"),
     sg.Text("", size=(22, 1), relief=SUNKEN, key="-TASK NEXT DUE-"),
 ]
 
@@ -469,6 +435,7 @@ task_frequency = [
         pad=(5, (6, 0)),
         readonly=True,
         background_color="#F2F2F2",
+        tooltip="Defaults to monthly if no selection made",
         key="-TASK FREQUENCY-",
     ),
 ]
@@ -519,7 +486,7 @@ task_schedule_frame = [
 ]
 
 task_buttons = [
-    sg.Button(name, size=(15, 2), pad=((4, 4), (22, 0)), key=f"TASK {name}") for name in ITEM_BUTTON_TEXT
+    sg.Button(name, size=(15, 2), pad=((4, 4), (22, 0)), key=f"TASK {name}") for name in IB_TEXT
 ]
 
 plants_left_column = [
@@ -597,7 +564,7 @@ try:
             gardens_changed = False
 
         elif event == "About...":
-            popups.about_popup()
+            popups.about()
 
         elif event == "Open web tutorial":
             webbrowser.open("https://github.com/jonboland/gardenlife/blob/master/README.rst")
@@ -624,15 +591,15 @@ try:
             g_owners = values["-OWNER NAMES-"].strip()
             g_since = values["-OWNED SINCE-"].strip()
             if not g_name:
-                popups.invalid_name_popup("garden name")
+                popups.invalid_name("garden name")
                 continue
             if not g_owners:
-                popups.invalid_name_popup("owner names")
+                popups.invalid_name("owner names")
                 continue
             try:
                 valid_date = datetime.strptime(g_since, "%d/%m/%Y")
             except ValueError:
-                popups.invalid_date_popup(field="Owned since", date=g_since)
+                popups.invalid_date(field="owned since", date=g_since)
             # If there are no validation errors, create/update the garden
             else:
                 cu_garden = Garden(
@@ -649,16 +616,16 @@ try:
                 # Update dropdowns and clear field values and links
                 event_funcs.update_garden_dropdown(window, gardens)
                 event_funcs.clear_all_item_dropdowns(window)
-                event_funcs.clear_all_values_and_links()
+                event_funcs.clear_all_values_and_links(window, garden)
                 gardens_changed = True
 
         elif event == "GARDEN REMOVE":
-            g_confirmation = popups.remove_confirmation_popup(garden.name, "garden")
+            g_confirmation = popups.remove_confirmation(garden.name, "garden")
             if g_confirmation == "OK":
                 del gardens[values["-GARDEN NAME-"]]
                 event_funcs.update_garden_dropdown(window, gardens)
                 event_funcs.clear_all_item_dropdowns(window)
-                event_funcs.clear_all_values_and_links()
+                event_funcs.clear_all_values_and_links(window, garden)
                 gardens_changed = True
 
         elif event == "-SELECT GARDEN-":  # A garden is selected from the dropdown
@@ -686,8 +653,8 @@ try:
                 window["-SUMMARY TOTAL TASKS-"].update(len(garden.tasks))
                 window["-SUMMARY OUTSTANDING TASKS-"].update(outstanding_tasks)
             # Then update the item dropdowns and clear item field values and links
-            event_funcs.update_all_item_dropdowns()
-            event_funcs.clear_all_item_values_and_links()
+            event_funcs.update_all_item_dropdowns(window, garden)
+            event_funcs.clear_all_item_values_and_links(window, garden)
 
         ####################### Manage Creatures Events ########################
 
@@ -697,16 +664,16 @@ try:
             c_appeared = values["-CREATURE APPEARED DATE-"].strip()
             # Check that a garden has been selected
             if not values["-SELECT GARDEN-"]:
-                popups.garden_not_selected_popup("creature")
+                popups.garden_not_selected("creature")
                 continue
             if not c_name:
-                popups.invalid_name_popup("creature name")
+                popups.invalid_name("creature name")
                 continue
             try:
                 if c_appeared:
                     valid_date = datetime.strptime(c_appeared, "%d/%m/%Y")
             except ValueError:
-                popups.invalid_date_popup(field="Appeared date", date=c_appeared)
+                popups.invalid_date(field="appeared date", date=c_appeared)
 
             else:
                 creature = Creature(
@@ -727,7 +694,7 @@ try:
                 gardens_changed = True
 
         elif event == "CREATURE REMOVE":
-            c_confirmation = popups.remove_confirmation_popup(values["-CREATURE NAME-"], "creature")
+            c_confirmation = popups.remove_confirmation(values["-CREATURE NAME-"], "creature")
             if c_confirmation == "OK":
                 garden.remove_item("creatures", values["-CREATURE NAME-"])
                 event_funcs.update_creature_dropdowns(window, garden)
@@ -740,14 +707,15 @@ try:
 
         # If a creature is selected populate the relevant fields with its values
         elif event == "-CREATURE NAME-":
-            window["-CREATURE NAME-"].update(event_funcs.creature_instance(garden, values).name)
-            window["-CREATURE TYPE-"].update(event_funcs.creature_instance(garden, values).org_type)
-            window["-CREATURE APPEARED DATE-"].update(event_funcs.creature_instance(garden, values).appeared)
-            window["-CREATURE STATUS-"].update(event_funcs.creature_instance(garden, values).status.get())
-            window["-CREATURE NOTES-"].update(event_funcs.creature_instance(garden, values).notes)
-            window["-CREATURE IMPACT SLIDER-"].update(event_funcs.creature_instance(garden, values).impact)
-            window["-CREATURE PREVALENCE SLIDER-"].update(event_funcs.creature_instance(garden, values).prevalence)
-            window["-CREATURE TREND SLIDER-"].update(event_funcs.creature_instance(garden, values).trend)
+            creature_instance = garden.creatures.get(values["-CREATURE NAME-"])
+            window["-CREATURE NAME-"].update(creature_instance.name)
+            window["-CREATURE TYPE-"].update(creature_instance.org_type)
+            window["-CREATURE APPEARED DATE-"].update(creature_instance.appeared)
+            window["-CREATURE STATUS-"].update(creature_instance.status.get())
+            window["-CREATURE NOTES-"].update(creature_instance.notes)
+            window["-CREATURE IMPACT SLIDER-"].update(creature_instance.impact)
+            window["-CREATURE PREVALENCE SLIDER-"].update(creature_instance.prevalence)
+            window["-CREATURE TREND SLIDER-"].update(creature_instance.trend)
 
         ######################### Manage Plant Events ##########################
 
@@ -757,16 +725,16 @@ try:
             p_planted = values["-PLANT PLANTED DATE-"].strip()
             # Check that a garden has been selected
             if not values["-SELECT GARDEN-"]:
-                popups.garden_not_selected_popup("plant")
+                popups.garden_not_selected("plant")
                 continue
             if not p_name:
-                popups.invalid_name_popup("plant name")
+                popups.invalid_name("plant name")
                 continue
             try:
                 if p_planted:
                     valid_date = datetime.strptime(p_planted, "%d/%m/%Y")
             except ValueError:
-                popups.invalid_date_popup(field="Planted date", date=p_planted)
+                popups.invalid_date(field="planted date", date=p_planted)
 
             else:
                 plant = Plant(
@@ -788,7 +756,7 @@ try:
                 gardens_changed = True
 
         elif event == "PLANT REMOVE":
-            p_confirmation = popups.remove_confirmation_popup(values["-PLANT NAME-"], "plant")
+            p_confirmation = popups.remove_confirmation(values["-PLANT NAME-"], "plant")
             if p_confirmation == "OK":
                 garden.remove_item("plants", values["-PLANT NAME-"])
                 event_funcs.update_plant_dropdowns(window, garden)
@@ -801,22 +769,23 @@ try:
 
         # If a plant is selected populate the relevant fields with its values
         elif event == "-PLANT NAME-":
-            window["-PLANT NAME-"].update(event_funcs.plant_instance(garden, values).name)
-            window["-PLANT TYPE-"].update(event_funcs.plant_instance(garden, values).org_type)
-            window["-PLANT PLANTED DATE-"].update(event_funcs.plant_instance(garden, values).planted)
-            window["-PLANT STATUS-"].update(event_funcs.plant_instance(garden, values).status.get())
-            window["-PLANT EDIBLE-"].update(event_funcs.plant_instance(garden, values).edible)
-            window["-PLANT NOTES-"].update(event_funcs.plant_instance(garden, values).notes)
-            window["-PLANT IMPACT SLIDER-"].update(event_funcs.plant_instance(garden, values).impact)
-            window["-PLANT PREVALENCE SLIDER-"].update(event_funcs.plant_instance(garden, values).prevalence)
-            window["-PLANT TREND SLIDER-"].update(event_funcs.plant_instance(garden, values).trend)
+            plant_instance = garden.plants.get(values["-PLANT NAME-"])
+            window["-PLANT NAME-"].update(plant_instance.name)
+            window["-PLANT TYPE-"].update(plant_instance.org_type)
+            window["-PLANT PLANTED DATE-"].update(plant_instance.planted)
+            window["-PLANT STATUS-"].update(plant_instance.status.get())
+            window["-PLANT EDIBLE-"].update(plant_instance.edible)
+            window["-PLANT NOTES-"].update(plant_instance.notes)
+            window["-PLANT IMPACT SLIDER-"].update(plant_instance.impact)
+            window["-PLANT PREVALENCE SLIDER-"].update(plant_instance.prevalence)
+            window["-PLANT TREND SLIDER-"].update(plant_instance.trend)
 
         ########################## Manage Task Events ##########################
 
         if event == "TASK CREATE/UPDATE":
             # Check that a garden has been selected
             if not values["-SELECT GARDEN-"]:
-                popups.garden_not_selected_popup("creature")
+                popups.garden_not_selected("creature")
                 continue
             # Strip and validate task name and set schedule values
             # NB: Frequency is not validated because it's a readonly dropdown
@@ -826,20 +795,20 @@ try:
             bymonth = values["-TASK BY MONTH-"].strip()
             interval = values["-TASK INTERVAL-"].strip()
             if not t_name:
-                popups.invalid_name_popup("task name")
+                popups.invalid_name("task name")
                 continue
             try:
                 if start_date:
                     valid_date = datetime.strptime(start_date, "%d/%m/%Y")
             except ValueError:
-                popups.invalid_date_popup(field="First due", date=start_date)
+                popups.invalid_date(field="first due", date=start_date)
                 continue
             if count and not count.isdigit():
-                popups.invalid_digit_popup(field="Count", digit=count)
-            elif bymonth and any(month not in popups.MONTHS for month in bymonth.split(" ")):
-                popups.invalid_bymonth_popup(bymonth)
+                popups.invalid_digit(field="count", digit=count)
+            elif bymonth and any(month not in MONTHS for month in bymonth.split(" ")):
+                popups.invalid_bymonth(bymonth)
             elif interval and not interval.isdigit():
-                popups.invalid_digit_popup(field="Interval", digit=interval)
+                popups.invalid_digit(field="interval", digit=interval)
             # If there are no validation errors, create/update the task
             else:
                 task = Task(
@@ -860,15 +829,15 @@ try:
                 )
                 # Handle rare situation where provided shedule doesn't produce any due dates
                 if not task.schedule:
-                    popups.no_due_dates_popup()
+                    popups.no_due_dates()
                     continue
 
                 if values["-TASK STATUS-"] == "archived":
                     task.status.archive()
-
                 # If the task already exists add any pre-existing completed dates to it
-                if event_funcs.task_instance(garden, values):
-                    task.completed_dates = event_funcs.task_instance(garden, values).completed_dates
+                task_instance = garden.tasks.get(values["-TASK NAME-"])
+                if task_instance:
+                    task.completed_dates = task_instance.completed_dates
                 # Add the task to the garden, overwriting the old version if it already exists
                 garden.add_item("tasks", task)
                 event_funcs.clear_task_values(window)
@@ -887,7 +856,7 @@ try:
                 gardens_changed = True
 
         elif event == "TASK REMOVE":
-            t_confirmation = popups.remove_confirmation_popup(values["-TASK NAME-"], "task")
+            t_confirmation = popups.remove_confirmation(values["-TASK NAME-"], "task")
             if t_confirmation == "OK":
                 garden.remove_item("tasks", values["-TASK NAME-"])
                 event_funcs.update_task_dropdown(window, garden)
@@ -910,29 +879,29 @@ try:
             if "task" in globals():
                 subwindows.add_progress_window(window, task)
             else:
-                popups.task_not_created_popup()
-        # fmt: off
+                popups.task_not_created()
         # If a task is selected populate the relevant fields with its values
         elif event == "-TASK NAME-":
-            window["-TASK PROGRESS-"].update(event_funcs.task_instance(garden, values).get_current_progress())
-            window["-TASK NEXT DUE-"].update(event_funcs.task_instance(garden, values).get_next_due_date())
-            window["-TASK ASSIGNEE-"].update(event_funcs.task_instance(garden, values).assignee)
-            window["-TASK LENGTH-"].update(event_funcs.task_instance(garden, values).length)
-            window["-TASK LINKED CREATURES-"].set_value(event_funcs.task_instance(garden, values).linked_creatures)
-            window["-TASK LINKED PLANTS-"].set_value(event_funcs.task_instance(garden, values).linked_plants)
-            window["-TASK STATUS-"].update(event_funcs.task_instance(garden, values).status.get())
-            window["-TASK NOTES-"].update(event_funcs.task_instance(garden, values).description)
-            window["-TASK START-"].update(event_funcs.task_instance(garden, values).raw_schedule["start date"])
-            window["-TASK FREQUENCY-"].update(event_funcs.task_instance(garden, values).raw_schedule["freq"])
-            window["-TASK COUNT-"].update(event_funcs.task_instance(garden, values).raw_schedule["count"])
-            window["-TASK BY MONTH-"].update(event_funcs.task_instance(garden, values).raw_schedule["bymonth"])
-            window["-TASK INTERVAL-"].update(event_funcs.task_instance(garden, values).raw_schedule["interval"])
+            task_instance = garden.tasks[values["-TASK NAME-"]]
+            window["-TASK PROGRESS-"].update(task_instance.get_current_progress())
+            window["-TASK NEXT DUE-"].update(task_instance.get_next_due_date())
+            window["-TASK ASSIGNEE-"].update(task_instance.assignee)
+            window["-TASK LENGTH-"].update(task_instance.length)
+            window["-TASK LINKED CREATURES-"].set_value(task_instance.linked_creatures)
+            window["-TASK LINKED PLANTS-"].set_value(task_instance.linked_plants)
+            window["-TASK STATUS-"].update(task_instance.status.get())
+            window["-TASK NOTES-"].update(task_instance.description)
+            window["-TASK START-"].update(task_instance.raw_schedule["start date"])
+            window["-TASK FREQUENCY-"].update(task_instance.raw_schedule["freq"])
+            window["-TASK COUNT-"].update(task_instance.raw_schedule["count"])
+            window["-TASK BY MONTH-"].update(task_instance.raw_schedule["bymonth"])
+            window["-TASK INTERVAL-"].update(task_instance.raw_schedule["interval"])
             # Assign instance to task variable so progress can be added
-            task = event_funcs.task_instance(garden, values)
+            task = task_instance
 
 except Exception as e:
     logger.exception("Fatal Error")
-    popups.fatal_error_popup(e)
+    popups.fatal_error(e)
 
     ########################################################################
 

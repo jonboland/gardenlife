@@ -1,10 +1,8 @@
 from datetime import datetime
-from dateutil.rrule import rrule, DAILY, WEEKLY, MONTHLY, YEARLY
+from dateutil.rrule import rrule
 
+from constants import FREQS
 from status import Status
-
-
-FREQS = {"daily": DAILY, "weekly": WEEKLY, "monthly": MONTHLY, "yearly": YEARLY}
 
 
 class Task:
@@ -46,7 +44,7 @@ class Task:
         }
         # Convert string to datetime object. Set start date to today if no date supplied
         start_date = self._set_date(start_date)
-        freq = FREQS.get(freq, MONTHLY)
+        freq = FREQS.get(freq, FREQS["monthly"])
         count = int(count) if count else 1
         bymonth = [int(month) for month in bymonth.split(" ")] if bymonth else None
         interval = int(interval) if interval else 1

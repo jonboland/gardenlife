@@ -3,7 +3,7 @@ import sys
 
 import PySimpleGUI as sg
 
-from accent import ACCENT_COLOR
+from constants import ACCENT_COLOR, CREATURE_HEADS, PLANT_HEADS, TASK_HEADS
 import summary_funcs
 
  
@@ -77,7 +77,7 @@ def add_progress_window(window, task):
 def view_creatures_window(window, garden):
     window.Disable()
 
-    header_row = [[summary_funcs.summary_head_format(title) for title in summary_funcs.CREATURE_HEADS]]
+    header_row = [[summary_funcs.summary_head_format(title) for title in CREATURE_HEADS]]
 
     creatures = [
         summary_funcs.creature_fields(creature)
@@ -105,7 +105,7 @@ def view_creatures_window(window, garden):
 def view_plants_window(window, garden, attr):
     window.Disable()
 
-    header_row = [[summary_funcs.summary_head_format(title) for title in summary_funcs.PLANT_HEADS]]
+    header_row = [[summary_funcs.summary_head_format(title) for title in PLANT_HEADS]]
 
     plants = [
         summary_funcs.plant_fields(plant)
@@ -136,11 +136,11 @@ def view_tasks_window(window, garden):
 
     name_head = [
         sg.Input(
-            summary_funcs.TASK_HEADS[0], size=(18, 1), text_color="white", background_color=ACCENT_COLOR
+            TASK_HEADS[0], size=(18, 1), text_color="white", background_color=ACCENT_COLOR
         )
     ]
 
-    other_head = [summary_funcs.summary_head_format(title) for title in summary_funcs.TASK_HEADS[1:]]
+    other_head = [summary_funcs.summary_head_format(title) for title in TASK_HEADS[1:]]
 
     header_row = [name_head + other_head]
 
