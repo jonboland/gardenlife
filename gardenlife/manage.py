@@ -76,9 +76,7 @@ summary = [
     for label, value in summary_details.items()
 ]
 
-report_buttons = [
-    [sg.Button(name, size=(20, 2), pad=(0, 10), border_width=2)] for name in RB_TEXT
-]
+report_buttons = [[sg.Button(name, size=(20, 2), pad=(0, 10), border_width=2)] for name in RB_TEXT]
 
 summary_tab = [
     [
@@ -207,8 +205,7 @@ creature_notes_label = [sg.Text("Notes:", size=(8, 1), pad=(0, 10))]
 creature_notes_field = [sg.Multiline(size=(35, 10), pad=(0, 10), key="-CREATURE NOTES-")]
 
 creature_buttons = [
-    sg.Button(name, size=(15, 2), pad=((0, 7), (32, 0)), key=f"CREATURE {name}")
-    for name in IB_TEXT
+    sg.Button(name, size=(15, 2), pad=((0, 7), (32, 0)), key=f"CREATURE {name}") for name in IB_TEXT
 ]
 
 creatures_left_column = [
@@ -315,8 +312,7 @@ plant_notes_label = [sg.Text("Notes:", size=(8, 1), pad=(0, 10))]
 plant_notes_field = [sg.Multiline(size=(35, 10), pad=(0, 10), key="-PLANT NOTES-")]
 
 plant_buttons = [
-    sg.Button(name, size=(15, 2), pad=((0, 7), (32, 0)), key=f"PLANT {name}")
-    for name in IB_TEXT
+    sg.Button(name, size=(15, 2), pad=((0, 7), (32, 0)), key=f"PLANT {name}") for name in IB_TEXT
 ]
 
 plants_left_column = [

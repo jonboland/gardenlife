@@ -31,54 +31,40 @@ def test_one_owner(shade):
 
 def test_two_owners():
     light = garden.Garden(
-        "Light", "London", 0.2, "13/11/2017", ["Paul Daniels", "Ruby Wilson"],
+        "Light",
+        "London",
+        0.2,
+        "13/11/2017",
+        ["Paul Daniels", "Ruby Wilson"],
     )
     assert light.ownership() == "Paul Daniels and Ruby Wilson"
 
 
 def test_ownership_lenght_less_than_two_years(shade):
-    assert (
-        shade.ownership_length("25/01/1989")
-        == "721 days"
-    )
+    assert shade.ownership_length("25/01/1989") == "721 days"
 
 
 def test_ownership_lenght_over_17_years(shade):
-    assert (
-        shade.ownership_length("22/03/2004")
-        == "6,256 days (around 17 years)"
-    )
+    assert shade.ownership_length("22/03/2004") == "6,256 days (around 17 years)"
 
 
 def test_ownership_lenght_around_33_and_a_half_year(shade):
-    assert (
-        shade.ownership_length("22/07/2020")
-        == "12,222 days (around 33.5 years)"
-    )
+    assert shade.ownership_length("22/07/2020") == "12,222 days (around 33.5 years)"
 
 
 def test_ownership_lenght_nearly_40_years(shade):
-    assert (
-        shade.ownership_length("01/01/2027")
-        == "14,576 days (around 40 years)"
-    )
+    assert shade.ownership_length("01/01/2027") == "14,576 days (around 40 years)"
 
 
 def test_ownership_lenght_one_day(shade):
-    assert (
-        shade.ownership_length("05/02/1987")
-        == "1 day"
-    )
+    assert shade.ownership_length("05/02/1987") == "1 day"
 
 
 def test_ownership_lenght_zero_days():
     new_shade = garden.Garden(
         "New Shade", "Bath", 0.7, garden.strftime("%d/%m/%Y"), "Paul Daniels"
     )
-    assert (
-        new_shade.ownership_length()
-        == "0 days"
-    )
+    assert new_shade.ownership_length() == "0 days"
 
 
 def test_season_current(shade):
@@ -113,8 +99,12 @@ def test_add_item_task(shade):
     shade.add_item("tasks", cut_hedges)
     assert shade.tasks["cut hedges"] == cut_hedges
 
+
 def test_str_representation(shade):
-    assert str(shade) == "Garden in Hull called Shade, which is approximately 1 acre in size."
+    assert (
+        str(shade)
+        == "Garden in Hull called Shade, which is approximately 1 acre in size."
+    )
 
 
 if __name__ == "__main__":

@@ -4,8 +4,6 @@ import context
 import organisms
 
 
-
-
 @pytest.fixture
 def badger():
     return organisms.Creature(

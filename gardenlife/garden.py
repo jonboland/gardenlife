@@ -36,9 +36,7 @@ class Garden:
             return f"{self.owners[0]}"
         if len(self.owners) == 2:
             return f"{' and '.join(self.owners)}"
-        return (
-            f"{', '.join(self.owners[:-1])} and {self.owners[-1]}"
-        )
+        return f"{', '.join(self.owners[:-1])} and {self.owners[-1]}"
 
     def ownership_length(self, today=None):
         """Return garden ownership length."""

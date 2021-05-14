@@ -4,8 +4,8 @@ from status import Status
 
 class Organism:
     def __init__(
-        self, 
-        name,  # Eg Badger, Mouse, Ash, Leek 
+        self,
+        name,  # Eg Badger, Mouse, Ash, Leek
         org_type,  # Eg Mammal, Rodent, Tree, Vegetable
         notes=None,
         age=None,

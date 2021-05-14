@@ -29,10 +29,10 @@ LEVELS = {
         5: "very positive",
     },
     "prevalence_levels": {
-        1: "very low", 
-        2: "low", 
-        3: "medium", 
-        4: "high", 
+        1: "very low",
+        2: "low",
+        3: "medium",
+        4: "high",
         5: "very high"
     },
     "trend_levels": {
