@@ -1,12 +1,7 @@
 from operator import attrgetter
 
 import PySimpleGUI as sg
-from accent import ACCENT_COLOR
-
-
-CREATURE_HEADS = ("Name", "Type", "Appeared", "Impact", "Prevalence", "Trend", "Status")
-PLANT_HEADS = ("Name", "Type", "Planted", "Impact", "Prevalence", "Trend", "Status")
-TASK_HEADS = ("Name", "Progress", "Next Due", "Assignee", "Length", "Creatures", "Plants", "Status")
+from constants import ACCENT_COLOR
 
 
 def summary_head_format(title):

@@ -12,7 +12,7 @@ from PySimpleGUI.PySimpleGUI import Column
 from garden import Garden
 from organisms import Creature, Plant
 from task import Task
-from accent import ACCENT_COLOR
+from constants import ACCENT_COLOR, FIELD_SIZE, IB_TEXT, MG_FIELD_SIZE, MONTHS, RB_TEXT
 import event_funcs
 import popups
 import subwindows
@@ -50,8 +50,6 @@ menu_definition = [["File", ["Save", "Exit"]], ["Help", ["About...", "Open web t
 # ------------------------------- Garden Summary Tab ------------------------------- #
 
 
-REPORT_BUTTON_TEXT = ("VIEW ALL CREATURES", "VIEW ALL PLANTS", "VIEW EDIBLE PLANTS", "VIEW ALL TASKS")
-
 outstanding_tasks = sum(
     task.get_current_progress() in {"Due", "Overdue", "Very overdue"} for task in garden.tasks.values()
 )
@@ -78,7 +76,7 @@ summary = [
 ]
 
 report_buttons = [
-    [sg.Button(name, size=(20, 2), pad=(0, 10), border_width=2)] for name in REPORT_BUTTON_TEXT
+    [sg.Button(name, size=(20, 2), pad=(0, 10), border_width=2)] for name in RB_TEXT
 ]
 
 summary_tab = [
@@ -90,10 +88,6 @@ summary_tab = [
 
 
 # ------------------------ Shared Tab Functions & Constants ------------------------ #
-
-
-ITEM_BUTTON_TEXT = ("CREATE/UPDATE", "REMOVE")
-FIELD_SIZE = (25, 1)
 
 
 def item_label(label):
@@ -116,9 +110,6 @@ def organism_slider(key=None, tooltip=None):
 
 
 # -------------------------------- Manage Garden Tab ------------------------------- #
-
-
-MG_FIELD_SIZE = (34, 1)
 
 
 garden_details = {
@@ -163,7 +154,7 @@ owned_since = [
 ]
 
 garden_buttons = [
-    sg.Button(name, size=(18, 2), pad=((32.5, 0), 30), key=f"GARDEN {name}") for name in ITEM_BUTTON_TEXT
+    sg.Button(name, size=(18, 2), pad=((32.5, 0), 30), key=f"GARDEN {name}") for name in IB_TEXT
 ]
 
 garden_elements = [select_garden, garden_blank] + garden_details + [owned_since, garden_buttons]
@@ -242,7 +233,7 @@ creature_notes_field = [sg.Multiline(size=(35, 10), pad=(0, 10), key="-CREATURE 
 
 creature_buttons = [
     sg.Button(name, size=(15, 2), pad=((0, 7), (32, 0)), key=f"CREATURE {name}")
-    for name in ITEM_BUTTON_TEXT
+    for name in IB_TEXT
 ]
 
 creatures_left_column = [
@@ -350,7 +341,7 @@ plant_notes_field = [sg.Multiline(size=(35, 10), pad=(0, 10), key="-PLANT NOTES-
 
 plant_buttons = [
     sg.Button(name, size=(15, 2), pad=((0, 7), (32, 0)), key=f"PLANT {name}")
-    for name in ITEM_BUTTON_TEXT
+    for name in IB_TEXT
 ]
 
 plants_left_column = [
@@ -469,6 +460,7 @@ task_frequency = [
         pad=(5, (6, 0)),
         readonly=True,
         background_color="#F2F2F2",
+        tooltip="Defaults to monthly if no selection made",
         key="-TASK FREQUENCY-",
     ),
 ]
@@ -519,7 +511,7 @@ task_schedule_frame = [
 ]
 
 task_buttons = [
-    sg.Button(name, size=(15, 2), pad=((4, 4), (22, 0)), key=f"TASK {name}") for name in ITEM_BUTTON_TEXT
+    sg.Button(name, size=(15, 2), pad=((4, 4), (22, 0)), key=f"TASK {name}") for name in IB_TEXT
 ]
 
 plants_left_column = [
@@ -838,7 +830,7 @@ try:
                 continue
             if count and not count.isdigit():
                 popups.invalid_digit(field="count", digit=count)
-            elif bymonth and any(month not in popups.MONTHS for month in bymonth.split(" ")):
+            elif bymonth and any(month not in MONTHS for month in bymonth.split(" ")):
                 popups.invalid_bymonth(bymonth)
             elif interval and not interval.isdigit():
                 popups.invalid_digit(field="interval", digit=interval)

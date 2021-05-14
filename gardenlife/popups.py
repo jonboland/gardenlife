@@ -3,10 +3,6 @@ import traceback
 import PySimpleGUI as sg
 
 
-
-MONTHS = [str(month) for month in range(1, 13)]
-
-
 def fatal_error(error):
     sg.popup(
         "Sorry for the disruption.",

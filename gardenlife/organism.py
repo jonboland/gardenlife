@@ -1,29 +1,5 @@
+from constants import LEVELS
 from status import Status
-
-
-LEVELS = {
-    "impact_levels": {
-        1: "very negative",
-        2: "negative",
-        3: "neutral",
-        4: "positive",
-        5: "very positive",
-    },
-    "prevalence_levels": {
-        1: "very low", 
-        2: "low", 
-        3: "medium", 
-        4: "high", 
-        5: "very high"
-    },
-    "trend_levels": {
-        1: "rapid decrease",
-        2: "decreasing",
-        3: "stable",
-        4: "increasing",
-        5: "rapid increase",
-    },
-}
 
 
 class Organism:
