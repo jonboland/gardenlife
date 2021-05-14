@@ -546,7 +546,7 @@ gardens_changed = False
 try:
     while True:
         event, values = window.read()
-        print(event, values)
+        # print(event, values)
 
         ##################### Menu & Window Closure Events #####################
 
