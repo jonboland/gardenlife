@@ -7,8 +7,8 @@ import organisms
 @pytest.fixture
 def sunflower():
     return organisms.Plant(
-        plant_name="sunflower",
-        plant_type="flower",
+        name="sunflower",
+        org_type="flower",
         planted="03/05/2021",
         prevalence=2,
         trend=3,
@@ -39,7 +39,7 @@ def test_plant_repr(sunflower):
 
 
 def test_plant_str(sunflower):
-    assert str(sunflower) == "This plant is a sunflower, which is a flower."
+    assert str(sunflower) == "Plant name: sunflower. Plant type: flower."
 
 
 def test_current(sunflower):

@@ -8,20 +8,20 @@ import task
 
 @pytest.fixture
 def shade():
-    return garden.Garden("Shade", "Hull", 1, "04/02/1987", "Dave Davidson")
+    return garden.Garden("Shade", "Hull", 1, "04/02/1987", ["Dave Davidson"])
 
 
 @pytest.fixture
 def badger():
     return organisms.Creature(
-        "badger",
-        "mammal",
-        "03/07/2020",
-        "Digs holes in various parts of the garden.",
-        10,
-        3,
-        2,
-        4,
+        name="badger",
+        org_type="mammal",
+        appeared="03/07/2020",
+        notes="Digs holes in various parts of the garden.",
+        age=10,
+        impact=3,
+        prevalence=2,
+        trend=4,
     )
 
 
@@ -31,19 +31,9 @@ def test_one_owner(shade):
 
 def test_two_owners():
     light = garden.Garden(
-        "Light", "London", 0.2, "13/11/2017", "Paul Daniels", "Ruby Wilson"
+        "Light", "London", 0.2, "13/11/2017", ["Paul Daniels", "Ruby Wilson"],
     )
     assert light.ownership() == "Paul Daniels and Ruby Wilson"
-
-
-def test_three_owners_from_string():
-    string_garden = garden.Garden.from_string(
-        "Bell-Cranleigh-0.1-24/04/2009-Mary Jones-Greg Jones-Spot"
-    )
-    assert (
-        string_garden.ownership()
-        == "Mary Jones, Greg Jones and Spot"
-    )
 
 
 def test_ownership_lenght_less_than_two_years(shade):

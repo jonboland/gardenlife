@@ -3,25 +3,27 @@ import pytest
 import time
 
 import context
-from task import Task, MONTHLY
+from task import Task
 
 
 @pytest.fixture
 def cut_hedges():
     task = Task(
-        task_name="cut hedges", 
+        name="cut hedges", 
         description="Cut all hedges in garden ready for Summer and Winter.",
         assignee="Bob",
         length="8",
     )
-    task.set_schedule(start_date="01/05/2020", count="5", bymonth="5 10")
+    task.set_schedule(
+        freq="monthly", start_date="01/05/2020", count="5", bymonth="5 10", interval=1
+    )
     return task
 
 
 @pytest.fixture
 def cut_hedges_too():
     task = Task("cut hedges")
-    task.set_schedule(start_date="01/05/2020")
+    task.set_schedule(freq="", start_date="01/05/2020", count="", bymonth="", interval=1)
     return task
 
 
@@ -58,12 +60,14 @@ def test_equality_comparison_true(cut_hedges, cut_hedges_too):
 # Set schedule
 
 def test_set_schedule_without_start_date(prune_tree):
-    prune_tree.set_schedule(count=1)
+    prune_tree.set_schedule(start_date="", freq="", count="", bymonth="", interval="")
     assert prune_tree.schedule[0].strftime("%d/%m/%Y")  == time.strftime("%d/%m/%Y")
 
 
 def test_set_schedule_with_start_date(prune_tree):
-    prune_tree.set_schedule(start_date="01/10/2020", freq=MONTHLY, count="4")
+    prune_tree.set_schedule(
+        start_date="01/10/2020", freq="monthly", count="4", bymonth="", interval=""
+    )
     assert prune_tree.schedule == [
         datetime(2020, 10, 1, 0, 0),
         datetime(2020, 11, 1, 0, 0),
