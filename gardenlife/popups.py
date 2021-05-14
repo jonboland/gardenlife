@@ -7,7 +7,7 @@ import PySimpleGUI as sg
 MONTHS = [str(month) for month in range(1, 13)]
 
 
-def fatal_error_popup(error):
+def fatal_error(error):
     sg.popup(
         "Sorry for the disruption.",
         "Unfortunately, gardenlife has stopped working because the following fatal error occured:",
@@ -18,7 +18,7 @@ def fatal_error_popup(error):
     )
 
 
-def about_popup():
+def about():
     sg.popup(
         "gardenlife v1.0\n\n" "A garden management application created by Jon Boland.\n",
         title="About...",
@@ -26,7 +26,7 @@ def about_popup():
     )
 
 
-def garden_not_selected_popup(item):
+def garden_not_selected(item):
     return sg.popup(
         f"It wasn't possible to add the {item} because a garden hasn't been selected. "
         "Please choose a garden on the Manage Garden tab and try again.",
@@ -35,15 +35,15 @@ def garden_not_selected_popup(item):
     )
 
 
-def task_not_created_popup():
+def task_not_created():
     sg.popup(
-        "Task must be created before progress is added.\n",
+        "The task must be created before progress is added.\n",
         title="Task Not Created Error", 
         keep_on_top=True,
     )
 
 
-def remove_confirmation_popup(name, element):
+def remove_confirmation(name, element):
     return sg.popup_ok_cancel(
         f"Are you sure you want to remove {name}?",
         f"This {element} will be permanently deleted.\n",
@@ -53,7 +53,7 @@ def remove_confirmation_popup(name, element):
     )
 
 
-def invalid_name_popup(field):
+def invalid_name(field):
     return sg.popup(
         f"The {field} field cannot be blank. Please add a name and try again.",
         title="Blank Name Error",
@@ -61,7 +61,7 @@ def invalid_name_popup(field):
     )
 
 
-def invalid_date_popup(field, date):
+def invalid_date(field, date):
     return sg.popup(
         f"The {field} field contains {date}, which is not a valid date. "
         "The format should be DD/MM/YYYY. Please correct and try again.",
@@ -70,7 +70,7 @@ def invalid_date_popup(field, date):
     )
 
 
-def invalid_digit_popup(field, digit):
+def invalid_digit(field, digit):
     return sg.popup(
         f"The {field} field contains {digit}, which is not a valid digit. "
         "Please correct and try again.",
@@ -79,9 +79,9 @@ def invalid_digit_popup(field, digit):
     )
 
 
-def invalid_bymonth_popup(bymonth):
+def invalid_bymonth(bymonth):
     return sg.popup(
-        f'The By month field contains "{bymonth}", which includes an invalid month or months. '
+        f'The by month field contains "{bymonth}", which includes an invalid month or months. '
         "Months must be digits between 1 and 12, separated by a single space.",
         "Please correct and try again.",
         title="Month Format Error",
@@ -89,7 +89,7 @@ def invalid_bymonth_popup(bymonth):
     )
 
 
-def no_due_dates_popup():
+def no_due_dates():
     return sg.popup(
         "Based on the current schedule, there are no due dates for this task. "
         "Please alter the schedule and try again.",
