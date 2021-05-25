@@ -1,5 +1,13 @@
 [[package]]
 category = "dev"
+description = "Python graph (network) package"
+name = "altgraph"
+optional = false
+python-versions = "*"
+version = "0.17"
+
+[[package]]
+category = "dev"
 description = "Atomic file writes."
 marker = "sys_platform == \"win32\""
 name = "atomicwrites"
@@ -32,6 +40,27 @@ version = "0.4.3"
 
 [[package]]
 category = "dev"
+description = "Clean single-source support for Python 3 and 2"
+marker = "sys_platform == \"win32\""
+name = "future"
+optional = false
+python-versions = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*"
+version = "0.18.2"
+
+[[package]]
+category = "dev"
+description = "Mach-O header analysis and editing"
+marker = "sys_platform == \"darwin\""
+name = "macholib"
+optional = false
+python-versions = "*"
+version = "1.14"
+
+[package.dependencies]
+altgraph = ">=0.15"
+
+[[package]]
+category = "dev"
 description = "More routines for operating on iterables, beyond itertools"
 name = "more-itertools"
 optional = false
@@ -52,6 +81,18 @@ six = "*"
 
 [[package]]
 category = "dev"
+description = "Python PE parsing module"
+marker = "sys_platform == \"win32\""
+name = "pefile"
+optional = false
+python-versions = ">=3.6.0"
+version = "2021.5.24"
+
+[package.dependencies]
+future = "*"
+
+[[package]]
+category = "dev"
 description = "plugin and hook calling mechanisms for python"
 name = "pluggy"
 optional = false
@@ -68,6 +109,34 @@ name = "py"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 version = "1.9.0"
+
+[[package]]
+category = "dev"
+description = "PyInstaller bundles a Python application and all its dependencies into a single package."
+name = "pyinstaller"
+optional = false
+python-versions = ">=3.6"
+version = "4.3"
+
+[package.dependencies]
+altgraph = "*"
+macholib = ">=1.8"
+pefile = ">=2017.8.1"
+pyinstaller-hooks-contrib = ">=2020.6"
+pywin32-ctypes = ">=0.2.0"
+setuptools = "*"
+
+[package.extras]
+encryption = ["tinyaes (>=1.0.0)"]
+hook_testing = ["pytest (>=2.7.3)", "execnet (>=1.5.0)", "psutil"]
+
+[[package]]
+category = "dev"
+description = "Community maintained hooks for PyInstaller"
+name = "pyinstaller-hooks-contrib"
+optional = false
+python-versions = "*"
+version = "2021.1"
 
 [[package]]
 category = "dev"
@@ -120,14 +189,12 @@ six = ">=1.5"
 
 [[package]]
 category = "dev"
-description = "a python refactoring library..."
-name = "rope"
+description = ""
+marker = "sys_platform == \"win32\""
+name = "pywin32-ctypes"
 optional = false
 python-versions = "*"
-version = "0.19.0"
-
-[package.extras]
-dev = ["pytest"]
+version = "0.2.0"
 
 [[package]]
 category = "main"
@@ -146,10 +213,14 @@ python-versions = "*"
 version = "0.2.5"
 
 [metadata]
-content-hash = "41052fe09ce8a328787cf3fb09777b9c9b3f0f0fb0415ef7e36259a7a089339a"
+content-hash = "bfb8c55389f4f9fb57f4f3c504720a82dfcdf262b34b6148a643577d0eeb70ca"
 python-versions = "^3.8"
 
 [metadata.files]
+altgraph = [
+    {file = "altgraph-0.17-py2.py3-none-any.whl", hash = "sha256:c623e5f3408ca61d4016f23a681b9adb100802ca3e3da5e718915a9e4052cebe"},
+    {file = "altgraph-0.17.tar.gz", hash = "sha256:1f05a47122542f97028caf78775a095fbe6a2699b5089de8477eb583167d69aa"},
+]
 atomicwrites = [
     {file = "atomicwrites-1.4.0-py2.py3-none-any.whl", hash = "sha256:6d1784dea7c0c8d4a5172b6c620f40b6e4cbfdf96d783691f2e1302a7b88e197"},
     {file = "atomicwrites-1.4.0.tar.gz", hash = "sha256:ae70396ad1a434f9c7046fd2dd196fc04b12f9e91ffb859164193be8b6168a7a"},
@@ -162,6 +233,13 @@ colorama = [
     {file = "colorama-0.4.3-py2.py3-none-any.whl", hash = "sha256:7d73d2a99753107a36ac6b455ee49046802e59d9d076ef8e47b61499fa29afff"},
     {file = "colorama-0.4.3.tar.gz", hash = "sha256:e96da0d330793e2cb9485e9ddfd918d456036c7149416295932478192f4436a1"},
 ]
+future = [
+    {file = "future-0.18.2.tar.gz", hash = "sha256:b1bead90b70cf6ec3f0710ae53a525360fa360d306a86583adc6bf83a4db537d"},
+]
+macholib = [
+    {file = "macholib-1.14-py2.py3-none-any.whl", hash = "sha256:c500f02867515e6c60a27875b408920d18332ddf96b4035ef03beddd782d4281"},
+    {file = "macholib-1.14.tar.gz", hash = "sha256:0c436bc847e7b1d9bda0560351bf76d7caf930fb585a828d13608839ef42c432"},
+]
 more-itertools = [
     {file = "more-itertools-8.4.0.tar.gz", hash = "sha256:68c70cc7167bdf5c7c9d8f6954a7837089c6a36bf565383919bb595efb8a17e5"},
     {file = "more_itertools-8.4.0-py3-none-any.whl", hash = "sha256:b78134b2063dd214000685165d81c154522c3ee0a1c0d4d113c80361c234c5a2"},
@@ -170,6 +248,9 @@ packaging = [
     {file = "packaging-20.4-py2.py3-none-any.whl", hash = "sha256:998416ba6962ae7fbd6596850b80e17859a5753ba17c32284f67bfff33784181"},
     {file = "packaging-20.4.tar.gz", hash = "sha256:4357f74f47b9c12db93624a82154e9b120fa8293699949152b22065d556079f8"},
 ]
+pefile = [
+    {file = "pefile-2021.5.24.tar.gz", hash = "sha256:ed79b2353daa58421459abf4d685953bde0adf9f6e188944f97ba9795f100246"},
+]
 pluggy = [
     {file = "pluggy-0.13.1-py2.py3-none-any.whl", hash = "sha256:966c145cd83c96502c3c3868f50408687b38434af77734af1e9ca461a4081d2d"},
     {file = "pluggy-0.13.1.tar.gz", hash = "sha256:15b2acde666561e1298d71b523007ed7364de07029219b604cf808bfa1c765b0"},
@@ -177,6 +258,13 @@ pluggy = [
 py = [
     {file = "py-1.9.0-py2.py3-none-any.whl", hash = "sha256:366389d1db726cd2fcfc79732e75410e5fe4d31db13692115529d34069a043c2"},
     {file = "py-1.9.0.tar.gz", hash = "sha256:9ca6883ce56b4e8da7e79ac18787889fa5206c79dcc67fb065376cd2fe03f342"},
+]
+pyinstaller = [
+    {file = "pyinstaller-4.3.tar.gz", hash = "sha256:5ecf8bbc230d7298a796e52bb745b95eee12878d141f1645612c99246ecd23f2"},
+]
+pyinstaller-hooks-contrib = [
+    {file = "pyinstaller-hooks-contrib-2021.1.tar.gz", hash = "sha256:892310e6363655838485ee748bf1c5e5cade7963686d9af8650ee218a3e0b031"},
+    {file = "pyinstaller_hooks_contrib-2021.1-py2.py3-none-any.whl", hash = "sha256:27558072021857d89524c42136feaa2ffe4f003f1bdf0278f9b24f6902c1759c"},
 ]
 pyparsing = [
     {file = "pyparsing-2.4.7-py2.py3-none-any.whl", hash = "sha256:ef9d7589ef3c200abe66653d3f1ab1033c3c419ae9b9bdb1240a85b024efc88b"},
@@ -194,8 +282,9 @@ python-dateutil = [
     {file = "python-dateutil-2.8.1.tar.gz", hash = "sha256:73ebfe9dbf22e832286dafa60473e4cd239f8592f699aa5adaf10050e6e1823c"},
     {file = "python_dateutil-2.8.1-py2.py3-none-any.whl", hash = "sha256:75bb3f31ea686f1197762692a9ee6a7550b59fc6ca3a1f4b5d7e32fb98e2da2a"},
 ]
-rope = [
-    {file = "rope-0.19.0.tar.gz", hash = "sha256:64e6d747532e1f5c8009ec5aae3e5523a5bcedf516f39a750d57d8ed749d90da"},
+pywin32-ctypes = [
+    {file = "pywin32-ctypes-0.2.0.tar.gz", hash = "sha256:24ffc3b341d457d48e8922352130cf2644024a4ff09762a2261fd34c36ee5942"},
+    {file = "pywin32_ctypes-0.2.0-py2.py3-none-any.whl", hash = "sha256:9dc2d991b3479cc2df15930958b674a48a227d5361d413827a4cfd0b5876fc98"},
 ]
 six = [
     {file = "six-1.15.0-py2.py3-none-any.whl", hash = "sha256:8b74bedcbbbaca38ff6d7491d76f2b06b3592611af620f8426e82dddb04a5ced"},
