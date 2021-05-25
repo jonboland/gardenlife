@@ -1,3 +1,10 @@
+from datetime import datetime
+
+
+def check_date_validity(date):
+    return datetime.strptime(date, "%d/%m/%Y")
+
+
 def update_garden_dropdown(window, gardens):
     garden_names = sorted(list(gardens))
     return window["-SELECT GARDEN-"].update(values=garden_names, size=(34, 10))

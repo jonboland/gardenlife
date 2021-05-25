@@ -1,5 +1,5 @@
 class Status:
-    def __init__(self, status="current"):
+    def __init__(self, status="Current"):
         self.status = status
 
     @property
@@ -8,7 +8,7 @@ class Status:
 
     @status.setter
     def status(self, status):
-        if status not in ("current", "archived"):
+        if status not in ("Current", "Archived"):
             raise ValueError(f"{status} is not a valid status")
         self._status = status
 
@@ -16,10 +16,10 @@ class Status:
         return f"{self.__class__.__name__}('{self.status}')"
 
     def archive(self):
-        self.status = "archived"
+        self.status = "Archived"
 
     def unarchive(self):
-        self.status = "current"
+        self.status = "Current"
 
     def get(self):
         return self.status

@@ -22,25 +22,25 @@ RB_TEXT = ("VIEW ALL CREATURES", "VIEW ALL PLANTS", "VIEW EDIBLE PLANTS", "VIEW 
 # organism.py
 LEVELS = {
     "impact_levels": {
-        1: "very negative",
-        2: "negative",
-        3: "neutral",
-        4: "positive",
-        5: "very positive",
+        1: "Very Negative",
+        2: "Negative",
+        3: "Neutral",
+        4: "Positive",
+        5: "Very Positive",
     },
     "prevalence_levels": {
-        1: "very low",
-        2: "low",
-        3: "medium",
-        4: "high",
-        5: "very high"
+        1: "Very Low",
+        2: "Low",
+        3: "Medium",
+        4: "High",
+        5: "Very High"
     },
     "trend_levels": {
-        1: "rapid decrease",
-        2: "decreasing",
-        3: "stable",
-        4: "increasing",
-        5: "rapid increase",
+        1: "Rapid Decrease",
+        2: "Decreasing",
+        3: "Stable",
+        4: "Increasing",
+        5: "Rapid Increase",
     },
 }
 
@@ -50,4 +50,4 @@ PLANT_HEADS = ("Name", "Type", "Planted", "Impact", "Prevalence", "Trend", "Stat
 TASK_HEADS = ("Name", "Progress", "Next Due", "Assignee", "Length", "Creatures", "Plants", "Status")
 
 # task.py
-FREQS = {"daily": DAILY, "weekly": WEEKLY, "monthly": MONTHLY, "yearly": YEARLY}
+FREQS = {"Daily": DAILY, "Weekly": WEEKLY, "Monthly": MONTHLY, "Yearly": YEARLY}

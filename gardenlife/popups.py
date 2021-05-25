@@ -16,7 +16,7 @@ def fatal_error(error):
 
 def about():
     sg.popup(
-        "gardenlife v1.0\n\n" "A garden management application created by Jon Boland.\n",
+        "gardenlife v0.1.0\n\n" "A garden management application created by Jon Boland.\n",
         title="About...",
         keep_on_top=True,
     )

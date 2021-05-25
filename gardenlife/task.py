@@ -42,10 +42,10 @@ class Task:
             "bymonth": bymonth,
             "interval": interval,
         }
-        # Converts string to datetime object. Set start date to today if not supplied
+        # Converts string to datetime object. Sets start date to today if not supplied
         start_date = self._set_date(start_date)
         # Sets the frequency to the required value or monthly if not supplied
-        freq = FREQS.get(freq, FREQS["monthly"])
+        freq = FREQS.get(freq, FREQS["Monthly"])
         count = int(count) if count else 1
         bymonth = [int(month) for month in bymonth.split(" ")] if bymonth else None
         interval = int(interval) if interval else 1
@@ -138,7 +138,7 @@ class Task:
         return self._date_to_string(next_due)
 
     def _set_date(self, date=None):
-        # Return datetime object from string or today if not date.
+        # Return datetime object from string or today if not date
         if date:
             return self._string_to_date(date)
         return datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)

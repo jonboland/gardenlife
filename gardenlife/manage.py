@@ -167,8 +167,8 @@ creature_impact = [
     tab_funcs.organism_slider_label("Impact level:"),
     tab_funcs.organism_slider(
         key="-CREATURE IMPACT SLIDER-",
-        tooltip="Impact levels — 1: very negative, 2: negative, "
-        "3: neutral, 4: positive, 5: very positive",
+        tooltip="Impact levels — 1: Very Negative, 2: Negative, "
+        "3: Neutral, 4: Positive, 5: Very Positive",
     ),
 ]
 
@@ -176,7 +176,7 @@ creature_prevalence = [
     tab_funcs.organism_slider_label("Prevalence level:"),
     tab_funcs.organism_slider(
         key="-CREATURE PREVALENCE SLIDER-",
-        tooltip="Prevalence levels — 1: very low, 2: low, " "3: medium, 4: high, 5: very high",
+        tooltip="Prevalence levels — 1: Very Low, 2: Low, " "3: Medium, 4: High, 5: Very High",
     ),
 ]
 
@@ -184,15 +184,15 @@ creature_trend = [
     tab_funcs.organism_slider_label("Trend level:"),
     tab_funcs.organism_slider(
         key="-CREATURE TREND SLIDER-",
-        tooltip="Trend levels — 1: rapidly decreasing, 2: decreasing, "
-        "3: stable, 4: increasing, 5: rapidly increasing",
+        tooltip="Trend levels — 1: Rapid Decrease, 2: Decreasing, "
+        "3: Stable, 4: Increasing, 5: Rapid Increase",
     ),
 ]
 
 creature_status = [
     sg.Text("Status:", size=(8, 1), pad=(0, 10)),
     sg.Combo(
-        ["", "current", "archived"],
+        ["", "Current", "Archived"],
         size=FIELD_SIZE,
         readonly=True,
         background_color="#F2F2F2",
@@ -294,7 +294,7 @@ plant_trend = [
 plant_status = [
     sg.Text("Status:", size=(8, 1), pad=(0, 10)),
     sg.Combo(
-        ["", "current", "archived"],
+        ["", "Current", "Archived"],
         size=FIELD_SIZE,
         readonly=True,
         background_color="#F2F2F2",
@@ -405,7 +405,7 @@ task_link_organisms = [
 task_status = [
     sg.Text("Status:", size=(8, 1), pad=((2, 0), 10)),
     sg.Combo(
-        ["", "current", "archived"],
+        ["", "Current", "Archived"],
         size=FIELD_SIZE,
         readonly=True,
         background_color="#F2F2F2",
@@ -426,7 +426,7 @@ task_start = [
 task_frequency = [
     sg.Text("Frequency:", size=(8, 1), pad=(3, (6, 0))),
     sg.Combo(
-        ["", "daily", "weekly", "monthly", "yearly"],
+        ["", "Daily", "Weekly", "Monthly", "Yearly"],
         size=(18, 1),
         pad=(5, (6, 0)),
         readonly=True,
@@ -535,7 +535,7 @@ window = sg.Window("gardenlife", layout, keep_on_top=True, enable_close_attempte
 # ---------------------------------- Event Loop ------------------------------------ #
 
 
-# Keeps track of whether any changes have been made since the garden was saved
+# Keeps track of whether any changes have been made since the gardens dict was saved
 gardens_changed = False
 
 # Display and interact with the window using an event loop
@@ -593,7 +593,7 @@ try:
                 popups.invalid_name("owner names")
                 continue
             try:
-                valid_date = datetime.strptime(g_since, "%d/%m/%Y")
+                event_funcs.check_date_validity(g_since)
             except ValueError:
                 popups.invalid_date(field="owned since", date=g_since)
             # If there are no validation errors, create/update the garden
@@ -607,7 +607,7 @@ try:
                     cu_garden.creatures = garden_instance.creatures
                     cu_garden.plants = garden_instance.plants
                     cu_garden.tasks = garden_instance.tasks
-                # Add created/updated garden to gardens dictionary. Overwrite if already exists
+                # Add created/updated garden to gardens dict. Overwrite if already exists
                 gardens[g_name] = cu_garden
                 # Update dropdowns and clear field values and links
                 event_funcs.update_garden_dropdown(window, gardens)
@@ -667,7 +667,7 @@ try:
                 continue
             try:
                 if c_appeared:
-                    valid_date = datetime.strptime(c_appeared, "%d/%m/%Y")
+                    event_funcs.check_date_validity(c_appeared)
             except ValueError:
                 popups.invalid_date(field="appeared date", date=c_appeared)
 
@@ -681,7 +681,7 @@ try:
                     prevalence=values["-CREATURE PREVALENCE SLIDER-"],
                     trend=values["-CREATURE TREND SLIDER-"],
                 )
-                if values["-CREATURE STATUS-"] == "archived":
+                if values["-CREATURE STATUS-"] == "Archived":
                     creature.status.archive()
                 garden.add_item("creatures", creature)
                 event_funcs.update_creature_dropdowns(window, garden)
@@ -728,7 +728,7 @@ try:
                 continue
             try:
                 if p_planted:
-                    valid_date = datetime.strptime(p_planted, "%d/%m/%Y")
+                    event_funcs.check_date_validity(p_planted)
             except ValueError:
                 popups.invalid_date(field="planted date", date=p_planted)
 
@@ -743,7 +743,7 @@ try:
                     prevalence=values["-PLANT PREVALENCE SLIDER-"],
                     trend=values["-PLANT TREND SLIDER-"],
                 )
-                if values["-PLANT STATUS-"] == "archived":
+                if values["-PLANT STATUS-"] == "Archived":
                     plant.status.archive()
                 garden.add_item("plants", plant)
                 event_funcs.update_plant_dropdowns(window, garden)
@@ -795,7 +795,7 @@ try:
                 continue
             try:
                 if start_date:
-                    valid_date = datetime.strptime(start_date, "%d/%m/%Y")
+                    event_funcs.check_date_validity(start_date)
             except ValueError:
                 popups.invalid_date(field="first due", date=start_date)
                 continue
@@ -828,7 +828,7 @@ try:
                     popups.no_due_dates()
                     continue
 
-                if values["-TASK STATUS-"] == "archived":
+                if values["-TASK STATUS-"] == "Archived":
                     task.status.archive()
                 # If the task already exists add any pre-existing completed dates to it
                 task_instance = garden.tasks.get(values["-TASK NAME-"])
@@ -836,7 +836,6 @@ try:
                     task.completed_dates = task_instance.completed_dates
                 # Add the task to the garden, overwriting the old version if it already exists
                 garden.add_item("tasks", task)
-                event_funcs.clear_task_values(window)
                 event_funcs.update_task_dropdown(window, garden)
                 # Clear the task fields and variable once the task has been added to the garden
                 event_funcs.clear_task_values(window)
