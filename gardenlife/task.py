@@ -88,11 +88,12 @@ class Task:
     def get_all_progress(self):
         """
         Returns a dict containing all scheduled dates in string format with bool
-        indicating whether they are in the completed dates list
+        indicating whether they are in the completed dates list.
+        Any completed dates that are not in the current schedule are also included.
         """
         return {
             self._date_to_string(date): (date in self.completed_dates)
-            for date in self.schedule
+            for date in sorted(self.schedule + self.completed_dates)
         }
 
     def get_current_progress(self, current_date=None):
