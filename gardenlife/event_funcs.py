@@ -80,7 +80,6 @@ def clear_task_values(window):
         "INTERVAL",
     ):
         window[f"-TASK {value}-"].update("")
-        task = None
 
 
 def update_task_dropdown(window, garden):
