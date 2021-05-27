@@ -1,7 +1,7 @@
 """
-GUI for gardenlife. 
+GUI for gardenlife.
 
-Gardenlife is a garden management app. 
+Gardenlife is a garden management app.
 It allows you to keep track of the creatures and plants in your garden (or gardens).
 You can also use it to schedule one-off/repeat tasks and record progress.
 
@@ -592,7 +592,7 @@ def run_event_loop(logger, gardens, garden, window):
 
             ######################### Manage Garden Events #########################
 
-            if event == "GARDEN CREATE/UPDATE":
+            elif event == "GARDEN CREATE/UPDATE":
                 # Validate garden name and ownership info
                 g_name = values["-GARDEN NAME-"].strip()
                 g_owners = values["-OWNER NAMES-"].strip()
@@ -627,6 +627,8 @@ def run_event_loop(logger, gardens, garden, window):
                     gardens_changed = True
 
             elif event == "GARDEN REMOVE":
+                if not values["-SELECT GARDEN-"]:
+                    continue
                 g_confirmation = popups.remove_confirmation(garden.name, "garden")
                 if g_confirmation == "OK":
                     del gardens[values["-GARDEN NAME-"]]
@@ -670,13 +672,13 @@ def run_event_loop(logger, gardens, garden, window):
 
             ####################### Manage Creatures Events ########################
 
-            if event == "CREATURE CREATE/UPDATE":
+            elif event == "CREATURE CREATE/UPDATE":
                 # Validate garden name, creature name and appeared date
                 c_name = values["-CREATURE NAME-"].strip()
                 c_appeared = values["-CREATURE APPEARED DATE-"].strip()
                 # Check that a garden has been selected
                 if not values["-SELECT GARDEN-"]:
-                    popups.garden_not_selected("creature")
+                    popups.garden_not_selected("creature", "create")
                     continue
                 if not c_name:
                     popups.invalid_name("creature name")
@@ -706,6 +708,9 @@ def run_event_loop(logger, gardens, garden, window):
                     gardens_changed = True
 
             elif event == "CREATURE REMOVE":
+                if not values["-CREATURE NAME-"] in garden.creatures:
+                    popups.item_not_created("creature")
+                    continue
                 c_confirmation = popups.remove_confirmation(values["-CREATURE NAME-"], "creature")
                 if c_confirmation == "OK":
                     garden.remove_item("creatures", values["-CREATURE NAME-"])
@@ -713,12 +718,12 @@ def run_event_loop(logger, gardens, garden, window):
                     event_funcs.clear_creature_values(window)
                     window["-SUMMARY TOTAL CREATURES-"].update(len(garden.creatures))
                     gardens_changed = True
-
-            elif values["-CREATURE NAME-"] == "":
-                event_funcs.clear_creature_values(window)
-
-            # If a creature is selected populate the relevant fields with its values
+            
             elif event == "-CREATURE NAME-":
+                if not values["-CREATURE NAME-"]:
+                    event_funcs.clear_creature_values(window)
+                    continue
+                # If a creature is selected populate the relevant fields with its values
                 creature_instance = garden.creatures.get(values["-CREATURE NAME-"])
                 window["-CREATURE NAME-"].update(creature_instance.name)
                 window["-CREATURE TYPE-"].update(creature_instance.org_type)
@@ -731,7 +736,7 @@ def run_event_loop(logger, gardens, garden, window):
 
             ######################### Manage Plant Events ##########################
 
-            if event == "PLANT CREATE/UPDATE":
+            elif event == "PLANT CREATE/UPDATE":
                 # Validate plant name and planted date
                 p_name = values["-PLANT NAME-"].strip()
                 p_planted = values["-PLANT PLANTED DATE-"].strip()
@@ -768,6 +773,9 @@ def run_event_loop(logger, gardens, garden, window):
                     gardens_changed = True
 
             elif event == "PLANT REMOVE":
+                if not values["-PLANT NAME-"] in garden.plants:
+                    popups.item_not_created("plant")
+                    continue
                 p_confirmation = popups.remove_confirmation(values["-PLANT NAME-"], "plant")
                 if p_confirmation == "OK":
                     garden.remove_item("plants", values["-PLANT NAME-"])
@@ -775,12 +783,12 @@ def run_event_loop(logger, gardens, garden, window):
                     event_funcs.clear_plant_values(window)
                     window["-SUMMARY TOTAL PLANTS-"].update(len(garden.plants))
                     gardens_changed = True
-
-            elif values["-PLANT NAME-"] == "":
-                event_funcs.clear_plant_values(window)
-
-            # If a plant is selected populate the relevant fields with its values
+            
             elif event == "-PLANT NAME-":
+                if not values["-PLANT NAME-"]:
+                    event_funcs.clear_plant_values(window)
+                    continue
+                # If a plant is selected populate the relevant fields with its values
                 plant_instance = garden.plants.get(values["-PLANT NAME-"])
                 window["-PLANT NAME-"].update(plant_instance.name)
                 window["-PLANT TYPE-"].update(plant_instance.org_type)
@@ -794,7 +802,7 @@ def run_event_loop(logger, gardens, garden, window):
 
             ########################## Manage Task Events ##########################
 
-            if event == "TASK CREATE/UPDATE":
+            elif event == "TASK CREATE/UPDATE":
                 # Check that a garden has been selected
                 if not values["-SELECT GARDEN-"]:
                     popups.garden_not_selected("creature")
@@ -868,6 +876,9 @@ def run_event_loop(logger, gardens, garden, window):
                     gardens_changed = True
 
             elif event == "TASK REMOVE":
+                if not values["-TASK NAME-"] in garden.tasks:
+                    popups.item_not_created("task")
+                    continue
                 t_confirmation = popups.remove_confirmation(values["-TASK NAME-"], "task")
                 if t_confirmation == "OK":
                     garden.remove_item("tasks", values["-TASK NAME-"])
@@ -884,18 +895,20 @@ def run_event_loop(logger, gardens, garden, window):
                     )
                     gardens_changed = True
 
-            elif values["-TASK NAME-"] == "":
-                event_funcs.clear_task_values(window)
-                event_funcs.clear_organism_links(window, garden)
-                task = None
-
             elif event == "ADD PROGRESS":
-                if task:
+                # Check the task variable exists and has been assigned to a task
+                if "task" in locals() and task:
                     subwindows.add_progress_window(window, task)
                 else:
-                    popups.task_not_created()
-            # If a task is selected populate the relevant fields with its values
+                    popups.item_not_created("task", "progress can be added")
+            
             elif event == "-TASK NAME-":
+                if not values["-TASK NAME-"]:
+                    event_funcs.clear_task_values(window)
+                    event_funcs.clear_organism_links(window, garden)
+                    task = None
+                    continue
+                # If a task is selected populate the relevant fields with its values
                 task_instance = garden.tasks[values["-TASK NAME-"]]
                 window["-TASK PROGRESS-"].update(task_instance.get_current_progress())
                 window["-TASK NEXT DUE-"].update(task_instance.get_next_due_date())
@@ -910,7 +923,7 @@ def run_event_loop(logger, gardens, garden, window):
                 window["-TASK COUNT-"].update(task_instance.raw_schedule["count"])
                 window["-TASK BY MONTH-"].update(task_instance.raw_schedule["bymonth"])
                 window["-TASK INTERVAL-"].update(task_instance.raw_schedule["interval"])
-                # Assign instance to task variable so progress can be added
+                # Then assign instance to task variable so progress can be added
                 task = task_instance
 
     # Handle fatal exceptions gracefully and log them in the gardenlife.log file
@@ -928,8 +941,8 @@ def run_event_loop(logger, gardens, garden, window):
 def main():
     """
     Run the gardenlife app.
-    
-    Set up error logging, load the gardens dict and most recently created/updated garden, 
+
+    Set up error logging, load the gardens dict and most recently created/updated garden,
     create the window, and run the event loop.
     """
     logging.basicConfig(
