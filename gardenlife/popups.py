@@ -28,17 +28,17 @@ def about():
 
 def garden_not_selected(item):
     return sg.popup(
-        f"It wasn't possible to add the {item} because a garden hasn't been selected. "
+        f"It wasn't possible to create the {item} because a garden hasn't been selected. "
         "Please choose a garden on the Manage Garden tab and try again.",
         title="Garden Not Selected Error",
         keep_on_top=True,
     )
 
 
-def task_not_created():
-    sg.popup(
-        "The task must be created before progress is added.\n",
-        title="Task Not Created Error",
+def item_not_created(item, action="it can be removed"):
+    return sg.popup(
+        f"The {item} must be created before {action}.",
+        title="Item Not Created Error",
         keep_on_top=True,
     )
 
