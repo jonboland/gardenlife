@@ -1,7 +1,8 @@
-from pathlib import Path
 import traceback
 
 import PySimpleGUI as sg
+
+from constants import ICON, LOGO
 
 
 def fatal_error(error):
@@ -17,9 +18,10 @@ def fatal_error(error):
 
 def about():
     sg.popup(
-        "gardenlife v0.1.0\n\n" "A garden management application created by Jon Boland.\n",
-        title="About...",
-        image=str(Path(__file__).resolve().parent / "assets" / "ladybug.png"),
+        "    v0.1.0\n",
+        "    A garden management application created by Jon Boland.\n",
+        title="   About...",
+        image=LOGO,
         keep_on_top=True,
     )
 
@@ -47,7 +49,7 @@ def remove_confirmation(name, element):
         f"This {element} will be permanently deleted.\n",
         "Click OK if you wish to proceed.\n",
         # Added because the global icon doesn't appear to be applied to this popup type
-        icon=Path(__file__).resolve().parent / "assets" / "ladybug.ico",
+        icon=ICON,
         title="Remove Confirmation",
         keep_on_top=True,
     )
