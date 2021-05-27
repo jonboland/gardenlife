@@ -10,6 +10,7 @@ You can also use it to schedule one-off/repeat tasks and record progress.
 from calendar import Calendar
 from datetime import datetime
 from operator import attrgetter
+from pathlib import Path
 import logging
 import pickle
 from tkinter.constants import SUNKEN, GROOVE
@@ -61,6 +62,7 @@ def create_window(gardens, garden):
     sg.theme_input_background_color("light grey")
     sg.theme_input_text_color("black")
     sg.theme_slider_color(ACCENT_COLOR)
+    sg.set_global_icon(Path(__file__).resolve().parent / "assets" / "ladybug.ico")
 
     # -------------------------------------- Menu -------------------------------------- #
 
