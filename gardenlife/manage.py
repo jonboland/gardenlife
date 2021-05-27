@@ -10,7 +10,6 @@ You can also use it to schedule one-off/repeat tasks and record progress.
 from calendar import Calendar
 from datetime import datetime
 from operator import attrgetter
-from pathlib import Path
 import logging
 import pickle
 from tkinter.constants import SUNKEN, GROOVE
@@ -19,7 +18,7 @@ import webbrowser
 import PySimpleGUI as sg
 from PySimpleGUI.PySimpleGUI import Column
 
-from constants import ACCENT_COLOR, FIELD_SIZE, IB_TEXT, MG_FIELD_SIZE, MONTHS, RB_TEXT
+from constants import ACCENT_COLOR, FIELD_SIZE, IB_TEXT, ICON, MG_FIELD_SIZE, MONTHS, RB_TEXT
 from garden import Garden
 from organisms import Creature, Plant
 from task import Task
@@ -62,7 +61,7 @@ def create_window(gardens, garden):
     sg.theme_input_background_color("light grey")
     sg.theme_input_text_color("black")
     sg.theme_slider_color(ACCENT_COLOR)
-    sg.set_global_icon(Path(__file__).resolve().parent / "assets" / "ladybug.ico")
+    sg.set_global_icon(ICON)
 
     # -------------------------------------- Menu -------------------------------------- #
 
@@ -539,7 +538,7 @@ def create_window(gardens, garden):
     layout = [[sg.Menu(menu_definition)], [sg.TabGroup(all_tabs, tab_background_color=ACCENT_COLOR)]]
 
     # Create the window
-    return sg.Window("gardenlife", layout, keep_on_top=True, enable_close_attempted_event=True)
+    return sg.Window("Gardenlife", layout, keep_on_top=True, enable_close_attempted_event=True)
 
 
 ##########################################################################################

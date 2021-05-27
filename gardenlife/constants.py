@@ -1,8 +1,14 @@
+from pathlib import Path
+
 from dateutil.rrule import DAILY, WEEKLY, MONTHLY, YEARLY
+
+
+ASSETS_PATH = Path(__file__).resolve().parent / "assets"
 
 
 # general
 ACCENT_COLOR = "#004225"
+ICON = str(ASSETS_PATH / "gardenlife_icon.ico")
 
 # garden.py
 SEASONS = {
@@ -43,6 +49,9 @@ LEVELS = {
         5: "Rapid Increase",
     },
 }
+
+# popups.py
+LOGO = str(ASSETS_PATH / "gardenlife_logo.png")
 
 # subwindows.py
 CREATURE_HEADS = ("Name", "Type", "Appeared", "Impact", "Prevalence", "Trend", "Status")
