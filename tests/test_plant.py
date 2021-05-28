@@ -16,12 +16,12 @@ def sunflower():
 
 
 def test_impact_neutral(sunflower):
-    assert sunflower.get_level("impact") == "neutral"
+    assert sunflower.get_level("impact") == "Neutral"
 
 
 def test_prevalence_low(sunflower):
     sunflower.prevalence = 1
-    assert sunflower.get_level("prevalence") == "very low"
+    assert sunflower.get_level("prevalence") == "Very Low"
 
 
 def test_invalid_trend_level(sunflower):
@@ -43,12 +43,12 @@ def test_plant_str(sunflower):
 
 
 def test_current(sunflower):
-    assert sunflower.status.status == "current"
+    assert sunflower.status.status == "Current"
 
 
 def test_archived(sunflower):
     sunflower.status.archive()
-    assert sunflower.status.status == "archived"
+    assert sunflower.status.status == "Archived"
 
 
 def test_invalid_status(sunflower):
