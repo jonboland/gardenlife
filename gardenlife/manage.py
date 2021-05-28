@@ -1,13 +1,12 @@
 """
 GUI for gardenlife.
 
-Gardenlife is a garden management app.
+Gardenlife is a garden management application.
 It allows you to keep track of the creatures and plants in your garden (or gardens).
 You can also use it to schedule one-off/repeat tasks and record progress.
 
 """
 
-# from calendar import Calendar
 from datetime import datetime
 from operator import attrgetter
 import logging
@@ -16,7 +15,6 @@ from tkinter.constants import SUNKEN, GROOVE
 import webbrowser
 
 import PySimpleGUI as sg
-# from PySimpleGUI.PySimpleGUI import Column
 
 from constants import ACCENT_COLOR, FIELD_SIZE, IB_TEXT, ICON, MG_FIELD_SIZE, MONTHS, RB_TEXT
 from garden import Garden
@@ -582,10 +580,10 @@ def run_event_loop(logger, gardens, garden, window):
                 subwindows.view_creatures_window(window, garden)
 
             elif event == "VIEW ALL PLANTS":
-                subwindows.view_plants_window(window, garden, "name")
+                subwindows.view_plants_window(window, garden)
 
             elif event == "VIEW EDIBLE PLANTS":
-                subwindows.view_plants_window(window, garden, "edible")
+                subwindows.view_plants_window(window, garden, attr="edible")
 
             elif event == "VIEW ALL TASKS":
                 subwindows.view_tasks_window(window, garden)
@@ -922,7 +920,7 @@ def run_event_loop(logger, gardens, garden, window):
 
 def main():
     """
-    Run the gardenlife app.
+    Run the gardenlife application.
 
     Set up error logging, load the gardens dict and most recently created/updated garden,
     create the window, and run the event loop.
