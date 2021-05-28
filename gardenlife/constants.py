@@ -1,3 +1,5 @@
+"""Constants for the gardenlife application."""
+
 from pathlib import Path
 
 from dateutil.rrule import DAILY, WEEKLY, MONTHLY, YEARLY
@@ -9,6 +11,7 @@ ASSETS_PATH = Path(__file__).resolve().parent / "assets"
 # general
 ACCENT_COLOR = "#004225"
 ICON = str(ASSETS_PATH / "gardenlife_icon.ico")
+VERSION_NUMBER = "v0.1.0"
 
 # garden.py
 SEASONS = {
