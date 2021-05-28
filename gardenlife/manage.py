@@ -399,6 +399,7 @@ def create_window(gardens, garden):
             size=(17, 5),
             pad=((1, 26), 0),
             highlight_background_color=ACCENT_COLOR,
+            tooltip="Ctrl/Command click to select multiple items",
             key="-TASK LINKED CREATURES-",
         ),
         sg.Listbox(
