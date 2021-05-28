@@ -19,12 +19,12 @@ def badger():
 
 
 def test_impact_neutral(badger):
-    assert badger.get_level("impact") == "neutral"
+    assert badger.get_level("impact") == "Neutral"
 
 
 def test_prevalence_low(badger):
     badger.prevalence = 1
-    assert badger.get_level("prevalence") == "very low"
+    assert badger.get_level("prevalence") == "Very Low"
 
 
 def test_invalid_impact_level(badger):
@@ -44,7 +44,7 @@ def test_notes(badger):
 def test_unarchived(badger):
     badger.status.archive()
     badger.status.unarchive()
-    assert badger.status.status == "current"
+    assert badger.status.status == "Current"
 
 
 if __name__ == "__main__":
