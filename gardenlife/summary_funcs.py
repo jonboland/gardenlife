@@ -1,3 +1,5 @@
+"""Summary functions for the gardenlife application."""
+
 from operator import attrgetter
 
 import PySimpleGUI as sg
@@ -5,18 +7,22 @@ from constants import ACCENT_COLOR
 
 
 def summary_head_format(title):
+    """Apply formatting to summary headings."""
     return sg.Input(title, size=(13, 1), text_color="white", background_color=ACCENT_COLOR)
 
 
 def summary_field_format(value):
+    """Apply formatting to a summary field."""
     return sg.Input(value, size=(13, 1))
 
 
 def organism_column_format(table):
+    """Apply formatting to creature and plant summary columns."""
     return sg.Column(table, size=(750, 500), scrollable=True)
 
 
 def creature_fields(creature):
+    """Return formatted summary fields for a creature."""
     values = (
         creature.name,
         creature.org_type,
@@ -30,6 +36,7 @@ def creature_fields(creature):
 
 
 def plant_fields(plant):
+    """Return formatted summary fields for a plant."""
     values = (
         plant.name,
         plant.org_type,
@@ -43,7 +50,7 @@ def plant_fields(plant):
 
 
 def task_fields(task):
-    """Converts task values into task summary fields."""
+    """Return formatted summary fields for a task."""
     name_field = [sg.Input(task.name, size=(18, 1))]
     other_values = (
         task.get_current_progress(),
@@ -58,14 +65,14 @@ def task_fields(task):
     return name_field + other_fields
 
 
-def sorted_organisms(organisms, sort_key):
-    """Sorts organism instances by archived status then by sort key."""
+def sorted_organisms(organisms, sort_key="name"):
+    """Sort organism instances by archived status then by sort key."""
     organisms = sorted(organisms, key=attrgetter(sort_key))
     return sorted(organisms, key=lambda organism: str(organism.status), reverse=True)
 
 
 def sorted_tasks(tasks):
-    """Sorts tasks instances by status, progress, due date, assignee, and name."""
+    """Sort tasks instances by status, progress, due date, assignee, and name."""
     tasks = list(tasks)
     tasks.sort(key=attrgetter("assignee", "name"))
     tasks.sort(key=lambda task: task.get_next_due_date())
