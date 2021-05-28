@@ -87,6 +87,16 @@ def update_task_dropdown(window, garden):
     return window["-TASK NAME-"].update(values=task_names, size=(25, 10))
 
 
+def update_task_summaries(window, garden):
+    window["-SUMMARY TOTAL TASKS-"].update(len(garden.tasks))
+    window["-SUMMARY OUTSTANDING TASKS-"].update(
+        sum(
+            task.get_current_progress() in {"Due", "Overdue", "Very overdue"}
+            for task in garden.tasks.values()
+        )
+    )
+
+
 def clear_organism_links(window, garden):
     window["-TASK LINKED CREATURES-"].update(sorted(list(garden.creatures)))
     window["-TASK LINKED PLANTS-"].update(sorted(list(garden.plants)))
