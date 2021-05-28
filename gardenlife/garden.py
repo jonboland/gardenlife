@@ -1,3 +1,4 @@
+
 from datetime import datetime
 from time import strftime
 
@@ -58,6 +59,7 @@ class Garden:
         return exact_days + approx_years if years > 2 else exact_days
 
     def garden_size(self):
+        """Return garden size in acres."""
         acres = "acre" if self.size in {1, "1"} else "acres"
         return f"{self.size} {acres}"
 

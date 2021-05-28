@@ -6,6 +6,7 @@ from status import Status
 
 
 class Task:
+    """Class to represent a garden task."""
     def __init__(
         self,
         name,
@@ -33,7 +34,7 @@ class Task:
         return repr(self) == other
 
     def set_schedule(self, start_date, freq, count, bymonth, interval):
-        """Sets the task's scheduled dates using dateutils.rrule."""
+        """Set task's scheduled dates using dateutils.rrule."""
         # Stores the raw schedule values to repopulate UI fields
         self.raw_schedule = {
             "start date": start_date,
@@ -62,8 +63,8 @@ class Task:
 
     def update_completed_dates(self, all_progress):
         """
-        Takes a dict containing all scheduled dates as keys in string format.
-        Adds or removes dates from completed dates list based on their boolean values.
+        Take a dict containing all scheduled dates as keys in string format.
+        Add or removes dates from completed dates list based on their boolean values.
         """
         for date_string, boolean in all_progress.items():
             date = self._string_to_date(date_string)
@@ -74,12 +75,12 @@ class Task:
         self.completed_dates.sort()
 
     def _add_completed_date(self, date):
-        # Adds date to completed date list if not already present
+        # Add date to completed date list if not already present
         if date not in self.completed_dates:
             self.completed_dates.append(date)
 
     def _remove_completed_date(self, date):
-        # Removes date from completed date list
+        # Remove date from completed dates list
         try:
             self.completed_dates.remove(date)
         except ValueError:
@@ -87,7 +88,7 @@ class Task:
 
     def get_all_progress(self):
         """
-        Returns a dict containing all scheduled dates in string format with bool
+        Return a dict containing all scheduled dates in string format with bool
         indicating whether they are in the completed dates list.
         Any completed dates that are not in the current schedule are also included.
         """
@@ -97,7 +98,7 @@ class Task:
         }
 
     def get_current_progress(self, current_date=None):
-        """Returns current task progress."""
+        """Return current task progress."""
         # Convert string to datetime object. Set current date to today if no date supplied
         current_date = self._set_date(current_date)
 
@@ -129,6 +130,7 @@ class Task:
         return "Completed"
 
     def get_next_due_date(self):
+        """Return task's next due date in string format."""
         if not self.completed_dates:
             return self._date_to_string(self.schedule[0])
         elif self.schedule[-1] <= self.completed_dates[-1]:
@@ -145,9 +147,9 @@ class Task:
         return datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)
 
     def _string_to_date(self, date_string):
-        # Converts a string into a datetime object
+        # Convert a string into a datetime object
         return datetime.strptime(date_string, "%d/%m/%Y")
 
     def _date_to_string(self, date_object):
-        # Converts a datetime object into a string
+        # Convert a datetime object into a string
         return datetime.strftime(date_object, "%d/%m/%Y")

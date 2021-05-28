@@ -1,3 +1,5 @@
+"""Subwindows for the gardenlife application."""
+
 import pickle
 import sys
 
@@ -8,6 +10,10 @@ import summary_funcs
 
 
 def unsaved_changes_window(window, gardens):
+    """
+    Display confirmation window when user attempts to close the application 
+    with unsaved changes. Options are save, don't save, and cancel.
+    """
     window.Disable()
 
     confirm_layout = [
@@ -43,6 +49,7 @@ def unsaved_changes_window(window, gardens):
 
 
 def add_progress_window(window, task):
+    """Display window enabling user to add progress to the selected task."""
     window.Disable()
 
     progress_layout = [
@@ -75,13 +82,14 @@ def add_progress_window(window, task):
 
 
 def view_creatures_window(window, garden):
+    """Display window containing summary of all the creatures in the currently selected garden."""
     window.Disable()
 
     header_row = [[summary_funcs.summary_head_format(title) for title in CREATURE_HEADS]]
 
     creatures = [
         summary_funcs.creature_fields(creature)
-        for creature in summary_funcs.sorted_organisms(garden.creatures.values(), sort_key="name")
+        for creature in summary_funcs.sorted_organisms(garden.creatures.values())
     ]
 
     creature_table = header_row + creatures
@@ -102,14 +110,18 @@ def view_creatures_window(window, garden):
             break
 
 
-def view_plants_window(window, garden, attr):
+def view_plants_window(window, garden, attr="name"):
+    """
+    Display window containing summary of the plants in the currently selected garden.
+    The window can be filtered by an attribute such as whether the plant is edible.
+    """
     window.Disable()
 
     header_row = [[summary_funcs.summary_head_format(title) for title in PLANT_HEADS]]
 
     plants = [
         summary_funcs.plant_fields(plant)
-        for plant in summary_funcs.sorted_organisms(garden.plants.values(), sort_key="name")
+        for plant in summary_funcs.sorted_organisms(garden.plants.values())
         if getattr(plant, attr)
     ]
 
@@ -132,6 +144,10 @@ def view_plants_window(window, garden, attr):
 
 
 def view_tasks_window(window, garden):
+    """
+    Display window containing summary of the tasks in the currently selected garden.
+    The tasks are sorted by status, progress, due date, assignee, and name.
+    """
     window.Disable()
 
     name_head = [

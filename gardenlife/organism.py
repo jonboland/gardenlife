@@ -3,6 +3,7 @@ from status import Status
 
 
 class Organism:
+    """Class to represent an organism."""
     def __init__(
         self,
         name,  # Eg Badger, Mouse, Ash, Leek
