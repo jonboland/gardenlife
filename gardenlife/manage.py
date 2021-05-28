@@ -7,7 +7,7 @@ You can also use it to schedule one-off/repeat tasks and record progress.
 
 """
 
-from calendar import Calendar
+# from calendar import Calendar
 from datetime import datetime
 from operator import attrgetter
 import logging
@@ -16,7 +16,7 @@ from tkinter.constants import SUNKEN, GROOVE
 import webbrowser
 
 import PySimpleGUI as sg
-from PySimpleGUI.PySimpleGUI import Column
+# from PySimpleGUI.PySimpleGUI import Column
 
 from constants import ACCENT_COLOR, FIELD_SIZE, IB_TEXT, ICON, MG_FIELD_SIZE, MONTHS, RB_TEXT
 from garden import Garden
@@ -553,7 +553,7 @@ def run_event_loop(logger, gardens, garden, window):
     try:
         while True:
             event, values = window.read()
-            print(event, values)
+            # print(event, values)
 
             ##################### Menu & Window Closure Events #####################
 
@@ -659,13 +659,7 @@ def run_event_loop(logger, gardens, garden, window):
                     window["-SUMMARY OWNED FOR-"].update(garden.ownership_length())
                     window["-SUMMARY TOTAL CREATURES-"].update(len(garden.creatures))
                     window["-SUMMARY TOTAL PLANTS-"].update(len(garden.plants))
-                    window["-SUMMARY TOTAL TASKS-"].update(len(garden.tasks))
-                    window["-SUMMARY OUTSTANDING TASKS-"].update(
-                        sum(
-                            task.get_current_progress() in {"Due", "Overdue", "Very overdue"}
-                            for task in garden.tasks.values()
-                        )
-                    )
+                    event_funcs.update_task_summaries(window, garden)
                 # Then update the item dropdowns and clear item field values and links
                 event_funcs.update_all_item_dropdowns(window, garden)
                 event_funcs.clear_all_item_values_and_links(window, garden)
@@ -678,7 +672,7 @@ def run_event_loop(logger, gardens, garden, window):
                 c_appeared = values["-CREATURE APPEARED DATE-"].strip()
                 # Check that a garden has been selected
                 if not values["-SELECT GARDEN-"]:
-                    popups.garden_not_selected("creature", "create")
+                    popups.garden_not_selected("creature")
                     continue
                 if not c_name:
                     popups.invalid_name("creature name")
@@ -718,7 +712,7 @@ def run_event_loop(logger, gardens, garden, window):
                     event_funcs.clear_creature_values(window)
                     window["-SUMMARY TOTAL CREATURES-"].update(len(garden.creatures))
                     gardens_changed = True
-            
+
             elif event == "-CREATURE NAME-":
                 if not values["-CREATURE NAME-"]:
                     event_funcs.clear_creature_values(window)
@@ -783,7 +777,7 @@ def run_event_loop(logger, gardens, garden, window):
                     event_funcs.clear_plant_values(window)
                     window["-SUMMARY TOTAL PLANTS-"].update(len(garden.plants))
                     gardens_changed = True
-            
+
             elif event == "-PLANT NAME-":
                 if not values["-PLANT NAME-"]:
                     event_funcs.clear_plant_values(window)
@@ -805,7 +799,7 @@ def run_event_loop(logger, gardens, garden, window):
             elif event == "TASK CREATE/UPDATE":
                 # Check that a garden has been selected
                 if not values["-SELECT GARDEN-"]:
-                    popups.garden_not_selected("creature")
+                    popups.garden_not_selected("task")
                     continue
                 # Strip and validate task name and set schedule values
                 # NB: Frequency is not validated because it's a readonly dropdown
@@ -866,13 +860,7 @@ def run_event_loop(logger, gardens, garden, window):
                     event_funcs.clear_organism_links(window, garden)
                     task = None
                     # Update the task numbers shown on the summary tab
-                    window["-SUMMARY TOTAL TASKS-"].update(len(garden.tasks))
-                    window["-SUMMARY OUTSTANDING TASKS-"].update(
-                        sum(
-                            task.get_current_progress() in {"Due", "Overdue", "Very overdue"}
-                            for task in garden.tasks.values()
-                        )
-                    )
+                    event_funcs.update_task_summaries(window, garden)
                     gardens_changed = True
 
             elif event == "TASK REMOVE":
@@ -886,13 +874,7 @@ def run_event_loop(logger, gardens, garden, window):
                     event_funcs.clear_task_values(window)
                     task = None
                     event_funcs.clear_organism_links(window, garden)
-                    window["-SUMMARY TOTAL TASKS-"].update(len(garden.tasks))
-                    window["-SUMMARY OUTSTANDING TASKS-"].update(
-                        sum(
-                            task.get_current_progress() in {"Due", "Overdue", "Very overdue"}
-                            for task in garden.tasks.values()
-                        )
-                    )
+                    event_funcs.update_task_summaries(window, garden)
                     gardens_changed = True
 
             elif event == "ADD PROGRESS":
@@ -901,7 +883,7 @@ def run_event_loop(logger, gardens, garden, window):
                     subwindows.add_progress_window(window, task)
                 else:
                     popups.item_not_created("task", "progress can be added")
-            
+
             elif event == "-TASK NAME-":
                 if not values["-TASK NAME-"]:
                     event_funcs.clear_task_values(window)
@@ -927,9 +909,9 @@ def run_event_loop(logger, gardens, garden, window):
                 task = task_instance
 
     # Handle fatal exceptions gracefully and log them in the gardenlife.log file
-    except Exception as e:
+    except Exception as ex:
         logger.exception("Fatal Error")
-        popups.fatal_error(e)
+        popups.fatal_error(ex)
 
     # Finish up by removing from the screen
     window.close()
