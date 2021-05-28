@@ -39,18 +39,18 @@ def prune_tree():
 
 
 def test_status_current(cut_hedges):
-    assert cut_hedges.status.get() == "current"
+    assert cut_hedges.status.get() == "Current"
 
 
 def test_status_archived(cut_hedges):
     cut_hedges.status.archive()
-    assert cut_hedges.status.get() == "archived"
+    assert cut_hedges.status.get() == "Archived"
 
 
 def test_status_unarchived(cut_hedges):
     cut_hedges.status.archive()
     cut_hedges.status.unarchive()
-    assert cut_hedges.status.get() == "current"
+    assert cut_hedges.status.get() == "Current"
 
 
 # Equality
