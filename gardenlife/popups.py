@@ -2,7 +2,6 @@
 Popups for the gardenlife application.
 """
 
-
 import traceback
 
 import PySimpleGUI as sg
