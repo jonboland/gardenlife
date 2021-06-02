@@ -889,8 +889,7 @@ def run_event_loop(logger, gardens, garden, window):
             elif event == "ADD PROGRESS":
                 # Check the task variable exists and has been assigned to a task
                 if "task" in locals() and task:
-                    added = subwindows.add_progress_window(window, task)
-                    if added:
+                    if subwindows.add_progress_window(window, task):
                         gardens_changed = True
                 else:
                     popups.item_not_created("task", "progress can be added")
