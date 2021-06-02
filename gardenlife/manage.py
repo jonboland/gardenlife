@@ -412,7 +412,7 @@ def create_window(gardens, garden):
     ]
 
     task_status = [
-        sg.Text("Status:", size=(8, 1), pad=((2, 0), 10)),
+        sg.Text("Status:", size=(10, 1), pad=((2, 0), 10)),
         sg.Combo(
             ["", "Current", "Archived"],
             size=FIELD_SIZE,
@@ -722,6 +722,7 @@ def run_event_loop(logger, gardens, garden, window):
                 if not values["-CREATURE NAME-"]:
                     event_funcs.clear_creature_values(window)
                     continue
+                # elif values["-CREATURE NAME-"]
                 # If a creature is selected populate the relevant fields with its values
                 creature_instance = garden.creatures.get(values["-CREATURE NAME-"])
                 window["-CREATURE NAME-"].update(creature_instance.name)
@@ -889,7 +890,9 @@ def run_event_loop(logger, gardens, garden, window):
             elif event == "ADD PROGRESS":
                 # Check the task variable exists and has been assigned to a task
                 if "task" in locals() and task:
-                    subwindows.add_progress_window(window, task)
+                    added = subwindows.add_progress_window(window, task)
+                    if added:
+                        gardens_changed = True
                 else:
                     popups.item_not_created("task", "progress can be added")
 
