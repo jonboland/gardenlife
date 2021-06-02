@@ -722,7 +722,6 @@ def run_event_loop(logger, gardens, garden, window):
                 if not values["-CREATURE NAME-"]:
                     event_funcs.clear_creature_values(window)
                     continue
-                # elif values["-CREATURE NAME-"]
                 # If a creature is selected populate the relevant fields with its values
                 creature_instance = garden.creatures.get(values["-CREATURE NAME-"])
                 window["-CREATURE NAME-"].update(creature_instance.name)
