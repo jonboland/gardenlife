@@ -412,7 +412,7 @@ def create_window(gardens, garden):
     ]
 
     task_status = [
-        sg.Text("Status:", size=(8, 1), pad=((2, 0), 10)),
+        sg.Text("Status:", size=(10, 1), pad=((2, 0), 10)),
         sg.Combo(
             ["", "Current", "Archived"],
             size=FIELD_SIZE,
@@ -889,7 +889,8 @@ def run_event_loop(logger, gardens, garden, window):
             elif event == "ADD PROGRESS":
                 # Check the task variable exists and has been assigned to a task
                 if "task" in locals() and task:
-                    subwindows.add_progress_window(window, task)
+                    if subwindows.add_progress_window(window, task):
+                        gardens_changed = True
                 else:
                     popups.item_not_created("task", "progress can be added")
 

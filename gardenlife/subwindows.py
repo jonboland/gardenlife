@@ -74,8 +74,11 @@ def add_progress_window(window, task):
 
         if progress_event == "Add":
             task.update_completed_dates(progress_values)
+            progress_window.close()
+            window.Enable()
+            return True
 
-        if progress_event in (sg.WIN_CLOSED, "Add"):
+        if progress_event == sg.WIN_CLOSED:
             progress_window.close()
             window.Enable()
             break
