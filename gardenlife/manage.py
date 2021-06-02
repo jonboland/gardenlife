@@ -697,6 +697,10 @@ def run_event_loop(logger, gardens, garden, window):
                     garden.add_item("creatures", creature)
                     event_funcs.update_creature_dropdowns(window, garden)
                     event_funcs.clear_creature_values(window)
+                    # Clear the task fields and organism links
+                    event_funcs.clear_task_values(window)
+                    event_funcs.clear_organism_links(window, garden)
+                    # Update the associated summary field
                     window["-SUMMARY TOTAL CREATURES-"].update(len(garden.creatures))
                     gardens_changed = True
 
@@ -709,6 +713,8 @@ def run_event_loop(logger, gardens, garden, window):
                     garden.remove_item("creatures", values["-CREATURE NAME-"])
                     event_funcs.update_creature_dropdowns(window, garden)
                     event_funcs.clear_creature_values(window)
+                    event_funcs.clear_task_values(window)
+                    event_funcs.clear_organism_links(window, garden)
                     window["-SUMMARY TOTAL CREATURES-"].update(len(garden.creatures))
                     gardens_changed = True
 
@@ -762,6 +768,8 @@ def run_event_loop(logger, gardens, garden, window):
                     garden.add_item("plants", plant)
                     event_funcs.update_plant_dropdowns(window, garden)
                     event_funcs.clear_plant_values(window)
+                    event_funcs.clear_task_values(window)
+                    event_funcs.clear_organism_links(window, garden)
                     window["-SUMMARY TOTAL PLANTS-"].update(len(garden.plants))
                     gardens_changed = True
 
@@ -774,6 +782,8 @@ def run_event_loop(logger, gardens, garden, window):
                     garden.remove_item("plants", values["-PLANT NAME-"])
                     event_funcs.update_plant_dropdowns(window, garden)
                     event_funcs.clear_plant_values(window)
+                    event_funcs.clear_task_values(window)
+                    event_funcs.clear_organism_links(window, garden)
                     window["-SUMMARY TOTAL PLANTS-"].update(len(garden.plants))
                     gardens_changed = True
 
