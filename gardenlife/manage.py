@@ -50,6 +50,7 @@ def load_garden(gardens):
 def create_window(gardens, garden):
     """
     Define the layout and create the window.
+    
     Use details from the loaded garden (and gardens dict) to populate fields and dropdowns.
     """
     # -------------------------------------- Theme ------------------------------------- #
@@ -544,7 +545,14 @@ def create_window(gardens, garden):
 
 
 def run_event_loop(logger, gardens, garden, window):
-    """Display and interact with the main window and subwindows using an event loop."""
+    """
+    Display and interact with the main window and subwindows using an event loop.
+
+    Create, select, display, update, and remove gardens 
+    and the creatures, plants, and tasks they contain.
+    Save the gardens dict as gardens.pickle.
+    If a fatal exception occurs, log it in gardenlife.log.
+    """
 
     # Keeps track of whether any changes have been made since the gardens dict was saved
     gardens_changed = False
@@ -889,6 +897,7 @@ def run_event_loop(logger, gardens, garden, window):
             elif event == "ADD PROGRESS":
                 # Check the task variable exists and has been assigned to a task
                 if "task" in locals() and task:
+                    # Open the progress subwindow and set gardens_changed flag if progress added
                     if subwindows.add_progress_window(window, task):
                         gardens_changed = True
                 else:
