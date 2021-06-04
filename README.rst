@@ -179,4 +179,4 @@ Don’t forget to click the *CREATE/UPDATE* button whenever you make changes tha
 
 Remember to save the changes you’ve made to your garden (or gardens) periodically and before closing gardenlife.
 
-.. _`here`: https://github.com/jonboland/productselector/raw/master/docs/gardenlife.zip
+.. _`gardenlife`: https://github.com/jonboland/productselector/raw/master/docs/gardenlife.zip
