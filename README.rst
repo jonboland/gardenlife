@@ -5,17 +5,14 @@
 
 A garden management application.
 
-Gardenlife helps you keep track of all the creatures and plants in your garden (or gardens).
-You can also use it to schedule one-off/repeat tasks and record progress.
+Gardenlife helps you keep track of all the creatures and plants in your garden (or gardens). You can also use it to schedule one-off/repeat tasks and record progress.
 
 Usage
 ~~~~~
 
-Gardenlife is a desktop application written in Python that can be run via an executable file. 
-It isn’t necessary to install a Python interpreter or any modules.
+Gardenlife is a desktop application written in Python that can be run via an executable file. It isn’t necessary to install a Python interpreter or any modules.
 
-A version compatible with Windows 10 can be downloaded by clicking `gardenlife`_.
-Simply unzip the folder, place it in your chosen location, and double click the .exe file.
+A version compatible with Windows 10 can be downloaded by clicking `gardenlife`_. Simply unzip the folder, place it in your chosen location, and double click the .exe file.
 
 Demo
 ~~~~
@@ -78,12 +75,7 @@ The prevalence slider can be used to indicate how common the creature is in your
 
 Lastly, the trend level lets you record whether sightings of the creature seem to be increasing, decreasing, or staying stable.
 
-As with some of gardenlife’s other fields, if you hover your mouse over the sliders, tips about using them will appear.
-
-.. figure:: docs/impact_hover_text.png
-  :alt: The manage creatures tab of the gardenlife application with the creature Bee selected and impact level hover text displayed.
-
-|
+As with some of gardenlife’s other fields, if you hover your mouse over the sliders, tips about using them will appear. You can read more about this in the *Tips & Reminders* section at the end of this guide.
 
 The notes field can be used to record more detailed information, like the exact number of a particular creature in your garden, when you last saw one, or how it’s currently behaving.
 
@@ -187,6 +179,14 @@ The *Help* menu allows you to view information about gardenlife and open the web
 
 Tips & Reminders
 ****************
+
+As mentioned in the manage creatures section of this guide, if you hover your mouse over the impact, prevalence, and trend level sliders, tips about using them will appear. This also works on all date fields, along with the linked creatures and progress sections of the *Manage Tasks* tab.
+
+.. figure:: docs/impact_hover_text.png
+  :alt: The manage creatures tab of the gardenlife application with the creature Bee selected and impact level hover text displayed.
+
+|
+
 You can base a garden, creature, plant, or task on another by selecting it and changing the name before clicking the *CREATE/UPDATE* button.
 
 Leaving the task schedule entirely blank will create a one-off task due on the day it was created.
@@ -195,6 +195,6 @@ If you add progress to a task and then change its schedule to different dates, c
 
 Don’t forget to click the *CREATE/UPDATE* button whenever you make changes that you want to keep! If you alter something and select another item from the dropdown list without doing this, the update will be lost.
 
-Remember to save the changes you’ve made to your garden (or gardens) periodically and before closing gardenlife.
+Lastly, remember to save the changes you’ve made to your garden (or gardens) periodically and before closing gardenlife.
 
 .. _`gardenlife`: https://github.com/jonboland/gardenlife/raw/master/docs/gardenlife.zip
