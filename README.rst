@@ -54,6 +54,8 @@ Now that your garden has been added, you can view a summary of its details on th
 .. figure:: docs/garden_summary_no_items.png
   :alt: The garden summary tab of the gardenlife application displaying details for a garden called Our Garden.
 
+|
+
 As you can see, the information entered on the *Manage Garden* tab has been used to populate the relevant fields. There are several totals towards the bottom of the tab, all initially set to zero. These numbers automatically grow as you begin to add creatures, plants, and tasks to your garden. The outstanding tasks total will show any tasks you have added that are due, overdue, or very overdue (you can read more about this in the *Manage Tasks* section below).
 
 Right at the bottom, there is a field that displays the current season.
@@ -65,6 +67,8 @@ The *Manage Creatures* tab lets you create, update, and remove creatures from th
 
 .. figure:: docs/manage_creatures_blank.png
   :alt: The manage creatures tab of the gardenlife application before it has been populated.
+
+|
 
 To create your first creature, you need to add its name and type to the relevant fields and fill in any other details that you want to record. You can use the *PICK* button to select the date the creature first appeared. You can also set the impact, prevalence, and trend levels for the creature using the provided sliders. 
 
@@ -79,6 +83,8 @@ As with some of gardenlife’s other fields, if you hover your mouse over the sl
 .. figure:: docs/impact_hover_text.png
   :alt: The manage creatures tab of the gardenlife application with the creature Bee selected and impact level hover text displayed.
 
+|
+
 The notes field can be used to record more detailed information, like the exact number of a particular creature in your garden, when you last saw one, or how it’s currently behaving.
 
 Once you’ve inserted the creature’s details, you need to click the *CREATE/UPDATE* button to add it to your garden.
@@ -87,6 +93,8 @@ Most of the fields on this tab (and those on the plants and tasks tabs) are opti
 
 .. figure:: docs/date_format_error.png
   :alt: The gardenlife application’s date format error pop-up message.
+
+|
 
 If you want to view, update, or remove an existing creature, you just need to select it by clicking the arrow next to the creature name field.
 
@@ -101,6 +109,8 @@ If you know how to use the *Manage Creatures* tab, then you know how to use the 
 .. figure:: docs/manage_plants_radish.png
   :alt: The manage plants tab of the gardenlife application with Radish selected.
 
+|
+
 The only major difference is the tickbox labelled ‘edible’, used to identify vegetables, fruits, and herbs. Any plant flagged in this way can be viewed in a dedicated summary report to help you keep track of your veg patch or herb garden.
 
 Manage Tasks
@@ -110,6 +120,8 @@ The *Manage Tasks* tab shares many similarities with the *Manage Creatures* and 
 
 .. figure:: docs/manage_tasks_water_veg.png
   :alt: The manage tasks tab of the gardenlife application with the task Water veg 2021 selected.
+
+|
 
 You can add an assignee for each task you create, along with an estimate of how long it will take and a more detailed description. You can also specify which creatures and plants are linked to the task by selecting them from the provided lists. If you want to link several creatures or plants to a task, simply ctrl/command-click to choose each one.
 
@@ -146,6 +158,8 @@ Clicking the *ADD PROGRESS* button opens a window with a list of all the due dat
 .. figure:: docs/add_progress.png
   :alt: The gardenlife application’s add progress window.
 
+|
+
 There’s nothing to stop you from ticking tasks off early; and, if you miss a scheduled date entirely, you can just leave it unticked. Once you tick a later date, progress will automatically be calculated from that point. 
 
 Summary Reports
@@ -155,6 +169,8 @@ When you’ve added some creatures, plants, and tasks to your garden, you can vi
 
 .. figure:: docs/task_summary_report.png
   :alt: The gardenlife application’s task summary report containing nine tasks.
+
+|
 
 Anything marked as archived will be placed at the end of the reports. Also, to help you focus on what most needs your attention, the task summary report is ordered by progress, due date, and assignee.
 
