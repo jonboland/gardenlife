@@ -113,7 +113,7 @@ def view_creatures_window(window, garden):
             break
 
 
-def view_plants_window(window, garden, attr="name"):
+def view_plants_window(window, garden, attr="name", title=""):
     """
     Display window containing summary of the plants in the currently selected garden.
     The window can be filtered by an attribute such as whether the plant is edible.
@@ -134,7 +134,7 @@ def view_plants_window(window, garden, attr="name"):
 
     plant_summary_layout = [plant_summary_column, [sg.Button("Close")]]
 
-    plant_summary_window = sg.Window("Plant Summary", plant_summary_layout, keep_on_top=True)
+    plant_summary_window = sg.Window(f"{title}Plant Summary", plant_summary_layout, keep_on_top=True)
 
     while True:
         plant_sum_event, plant_sum_values = plant_summary_window.read()
