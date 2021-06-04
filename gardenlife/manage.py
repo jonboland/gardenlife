@@ -592,7 +592,7 @@ def run_event_loop(logger, gardens, garden, window):
                 subwindows.view_plants_window(window, garden)
 
             elif event == "VIEW EDIBLE PLANTS":
-                subwindows.view_plants_window(window, garden, attr="edible")
+                subwindows.view_plants_window(window, garden, attr="edible", title="Edible ")
 
             elif event == "VIEW ALL TASKS":
                 subwindows.view_tasks_window(window, garden)
