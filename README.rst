@@ -41,6 +41,8 @@ The first time you fire up gardenlife, most of its fields will be completely bla
 .. figure:: docs/manage_garden_blank.png
   :alt: The manage garden tab of the gardenlife application before it has been populated.
 
+|
+
 When you’ve added the info, you need to hit the *CREATE/UPDATE* button. This will clear all the fields, but when you select your garden from the dropdown list near the top of the tab, they will reappear.
 
 If you want to keep track of more than one garden, you can add as many as you like in the same way. You can also remove the currently selected garden by clicking the *REMOVE* button.
