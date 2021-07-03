@@ -1,4 +1,4 @@
-.. figure:: docs/gardenlife_logo.png
+.. figure:: docs/gardenlife_logo_outline.png
   :alt: Gardenlife logo. A stylised red ladybug with the text gardenlife.
 
 |
